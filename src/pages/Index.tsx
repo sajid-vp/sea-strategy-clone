@@ -103,6 +103,7 @@ const Index = () => {
   const [isEditingMission, setIsEditingMission] = useState(false);
   const [tempVision, setTempVision] = useState(vision);
   const [tempMission, setTempMission] = useState(mission);
+  const [selectedPeriod, setSelectedPeriod] = useState("all");
 
   const handleSaveVision = () => {
     setVision(tempVision);
@@ -227,7 +228,22 @@ const Index = () => {
 
         {/* Goals Section */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Goals</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-foreground">Goals</h2>
+            <div className="w-64">
+              <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by period" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All periods</SelectItem>
+                  <SelectItem value="2025-2028">2025-2028</SelectItem>
+                  <SelectItem value="2025-2026">2025-2026</SelectItem>
+                  <SelectItem value="2027-2028">2027-2028</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <Accordion type="multiple" className="space-y-4">
             {goals.map((goal) => {
               const totalKPIs = goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0);
