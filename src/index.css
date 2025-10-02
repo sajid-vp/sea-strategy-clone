@@ -39,8 +39,8 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
+    --border: 140 39% 65%; /* #86C69C - SEA Green */
+    --input: 140 39% 65%;
     --ring: 212 57% 64%; /* Primary blue */
 
     --radius: 0.75rem;
@@ -97,8 +97,8 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
+    --border: 140 39% 45%; /* #86C69C darker for dark mode */
+    --input: 140 39% 45%;
     --ring: 212 57% 64%;
     
     /* SEA Brand Gradient - Dark Mode */
