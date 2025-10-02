@@ -227,7 +227,7 @@ const Index = () => {
 
         {/* Goals Section */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Strategic Goals</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">Goals</h2>
           <Accordion type="multiple" className="space-y-4">
             {goals.map((goal) => {
               const totalKPIs = goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0);
