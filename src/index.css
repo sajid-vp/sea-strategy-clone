@@ -45,6 +45,9 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
+    /* SEA Brand Gradient */
+    --gradient-primary: linear-gradient(40deg, rgba(114, 160, 213, 1) 0%, rgba(104, 204, 202, 1) 100%);
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 0 0% 17%;
@@ -97,6 +100,10 @@ All colors MUST be HSL.
     --border: 0 0% 20%;
     --input: 0 0% 20%;
     --ring: 212 57% 64%;
+    
+    /* SEA Brand Gradient - Dark Mode */
+    --gradient-primary: linear-gradient(40deg, rgba(114, 160, 213, 1) 0%, rgba(104, 204, 202, 1) 100%);
+    
     --sidebar-background: 0 0% 12%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 212 57% 64%;
