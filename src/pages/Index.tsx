@@ -394,38 +394,41 @@ const Index = () => {
                       </div>
 
                       <div className="pt-4">
-                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4 px-2">
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-6">
                           Initiatives
                         </h4>
-                        <div className="space-y-6">
-                          {goal.initiatives.map((initiative) => (
-                            <div key={initiative.id} className="space-y-3">
-                              <div className="flex items-start justify-between px-2">
-                                <div className="flex items-center gap-2">
-                                  <h4 className="text-base font-semibold text-foreground">
-                                    {initiative.title}
-                                  </h4>
-                                  <span className="px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded">
-                                    {initiative.year}
-                                  </span>
+                        <div className="space-y-8">
+                          {goal.initiatives.map((initiative, idx) => (
+                            <div key={initiative.id}>
+                              {idx > 0 && <div className="border-t border-border mb-8" />}
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <h4 className="text-base font-semibold text-foreground">
+                                      {initiative.title}
+                                    </h4>
+                                    <span className="px-2.5 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded">
+                                      {initiative.year}
+                                    </span>
+                                  </div>
+                                  <StatusBadge status={initiative.status} />
                                 </div>
-                                <StatusBadge status={initiative.status} />
-                              </div>
-                              
-                              <div className="space-y-2">
-                                <div className="text-xs font-medium text-muted-foreground px-2">
-                                  KPIs ({initiative.kpis.length})
-                                </div>
-                                <div className="space-y-1 pl-4">
-                                  {initiative.kpis.map((kpi, idx) => (
-                                    <div
-                                      key={idx}
-                                      className="flex items-center justify-between py-2 px-2 hover:bg-muted/30 rounded transition-colors"
-                                    >
-                                      <span className="text-sm text-foreground">{kpi.name}</span>
-                                      <StatusBadge status={kpi.status} className="text-xs px-2 py-0.5" />
-                                    </div>
-                                  ))}
+                                
+                                <div className="space-y-3">
+                                  <div className="text-xs font-medium text-muted-foreground">
+                                    KPIs ({initiative.kpis.length})
+                                  </div>
+                                  <div className="space-y-0.5 pl-4">
+                                    {initiative.kpis.map((kpi, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="flex items-center justify-between py-3 hover:bg-muted/20 rounded px-2 transition-colors"
+                                      >
+                                        <span className="text-sm text-foreground">{kpi.name}</span>
+                                        <StatusBadge status={kpi.status} className="text-xs px-2.5 py-1" />
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
                             </div>
