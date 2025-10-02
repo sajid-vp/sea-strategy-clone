@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 
 const goals = [
@@ -328,27 +329,41 @@ const Initiatives = () => {
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label>Goals * (Select one or more)</Label>
-                        <div className="border rounded-lg p-4 space-y-2 max-h-48 overflow-y-auto">
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Goals * (Select one or more)</Label>
+                        <div className="border rounded-lg divide-y bg-card">
                           {goals.map((goal) => (
-                            <label 
+                            <div 
                               key={goal.id} 
-                              className="flex items-start gap-3 cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors"
+                              className="flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                              onClick={() => handleGoalsChange(goal.id.toString())}
                             >
-                              <input
-                                type="checkbox"
+                              <Checkbox
+                                id={`goal-${goal.id}`}
                                 checked={formData.goals.includes(goal.id.toString())}
-                                onChange={() => handleGoalsChange(goal.id.toString())}
+                                onCheckedChange={() => handleGoalsChange(goal.id.toString())}
                                 className="mt-1"
+                                onClick={(e) => e.stopPropagation()}
                               />
-                              <div>
-                                <div className="font-medium text-sm">{goal.title}</div>
-                                <div className="text-xs text-muted-foreground">{goal.description}</div>
-                              </div>
-                            </label>
+                              <label 
+                                htmlFor={`goal-${goal.id}`}
+                                className="flex-1 cursor-pointer space-y-1"
+                              >
+                                <div className="font-medium text-sm text-foreground leading-tight">
+                                  {goal.title}
+                                </div>
+                                <div className="text-xs text-muted-foreground leading-relaxed">
+                                  {goal.description}
+                                </div>
+                              </label>
+                            </div>
                           ))}
                         </div>
+                        {formData.goals.length === 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            Please select at least one goal for this initiative
+                          </p>
+                        )}
                       </div>
                     </div>
 
