@@ -116,106 +116,109 @@ const Index = () => {
 
       <main className="container mx-auto px-6 py-8">
         {/* Vision & Mission */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Vision & Mission</h2>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-foreground">Vision & Mission</h2>
+          </div>
           
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Vision Card */}
-            <Card className="p-8 relative hover:shadow-md transition-all">
-              <Dialog open={isEditingVision} onOpenChange={setIsEditingVision}>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="absolute top-4 right-4 h-8 w-8 hover:bg-muted"
-                    onClick={() => setTempVision(vision)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edit Vision</DialogTitle>
-                    <DialogDescription>
-                      Update your organization's vision statement
-                    </DialogDescription>
-                  </DialogHeader>
-                  <Textarea
-                    value={tempVision}
-                    onChange={(e) => setTempVision(e.target.value)}
-                    className="min-h-[100px]"
-                  />
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => setIsEditingVision(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleSaveVision} className="gap-2">
-                      <Save className="h-4 w-4" />
-                      Save
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow">
               <div className="flex items-start gap-4">
-                <div className="rounded-full bg-primary/15 p-4 flex-shrink-0">
-                  <Target className="h-7 w-7 text-primary" />
+                <div className="rounded-full bg-primary/10 p-3">
+                  <Target className="h-6 w-6 text-primary" />
                 </div>
-                <div className="flex-1 pt-1">
-                  <h3 className="text-xl font-semibold text-foreground mb-3">Vision</h3>
-                  <p className="text-muted-foreground leading-relaxed">{vision}</p>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-foreground">Vision</h3>
+                    <Dialog open={isEditingVision} onOpenChange={setIsEditingVision}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => setTempVision(vision)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Vision</DialogTitle>
+                          <DialogDescription>
+                            Update your organization's vision statement
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Textarea
+                          value={tempVision}
+                          onChange={(e) => setTempVision(e.target.value)}
+                          className="min-h-[100px]"
+                        />
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setIsEditingVision(false)}>
+                            Cancel
+                          </Button>
+                          <Button onClick={handleSaveVision} className="gap-2">
+                            <Save className="h-4 w-4" />
+                            Save
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <p className="text-muted-foreground">{vision}</p>
                 </div>
               </div>
             </Card>
 
-            {/* Mission Card */}
-            <Card className="p-8 relative hover:shadow-md transition-all">
-              <Dialog open={isEditingMission} onOpenChange={setIsEditingMission}>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="absolute top-4 right-4 h-8 w-8 hover:bg-muted"
-                    onClick={() => setTempMission(mission)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edit Mission</DialogTitle>
-                    <DialogDescription>
-                      Update your organization's mission statement
-                    </DialogDescription>
-                  </DialogHeader>
-                  <Textarea
-                    value={tempMission}
-                    onChange={(e) => setTempMission(e.target.value)}
-                    className="min-h-[100px]"
-                  />
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => setIsEditingMission(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleSaveMission} className="gap-2">
-                      <Save className="h-4 w-4" />
-                      Save
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
+            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow">
               <div className="flex items-start gap-4">
-                <div className="rounded-full bg-primary/15 p-4 flex-shrink-0">
-                  <Flag className="h-7 w-7 text-primary" />
+                <div className="rounded-full bg-primary/10 p-3">
+                  <Flag className="h-6 w-6 text-primary" />
                 </div>
-                <div className="flex-1 pt-1">
-                  <h3 className="text-xl font-semibold text-foreground mb-3">Mission</h3>
-                  <p className="text-muted-foreground leading-relaxed">{mission}</p>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-foreground">Mission</h3>
+                    <Dialog open={isEditingMission} onOpenChange={setIsEditingMission}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => setTempMission(mission)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Mission</DialogTitle>
+                          <DialogDescription>
+                            Update your organization's mission statement
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Textarea
+                          value={tempMission}
+                          onChange={(e) => setTempMission(e.target.value)}
+                          className="min-h-[100px]"
+                        />
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setIsEditingMission(false)}>
+                            Cancel
+                          </Button>
+                          <Button onClick={handleSaveMission} className="gap-2">
+                            <Save className="h-4 w-4" />
+                            Save
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <p className="text-muted-foreground">{mission}</p>
                 </div>
               </div>
             </Card>
           </div>
+
         </div>
 
         {/* Goals Section */}
