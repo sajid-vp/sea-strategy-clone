@@ -44,10 +44,13 @@ const goals = [
     id: 1,
     title: "Technology Excellence",
     description: "Build and maintain world-class technology infrastructure",
+    startYear: 2025,
+    endYear: 2028,
     initiatives: [
       {
         id: 1,
         title: "Develop and Implement IT infrastructure",
+        year: 2025,
         status: "on-track" as const,
         kpis: [
           { name: "ISO 27001 Implementation", status: "on-track" as const },
@@ -58,6 +61,7 @@ const goals = [
       {
         id: 2,
         title: "Digital Transformation initiatives",
+        year: 2025,
         status: "off-track" as const,
         kpis: [
           { name: "Student Information System Adoption", status: "on-track" as const },
@@ -71,10 +75,13 @@ const goals = [
     id: 2,
     title: "Educational Innovation",
     description: "Transform teaching and learning through technology",
+    startYear: 2025,
+    endYear: 2028,
     initiatives: [
       {
         id: 3,
         title: "Support Teaching & Learning",
+        year: 2025,
         status: "off-track" as const,
         kpis: [
           { name: "Education Platform Enhancement", status: "off-track" as const },
@@ -84,6 +91,7 @@ const goals = [
       {
         id: 4,
         title: "Increase satisfaction with IT services",
+        year: 2026,
         status: "on-track" as const,
         kpis: [
           { name: "IT Services Employee Satisfaction", status: "on-track" as const },
@@ -281,9 +289,14 @@ const Index = () => {
                       <div className="flex-1 text-left pr-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
-                            <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                              {goal.title}
-                            </h3>
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                                {goal.title}
+                              </h3>
+                              <span className="px-2.5 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
+                                {goal.startYear} - {goal.endYear}
+                              </span>
+                            </div>
                             <p className="text-sm text-muted-foreground mb-4">
                               {goal.description}
                             </p>
@@ -328,9 +341,16 @@ const Index = () => {
                             className="p-4 rounded-lg bg-card border border-border hover:shadow-md transition-shadow"
                           >
                             <div className="flex items-start justify-between mb-3">
-                              <h4 className="text-base font-semibold text-foreground flex-1">
-                                {initiative.title}
-                              </h4>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="text-base font-semibold text-foreground">
+                                    {initiative.title}
+                                  </h4>
+                                  <span className="px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded">
+                                    {initiative.year}
+                                  </span>
+                                </div>
+                              </div>
                               <StatusBadge status={initiative.status} />
                             </div>
                             <div className="space-y-2">
