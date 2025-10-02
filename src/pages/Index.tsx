@@ -12,6 +12,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Target,
   Flag,
@@ -21,52 +30,85 @@ import {
   LayoutGrid,
   List,
   Edit,
+  Save,
 } from "lucide-react";
 
-const initiatives = [
+const goals = [
   {
     id: 1,
-    title: "Develop and Implement IT infrastructure",
-    status: "on-track" as const,
-    kpis: [
-      { name: "ISO 27001 Implementation", status: "on-track" as const },
-      { name: "Smart Campus Infrastructure", status: "on-track" as const },
-      { name: "Child Safety Geo-tagging", status: "on-track" as const },
+    title: "Technology Excellence",
+    description: "Build and maintain world-class technology infrastructure",
+    initiatives: [
+      {
+        id: 1,
+        title: "Develop and Implement IT infrastructure",
+        status: "on-track" as const,
+        kpis: [
+          { name: "ISO 27001 Implementation", status: "on-track" as const },
+          { name: "Smart Campus Infrastructure", status: "on-track" as const },
+          { name: "Child Safety Geo-tagging", status: "on-track" as const },
+        ],
+      },
+      {
+        id: 2,
+        title: "Digital Transformation initiatives",
+        status: "off-track" as const,
+        kpis: [
+          { name: "Student Information System Adoption", status: "on-track" as const },
+          { name: "AI-Driven Business Intelligence Dashboards", status: "on-track" as const },
+          { name: "Unified Mobile App Development", status: "off-track" as const },
+        ],
+      },
     ],
   },
   {
     id: 2,
-    title: "Digital Transformation initiatives",
-    status: "off-track" as const,
-    kpis: [
-      { name: "Student Information System Adoption", status: "on-track" as const },
-      { name: "AI-Driven Business Intelligence Dashboards", status: "on-track" as const },
-      { name: "Unified Mobile App Development", status: "off-track" as const },
-    ],
-  },
-  {
-    id: 3,
-    title: "Support Teaching & Learning",
-    status: "off-track" as const,
-    kpis: [
-      { name: "Education Platform Enhancement", status: "off-track" as const },
-      { name: "Nursery Management System", status: "on-track" as const },
-    ],
-  },
-  {
-    id: 4,
-    title: "Increase satisfaction with IT services",
-    status: "on-track" as const,
-    kpis: [
-      { name: "IT Services Employee Satisfaction", status: "on-track" as const },
-      { name: "Digital Learning Experience", status: "on-track" as const },
-      { name: "SIS Stakeholder Satisfaction", status: "on-track" as const },
+    title: "Educational Innovation",
+    description: "Transform teaching and learning through technology",
+    initiatives: [
+      {
+        id: 3,
+        title: "Support Teaching & Learning",
+        status: "off-track" as const,
+        kpis: [
+          { name: "Education Platform Enhancement", status: "off-track" as const },
+          { name: "Nursery Management System", status: "on-track" as const },
+        ],
+      },
+      {
+        id: 4,
+        title: "Increase satisfaction with IT services",
+        status: "on-track" as const,
+        kpis: [
+          { name: "IT Services Employee Satisfaction", status: "on-track" as const },
+          { name: "Digital Learning Experience", status: "on-track" as const },
+          { name: "SIS Stakeholder Satisfaction", status: "on-track" as const },
+        ],
+      },
     ],
   },
 ];
 
 const Index = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [vision, setVision] = useState("To become the industry leader in strategic management solutions");
+  const [mission, setMission] = useState("We empower organizations to align their strategic priorities and drive measurable results through innovative technology");
+  const [isEditingVision, setIsEditingVision] = useState(false);
+  const [isEditingMission, setIsEditingMission] = useState(false);
+  const [tempVision, setTempVision] = useState(vision);
+  const [tempMission, setTempMission] = useState(mission);
+
+  const handleSaveVision = () => {
+    setVision(tempVision);
+    setIsEditingVision(false);
+  };
+
+  const handleSaveMission = () => {
+    setMission(tempMission);
+    setIsEditingMission(false);
+  };
+
+  const totalInitiatives = goals.reduce((acc, goal) => acc + goal.initiatives.length, 0);
 
   return (
     <div className="min-h-screen bg-background">
@@ -117,44 +159,108 @@ const Index = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">Vision & Mission</h2>
-            <Button variant="ghost" size="sm" className="gap-2">
-              <Edit className="h-4 w-4" />
-              Edit
-            </Button>
           </div>
           
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow">
+            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow border-l-4 border-l-primary">
               <div className="flex items-start gap-4">
                 <div className="rounded-full bg-primary/10 p-3">
                   <Target className="h-6 w-6 text-primary" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Vision</h3>
-                  <p className="text-muted-foreground">
-                    To become the industry leader in strategic management solutions
-                  </p>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-foreground">Vision</h3>
+                    <Dialog open={isEditingVision} onOpenChange={setIsEditingVision}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => setTempVision(vision)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Vision</DialogTitle>
+                          <DialogDescription>
+                            Update your organization's vision statement
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Textarea
+                          value={tempVision}
+                          onChange={(e) => setTempVision(e.target.value)}
+                          className="min-h-[100px]"
+                        />
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setIsEditingVision(false)}>
+                            Cancel
+                          </Button>
+                          <Button onClick={handleSaveVision} className="gap-2">
+                            <Save className="h-4 w-4" />
+                            Save
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <p className="text-muted-foreground">{vision}</p>
                 </div>
               </div>
             </Card>
 
-            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow">
+            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow border-l-4 border-l-primary">
               <div className="flex items-start gap-4">
                 <div className="rounded-full bg-primary/10 p-3">
                   <Flag className="h-6 w-6 text-primary" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Mission</h3>
-                  <p className="text-muted-foreground">
-                    We empower organizations to align their strategic priorities and drive measurable results through innovative technology
-                  </p>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-foreground">Mission</h3>
+                    <Dialog open={isEditingMission} onOpenChange={setIsEditingMission}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => setTempMission(mission)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Mission</DialogTitle>
+                          <DialogDescription>
+                            Update your organization's mission statement
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Textarea
+                          value={tempMission}
+                          onChange={(e) => setTempMission(e.target.value)}
+                          className="min-h-[100px]"
+                        />
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setIsEditingMission(false)}>
+                            Cancel
+                          </Button>
+                          <Button onClick={handleSaveMission} className="gap-2">
+                            <Save className="h-4 w-4" />
+                            Save
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <p className="text-muted-foreground">{mission}</p>
                 </div>
               </div>
             </Card>
           </div>
 
           {/* Filters */}
-          <Card className="p-4">
+          <Card className="p-4 border-l-4 border-l-primary">
             <div className="grid grid-cols-4 gap-4">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-2 block">Year</label>
@@ -216,14 +322,16 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Strategic Initiatives"
-            value="4"
+            value={totalInitiatives}
             subtitle="2025"
+            className="border-l-4 border-l-primary"
           />
           
           <StatCard
             title="Key Initiatives"
             value="0"
             subtitle="2025"
+            className="border-l-4 border-l-primary"
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
@@ -234,6 +342,7 @@ const Index = () => {
           <StatCard
             title="Initiative Status"
             value=""
+            className="border-l-4 border-l-primary"
           >
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
@@ -263,6 +372,7 @@ const Index = () => {
           <StatCard
             title="Overall Progress"
             value="50%"
+            className="border-l-4 border-l-primary"
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
@@ -299,50 +409,57 @@ const Index = () => {
           </div>
 
           <TabsContent value="overview" className="mt-0">
-            <div className="mb-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-foreground">Strategic Initiatives</h3>
-                <span className="text-sm text-muted-foreground">4 initiatives</span>
-              </div>
-            </div>
-
-            <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
-              {initiatives.map((initiative) => (
-                <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-foreground flex-1">
-                      {initiative.title}
-                    </h4>
-                    <StatusBadge status={initiative.status} />
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="text-sm font-medium text-muted-foreground">
-                      KPIs ({initiative.kpis.length})
+            <div className="space-y-8">
+              {goals.map((goal) => (
+                <div key={goal.id}>
+                  <Card className="p-6 mb-6 bg-gradient-to-r from-primary/5 to-transparent border-l-4 border-l-primary">
+                    <h3 className="text-2xl font-bold text-foreground mb-2">{goal.title}</h3>
+                    <p className="text-muted-foreground">{goal.description}</p>
+                    <div className="mt-4 text-sm text-muted-foreground">
+                      {goal.initiatives.length} initiatives
                     </div>
-                    {initiative.kpis.map((kpi, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                      >
-                        <span className="text-sm text-foreground">{kpi.name}</span>
-                        <StatusBadge status={kpi.status} />
-                      </div>
+                  </Card>
+
+                  <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
+                    {goal.initiatives.map((initiative) => (
+                      <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-l-4 border-l-primary">
+                        <div className="flex items-start justify-between mb-4">
+                          <h4 className="text-lg font-semibold text-foreground flex-1">
+                            {initiative.title}
+                          </h4>
+                          <StatusBadge status={initiative.status} />
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div className="text-sm font-medium text-muted-foreground">
+                            KPIs ({initiative.kpis.length})
+                          </div>
+                          {initiative.kpis.map((kpi, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                            >
+                              <span className="text-sm text-foreground">{kpi.name}</span>
+                              <StatusBadge status={kpi.status} />
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
                     ))}
                   </div>
-                </Card>
+                </div>
               ))}
             </div>
           </TabsContent>
 
           <TabsContent value="goal">
-            <Card className="p-8 text-center">
+            <Card className="p-8 text-center border-l-4 border-l-primary">
               <p className="text-muted-foreground">View by goal coming soon...</p>
             </Card>
           </TabsContent>
 
           <TabsContent value="department">
-            <Card className="p-8 text-center">
+            <Card className="p-8 text-center border-l-4 border-l-primary">
               <p className="text-muted-foreground">View by department coming soon...</p>
             </Card>
           </TabsContent>
