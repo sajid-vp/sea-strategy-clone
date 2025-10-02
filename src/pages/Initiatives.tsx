@@ -201,6 +201,39 @@ const Initiatives = () => {
           </div>
 
           <TabsContent value="overview" className="mt-0">
+            <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
+              {goals.flatMap((goal) =>
+                goal.initiatives.map((initiative) => (
+                  <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground">
+                    <div className="mb-4">
+                      <div className="text-xs text-muted-foreground mb-2">{goal.title}</div>
+                      <h4 className="text-lg font-semibold text-foreground mb-2">
+                        {initiative.title}
+                      </h4>
+                      <StatusBadge status={initiative.status} />
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="text-sm font-medium text-muted-foreground">
+                        KPIs ({initiative.kpis.length})
+                      </div>
+                      {initiative.kpis.map((kpi, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                        >
+                          <span className="text-sm text-foreground">{kpi.name}</span>
+                          <StatusBadge status={kpi.status} />
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="goal" className="mt-0">
             <div className="space-y-8">
               {goals.map((goal) => (
                 <div key={goal.id}>
@@ -239,12 +272,6 @@ const Initiatives = () => {
                 </div>
               ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="goal">
-            <Card className="p-8 text-center border-t-4 border-t-secondary-foreground">
-              <p className="text-muted-foreground">View by goal coming soon...</p>
-            </Card>
           </TabsContent>
         </Tabs>
       </main>
