@@ -247,7 +247,7 @@ const Index = () => {
               
               return (
                 <Link key={goal.id} to={`/goals/${goal.id}`} className="group">
-                  <Card className="p-6 bg-gradient-to-br from-secondary/30 to-transparent hover:shadow-lg transition-all cursor-pointer relative overflow-hidden">
+                  <Card className="p-6 border bg-gradient-to-br from-secondary/30 to-transparent hover:shadow-lg transition-all cursor-pointer relative overflow-hidden">
                     <div className="absolute top-4 right-4 flex items-center gap-0.5">
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 group-hover:translate-x-1 opacity-40" />
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 delay-75 group-hover:translate-x-1 opacity-60" />
