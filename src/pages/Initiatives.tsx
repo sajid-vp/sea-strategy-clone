@@ -14,6 +14,18 @@ import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { LayoutGrid, List, Target, Flag, TrendingUp, BarChart3, Users, User, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 const goals = [
   {
@@ -90,7 +102,56 @@ const goals = [
 const Initiatives = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedYear, setSelectedYear] = useState("2025");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
   const totalInitiatives = goals.reduce((acc, goal) => acc + goal.initiatives.length, 0);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    title: "",
+    goal: "",
+    year: "2025",
+    status: "on-track",
+    owner: "",
+    team: "",
+    description: "",
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!formData.title.trim() || !formData.goal || !formData.owner.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Here you would normally save to a database
+    toast({
+      title: "Success",
+      description: "Initiative created successfully",
+    });
+
+    // Reset form and close dialog
+    setFormData({
+      title: "",
+      goal: "",
+      year: "2025",
+      status: "on-track",
+      owner: "",
+      team: "",
+      description: "",
+    });
+    setIsDialogOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -192,10 +253,141 @@ const Initiatives = () => {
             </TabsList>
             
             <div className="flex items-center gap-2">
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                New Initiative
-              </Button>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    New Initiative
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Create New Initiative</DialogTitle>
+                    <DialogDescription>
+                      Add a new strategic initiative to track progress and KPIs
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Initiative Title *</Label>
+                        <Input
+                          id="title"
+                          placeholder="Enter initiative title"
+                          value={formData.title}
+                          onChange={(e) => handleInputChange("title", e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                          id="description"
+                          placeholder="Enter initiative description"
+                          value={formData.description}
+                          onChange={(e) => handleInputChange("description", e.target.value)}
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="goal">Goal *</Label>
+                          <Select 
+                            value={formData.goal} 
+                            onValueChange={(value) => handleInputChange("goal", value)}
+                          >
+                            <SelectTrigger id="goal">
+                              <SelectValue placeholder="Select goal" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {goals.map((goal) => (
+                                <SelectItem key={goal.id} value={goal.id.toString()}>
+                                  {goal.title}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="year">Year *</Label>
+                          <Select 
+                            value={formData.year} 
+                            onValueChange={(value) => handleInputChange("year", value)}
+                          >
+                            <SelectTrigger id="year">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="2025">2025</SelectItem>
+                              <SelectItem value="2026">2026</SelectItem>
+                              <SelectItem value="2027">2027</SelectItem>
+                              <SelectItem value="2028">2028</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="status">Status</Label>
+                        <Select 
+                          value={formData.status} 
+                          onValueChange={(value) => handleInputChange("status", value)}
+                        >
+                          <SelectTrigger id="status">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="on-track">On Track</SelectItem>
+                            <SelectItem value="at-risk">At Risk</SelectItem>
+                            <SelectItem value="off-track">Off Track</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="owner">Initiative Owner *</Label>
+                        <Input
+                          id="owner"
+                          placeholder="Enter owner name"
+                          value={formData.owner}
+                          onChange={(e) => handleInputChange("owner", e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="team">Team Members</Label>
+                        <Input
+                          id="team"
+                          placeholder="Enter team members (comma separated)"
+                          value={formData.team}
+                          onChange={(e) => handleInputChange("team", e.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Separate multiple names with commas
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-3">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => setIsDialogOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button type="submit">
+                        Create Initiative
+                      </Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
               <Button
                 variant={viewMode === "grid" ? "default" : "ghost"}
                 size="icon"
