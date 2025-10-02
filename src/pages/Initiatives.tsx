@@ -499,19 +499,22 @@ const Initiatives = () => {
                         </div>
                       </div>
                       
-                      <div className="space-y-3 pt-3 border-t border-border">
-                        <div className="text-sm font-medium text-muted-foreground">
-                          KPIs ({initiative.kpis.length})
-                        </div>
-                        {initiative.kpis.map((kpi, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                          >
-                            <span className="text-sm text-foreground">{kpi.name}</span>
-                            <StatusBadge status={kpi.status} />
+                      <div className="pt-3 border-t border-border">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-medium text-muted-foreground">
+                            {initiative.kpis.length} KPIs
                           </div>
-                        ))}
+                          <div className="flex items-center gap-3 text-xs">
+                            <div className="flex items-center gap-1">
+                              <div className="h-2 w-2 rounded-full bg-success" />
+                              <span>{initiative.kpis.filter(k => k.status === "on-track").length}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="h-2 w-2 rounded-full bg-destructive" />
+                              <span>{initiative.kpis.filter(k => k.status !== "on-track").length}</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </Card>
                   </Link>
@@ -540,19 +543,22 @@ const Initiatives = () => {
                             <StatusBadge status={initiative.status} />
                           </div>
                           
-                          <div className="space-y-3">
-                            <div className="text-sm font-medium text-muted-foreground">
-                              KPIs ({initiative.kpis.length})
-                            </div>
-                            {initiative.kpis.map((kpi, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                              >
-                                <span className="text-sm text-foreground">{kpi.name}</span>
-                                <StatusBadge status={kpi.status} />
+                          <div className="pt-3 border-t border-border">
+                            <div className="flex items-center justify-between">
+                              <div className="text-sm font-medium text-muted-foreground">
+                                {initiative.kpis.length} KPIs
                               </div>
-                            ))}
+                              <div className="flex items-center gap-3 text-xs">
+                                <div className="flex items-center gap-1">
+                                  <div className="h-2 w-2 rounded-full bg-success" />
+                                  <span>{initiative.kpis.filter(k => k.status === "on-track").length}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <div className="h-2 w-2 rounded-full bg-destructive" />
+                                  <span>{initiative.kpis.filter(k => k.status !== "on-track").length}</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </Card>
                       </Link>
@@ -602,19 +608,22 @@ const Initiatives = () => {
                               </div>
                             </div>
                             
-                            <div className="space-y-3 pt-3 border-t border-border">
-                              <div className="text-sm font-medium text-muted-foreground">
-                                KPIs ({initiative.kpis.length})
-                              </div>
-                              {initiative.kpis.map((kpi, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                                >
-                                  <span className="text-sm text-foreground">{kpi.name}</span>
-                                  <StatusBadge status={kpi.status} />
+                            <div className="pt-3 border-t border-border">
+                              <div className="flex items-center justify-between">
+                                <div className="text-sm font-medium text-muted-foreground">
+                                  {initiative.kpis.length} KPIs
                                 </div>
-                              ))}
+                                <div className="flex items-center gap-3 text-xs">
+                                  <div className="flex items-center gap-1">
+                                    <div className="h-2 w-2 rounded-full bg-success" />
+                                    <span>{initiative.kpis.filter(k => k.status === "on-track").length}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <div className="h-2 w-2 rounded-full bg-destructive" />
+                                    <span>{initiative.kpis.filter(k => k.status !== "on-track").length}</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </Card>
                         </Link>
