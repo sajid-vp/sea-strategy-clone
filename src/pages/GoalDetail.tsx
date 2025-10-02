@@ -117,6 +117,8 @@ const initiativeFormSchema = z.object({
   owner: z.string().trim().min(1, "Owner is required").max(100, "Owner name must be less than 100 characters"),
   status: z.enum(["on-track", "off-track", "at-risk"]),
   description: z.string().trim().max(500, "Description must be less than 500 characters").optional(),
+  goalId: z.string(),
+  goalTitle: z.string(),
 });
 
 type InitiativeFormValues = z.infer<typeof initiativeFormSchema>;
@@ -126,6 +128,9 @@ const GoalDetail = () => {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
+  // Find the goal first
+  const goal = goals.find(g => g.id.toString() === id);
+  
   const form = useForm<InitiativeFormValues>({
     resolver: zodResolver(initiativeFormSchema),
     defaultValues: {
@@ -134,6 +139,8 @@ const GoalDetail = () => {
       owner: "",
       status: "on-track",
       description: "",
+      goalId: id || "",
+      goalTitle: goal?.title || "",
     },
   });
   
@@ -146,9 +153,6 @@ const GoalDetail = () => {
     form.reset();
     setIsDialogOpen(false);
   };
-  
-  // Find the goal
-  const goal = goals.find(g => g.id.toString() === id);
 
   if (!goal) {
     return (
@@ -294,6 +298,17 @@ const GoalDetail = () => {
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    {/* Goal Display - Read Only */}
+                    <div className="space-y-2">
+                      <Label>Goal</Label>
+                      <div className="px-3 py-2 border rounded-md bg-muted text-muted-foreground">
+                        {goal.title}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        This initiative will be added to the above goal
+                      </p>
+                    </div>
+                    
                     <FormField
                       control={form.control}
                       name="title"
