@@ -401,8 +401,8 @@ const Index = () => {
                           {goal.initiatives.map((initiative) => (
                             <Card key={initiative.id} className="p-4 hover:shadow-md transition-shadow">
                               <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
+                                <div>
+                                  <div className="flex items-center gap-3 mb-2">
                                     <h4 className="text-base font-semibold text-foreground">
                                       {initiative.title}
                                     </h4>
@@ -546,8 +546,8 @@ const Index = () => {
                   <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
                     {goal.initiatives.map((initiative) => (
                       <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-l-4 border-l-secondary-foreground">
-                        <div className="flex items-start justify-between mb-4">
-                          <h4 className="text-lg font-semibold text-foreground flex-1">
+                        <div className="mb-4">
+                          <h4 className="text-lg font-semibold text-foreground mb-2">
                             {initiative.title}
                           </h4>
                           <StatusBadge status={initiative.status} />
