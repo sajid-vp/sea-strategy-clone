@@ -273,11 +273,10 @@ const Index = () => {
               const totalKPIs = goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0);
               const onTrackCount = goal.initiatives.filter(i => i.status === "on-track").length;
               const offTrackCount = goal.initiatives.filter(i => i.status === "off-track").length;
-              const progressPercentage = Math.round((onTrackCount / goal.initiatives.length) * 100);
               
               return (
                 <AccordionItem key={goal.id} value={`goal-${goal.id}`} className="border-none">
-                  <Card className="bg-gradient-to-r from-secondary/30 to-transparent border-l-4 border-l-secondary-foreground hover:shadow-lg transition-shadow overflow-hidden">
+                  <Card className="bg-gradient-to-r from-secondary/30 to-transparent hover:shadow-lg transition-shadow overflow-hidden">
                     <AccordionTrigger className="px-6 py-5 hover:no-underline group">
                       <div className="flex-1 text-left pr-4">
                         <div className="flex items-start justify-between mb-3">
@@ -317,14 +316,6 @@ const Index = () => {
                                 <span className="text-xs font-semibold text-destructive">{offTrackCount}</span>
                               </div>
                             )}
-                          </div>
-                          
-                          <div className="flex-1 min-w-[120px]">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-muted-foreground">Progress</span>
-                              <span className="text-xs font-semibold text-foreground">{progressPercentage}%</span>
-                            </div>
-                            <Progress value={progressPercentage} className="h-1.5" />
                           </div>
                         </div>
                       </div>
