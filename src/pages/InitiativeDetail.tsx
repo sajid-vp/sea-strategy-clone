@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -104,7 +105,13 @@ const InitiativeDetail = () => {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [kpiFormData, setKpiFormData] = useState({
-    name: "",
+    title: "",
+    description: "",
+    trackingMethod: "Manual",
+    reportingFrequency: "Quarterly",
+    reportingType: "Number",
+    reportingUnit: "%",
+    target: "",
     status: "on-track" as "on-track" | "off-track",
   });
   
@@ -148,10 +155,10 @@ const InitiativeDetail = () => {
   const handleKpiSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!kpiFormData.name.trim()) {
+    if (!kpiFormData.title.trim()) {
       toast({
         title: "Validation Error",
-        description: "Please enter a KPI name",
+        description: "Please enter a KPI title",
         variant: "destructive",
       });
       return;
@@ -165,7 +172,13 @@ const InitiativeDetail = () => {
 
     // Reset form and close dialog
     setKpiFormData({
-      name: "",
+      title: "",
+      description: "",
+      trackingMethod: "Manual",
+      reportingFrequency: "Quarterly",
+      reportingType: "Number",
+      reportingUnit: "%",
+      target: "",
       status: "on-track",
     });
     setIsDialogOpen(false);
@@ -199,6 +212,134 @@ const InitiativeDetail = () => {
                 </Badge>
               </div>
             </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add KPI
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Create KPI</DialogTitle>
+                  <DialogDescription>
+                    Add a new Key Performance Indicator to track progress
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <form onSubmit={handleKpiSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="kpi-title">Title *</Label>
+                    <Input
+                      id="kpi-title"
+                      placeholder="Title"
+                      value={kpiFormData.title}
+                      onChange={(e) => setKpiFormData(prev => ({ ...prev, title: e.target.value }))}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="kpi-description">Description</Label>
+                    <Textarea
+                      id="kpi-description"
+                      placeholder="Description"
+                      value={kpiFormData.description}
+                      onChange={(e) => setKpiFormData(prev => ({ ...prev, description: e.target.value }))}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="tracking-method">Tracking Method</Label>
+                      <Select 
+                        value={kpiFormData.trackingMethod} 
+                        onValueChange={(value) => setKpiFormData(prev => ({ ...prev, trackingMethod: value }))}
+                      >
+                        <SelectTrigger id="tracking-method">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Manual">Manual</SelectItem>
+                          <SelectItem value="Automatic">Automatic</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="reporting-frequency">Reporting Frequency</Label>
+                      <Select 
+                        value={kpiFormData.reportingFrequency} 
+                        onValueChange={(value) => setKpiFormData(prev => ({ ...prev, reportingFrequency: value }))}
+                      >
+                        <SelectTrigger id="reporting-frequency">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Weekly">Weekly</SelectItem>
+                          <SelectItem value="Monthly">Monthly</SelectItem>
+                          <SelectItem value="Quarterly">Quarterly</SelectItem>
+                          <SelectItem value="Annually">Annually</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="reporting-type">Reporting Type</Label>
+                      <Select 
+                        value={kpiFormData.reportingType} 
+                        onValueChange={(value) => setKpiFormData(prev => ({ ...prev, reportingType: value }))}
+                      >
+                        <SelectTrigger id="reporting-type">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Number">Number</SelectItem>
+                          <SelectItem value="Percentage">Percentage</SelectItem>
+                          <SelectItem value="Currency">Currency</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="reporting-unit">Reporting Unit</Label>
+                      <Input
+                        id="reporting-unit"
+                        placeholder="%"
+                        value={kpiFormData.reportingUnit}
+                        onChange={(e) => setKpiFormData(prev => ({ ...prev, reportingUnit: e.target.value }))}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="target">Target</Label>
+                      <Input
+                        id="target"
+                        placeholder="100"
+                        value={kpiFormData.target}
+                        onChange={(e) => setKpiFormData(prev => ({ ...prev, target: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit">
+                      Create KPI
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Parent Goal */}
@@ -239,71 +380,9 @@ const InitiativeDetail = () => {
 
             {/* KPIs */}
             <Card className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">
-                  Key Performance Indicators ({initiative.kpis.length})
-                </h2>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="gap-2">
-                      <Plus className="h-4 w-4" />
-                      Add KPI
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New KPI</DialogTitle>
-                      <DialogDescription>
-                        Create a new Key Performance Indicator for this initiative
-                      </DialogDescription>
-                    </DialogHeader>
-                    
-                    <form onSubmit={handleKpiSubmit} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="kpi-name">KPI Name *</Label>
-                        <Input
-                          id="kpi-name"
-                          placeholder="Enter KPI name"
-                          value={kpiFormData.name}
-                          onChange={(e) => setKpiFormData(prev => ({ ...prev, name: e.target.value }))}
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="kpi-status">Status *</Label>
-                        <Select 
-                          value={kpiFormData.status} 
-                          onValueChange={(value: "on-track" | "off-track") => 
-                            setKpiFormData(prev => ({ ...prev, status: value }))
-                          }
-                        >
-                          <SelectTrigger id="kpi-status">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="on-track">On Track</SelectItem>
-                            <SelectItem value="off-track">Off Track</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="flex justify-end gap-3">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={() => setIsDialogOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button type="submit">
-                          Add KPI
-                        </Button>
-                      </div>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </div>
+              <h2 className="text-lg font-semibold mb-4">
+                Key Performance Indicators ({initiative.kpis.length})
+              </h2>
               <div className="space-y-3">
                 {initiative.kpis.map((kpi, idx) => (
                   <div
