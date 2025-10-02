@@ -162,7 +162,7 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow border-l-4 border-l-primary">
+            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow">
               <div className="flex items-start gap-4">
                 <div className="rounded-full bg-primary/10 p-3">
                   <Target className="h-6 w-6 text-primary" />
@@ -210,7 +210,7 @@ const Index = () => {
               </div>
             </Card>
 
-            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow border-l-4 border-l-primary">
+            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow">
               <div className="flex items-start gap-4">
                 <div className="rounded-full bg-primary/10 p-3">
                   <Flag className="h-6 w-6 text-primary" />
@@ -259,8 +259,32 @@ const Index = () => {
             </Card>
           </div>
 
+        {/* Goals Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Strategic Goals</h2>
+          <div className="space-y-6">
+            {goals.map((goal) => (
+              <Card key={goal.id} className="p-6 bg-gradient-to-r from-secondary/30 to-transparent border-l-4 border-l-secondary-foreground hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-bold text-foreground mb-2">{goal.title}</h3>
+                <p className="text-muted-foreground mb-3">{goal.description}</p>
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-muted-foreground">
+                    <span className="font-semibold text-foreground">{goal.initiatives.length}</span> initiatives
+                  </span>
+                  <span className="text-muted-foreground">•</span>
+                  <span className="text-muted-foreground">
+                    <span className="font-semibold text-foreground">
+                      {goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0)}
+                    </span> KPIs
+                  </span>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
           {/* Filters */}
-          <Card className="p-4 border-l-4 border-l-primary">
+          <Card className="p-4 border-l-4 border-l-secondary-foreground">
             <div className="grid grid-cols-4 gap-4">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-2 block">Year</label>
@@ -324,14 +348,14 @@ const Index = () => {
             title="Strategic Initiatives"
             value={totalInitiatives}
             subtitle="2025"
-            className="border-l-4 border-l-primary"
+            className="border-l-4 border-l-secondary-foreground"
           />
           
           <StatCard
             title="Key Initiatives"
             value="0"
             subtitle="2025"
-            className="border-l-4 border-l-primary"
+            className="border-l-4 border-l-secondary-foreground"
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
@@ -342,7 +366,7 @@ const Index = () => {
           <StatCard
             title="Initiative Status"
             value=""
-            className="border-l-4 border-l-primary"
+            className="border-l-4 border-l-secondary-foreground"
           >
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
@@ -372,7 +396,7 @@ const Index = () => {
           <StatCard
             title="Overall Progress"
             value="50%"
-            className="border-l-4 border-l-primary"
+            className="border-l-4 border-l-secondary-foreground"
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
@@ -412,17 +436,14 @@ const Index = () => {
             <div className="space-y-8">
               {goals.map((goal) => (
                 <div key={goal.id}>
-                  <Card className="p-6 mb-6 bg-gradient-to-r from-primary/5 to-transparent border-l-4 border-l-primary">
-                    <h3 className="text-2xl font-bold text-foreground mb-2">{goal.title}</h3>
-                    <p className="text-muted-foreground">{goal.description}</p>
-                    <div className="mt-4 text-sm text-muted-foreground">
-                      {goal.initiatives.length} initiatives
-                    </div>
-                  </Card>
+                  <div className="mb-4">
+                    <h3 className="text-xl font-semibold text-foreground mb-1">{goal.title}</h3>
+                    <p className="text-sm text-muted-foreground">{goal.initiatives.length} initiatives</p>
+                  </div>
 
                   <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
                     {goal.initiatives.map((initiative) => (
-                      <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-l-4 border-l-primary">
+                      <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-l-4 border-l-secondary-foreground">
                         <div className="flex items-start justify-between mb-4">
                           <h4 className="text-lg font-semibold text-foreground flex-1">
                             {initiative.title}
@@ -453,13 +474,13 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="goal">
-            <Card className="p-8 text-center border-l-4 border-l-primary">
+            <Card className="p-8 text-center border-l-4 border-l-secondary-foreground">
               <p className="text-muted-foreground">View by goal coming soon...</p>
             </Card>
           </TabsContent>
 
           <TabsContent value="department">
-            <Card className="p-8 text-center border-l-4 border-l-primary">
+            <Card className="p-8 text-center border-l-4 border-l-secondary-foreground">
               <p className="text-muted-foreground">View by department coming soon...</p>
             </Card>
           </TabsContent>
