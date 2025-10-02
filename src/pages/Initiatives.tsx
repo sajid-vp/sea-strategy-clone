@@ -109,11 +109,9 @@ const Initiatives = () => {
   // Form state
   const [formData, setFormData] = useState({
     title: "",
-    goal: "",
+    goals: [] as string[],
     year: "2025",
-    status: "on-track",
     owner: "",
-    team: "",
     description: "",
   });
 
@@ -121,11 +119,20 @@ const Initiatives = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleGoalsChange = (goalId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      goals: prev.goals.includes(goalId)
+        ? prev.goals.filter(id => id !== goalId)
+        : [...prev.goals, goalId]
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
-    if (!formData.title.trim() || !formData.goal || !formData.owner.trim()) {
+    if (!formData.title.trim() || formData.goals.length === 0 || !formData.owner.trim()) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -143,11 +150,9 @@ const Initiatives = () => {
     // Reset form and close dialog
     setFormData({
       title: "",
-      goal: "",
+      goals: [],
       year: "2025",
-      status: "on-track",
       owner: "",
-      team: "",
       description: "",
     });
     setIsDialogOpen(false);
@@ -294,25 +299,6 @@ const Initiatives = () => {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="goal">Goal *</Label>
-                          <Select 
-                            value={formData.goal} 
-                            onValueChange={(value) => handleInputChange("goal", value)}
-                          >
-                            <SelectTrigger id="goal">
-                              <SelectValue placeholder="Select goal" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {goals.map((goal) => (
-                                <SelectItem key={goal.id} value={goal.id.toString()}>
-                                  {goal.title}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-2">
                           <Label htmlFor="year">Year *</Label>
                           <Select 
                             value={formData.year} 
@@ -329,47 +315,40 @@ const Initiatives = () => {
                             </SelectContent>
                           </Select>
                         </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="owner">Initiative Owner *</Label>
+                          <Input
+                            id="owner"
+                            placeholder="Enter owner name"
+                            value={formData.owner}
+                            onChange={(e) => handleInputChange("owner", e.target.value)}
+                            required
+                          />
+                        </div>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="status">Status</Label>
-                        <Select 
-                          value={formData.status} 
-                          onValueChange={(value) => handleInputChange("status", value)}
-                        >
-                          <SelectTrigger id="status">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="on-track">On Track</SelectItem>
-                            <SelectItem value="at-risk">At Risk</SelectItem>
-                            <SelectItem value="off-track">Off Track</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="owner">Initiative Owner *</Label>
-                        <Input
-                          id="owner"
-                          placeholder="Enter owner name"
-                          value={formData.owner}
-                          onChange={(e) => handleInputChange("owner", e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="team">Team Members</Label>
-                        <Input
-                          id="team"
-                          placeholder="Enter team members (comma separated)"
-                          value={formData.team}
-                          onChange={(e) => handleInputChange("team", e.target.value)}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Separate multiple names with commas
-                        </p>
+                        <Label>Goals * (Select one or more)</Label>
+                        <div className="border rounded-lg p-4 space-y-2 max-h-48 overflow-y-auto">
+                          {goals.map((goal) => (
+                            <label 
+                              key={goal.id} 
+                              className="flex items-start gap-3 cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={formData.goals.includes(goal.id.toString())}
+                                onChange={() => handleGoalsChange(goal.id.toString())}
+                                className="mt-1"
+                              />
+                              <div>
+                                <div className="font-medium text-sm">{goal.title}</div>
+                                <div className="text-xs text-muted-foreground">{goal.description}</div>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
