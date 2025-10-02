@@ -87,14 +87,14 @@ const Initiatives = () => {
             title="Strategic Initiatives"
             value={totalInitiatives}
             subtitle="2025"
-            className="border-t-4 border-t-secondary-foreground"
+            className="border-l-4 border-l-secondary-foreground"
           />
           
           <StatCard
             title="Key Initiatives"
             value="0"
             subtitle="2025"
-            className="border-t-4 border-t-secondary-foreground"
+            className="border-l-4 border-l-secondary-foreground"
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
@@ -105,7 +105,7 @@ const Initiatives = () => {
           <StatCard
             title="Initiative Status"
             value=""
-            className="border-t-4 border-t-secondary-foreground"
+            className="border-l-4 border-l-secondary-foreground"
           >
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
@@ -135,7 +135,7 @@ const Initiatives = () => {
           <StatCard
             title="Overall Progress"
             value="50%"
-            className="border-t-4 border-t-secondary-foreground"
+            className="border-l-4 border-l-secondary-foreground"
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
