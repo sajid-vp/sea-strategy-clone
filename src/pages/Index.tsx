@@ -8,9 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -27,14 +24,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Header } from "@/components/Header";
 import {
   Target,
   Flag,
-  Bell,
-  Search,
-  User,
-  LayoutGrid,
-  List,
   Edit,
   Save,
 } from "lucide-react";
@@ -104,7 +97,6 @@ const goals = [
 ];
 
 const Index = () => {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [vision, setVision] = useState("To become the industry leader in strategic management solutions");
   const [mission, setMission] = useState("We empower organizations to align their strategic priorities and drive measurable results through innovative technology");
   const [isEditingVision, setIsEditingVision] = useState(false);
@@ -122,51 +114,9 @@ const Index = () => {
     setIsEditingMission(false);
   };
 
-  const totalInitiatives = goals.reduce((acc, goal) => acc + goal.initiatives.length, 0);
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
-              <h1 className="text-2xl font-bold text-primary">FlowX</h1>
-              <nav className="flex gap-6">
-                <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Dashboard
-                </a>
-                <a href="#" className="text-sm font-medium text-primary border-b-2 border-primary pb-4">
-                  Strategy
-                </a>
-                <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Initiatives
-                </a>
-                <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Projects
-                </a>
-                <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Tasks
-                </a>
-                <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Scorecard
-                </a>
-              </nav>
-            </div>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon">
-                <Search className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Bell className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-6 py-8">
         {/* Vision & Mission */}
@@ -272,6 +222,8 @@ const Index = () => {
               </div>
             </Card>
           </div>
+
+        </div>
 
         {/* Goals Section */}
         <div className="mb-8">
@@ -441,152 +393,6 @@ const Index = () => {
             })}
           </Accordion>
         </div>
-
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard
-            title="Strategic Initiatives"
-            value={totalInitiatives}
-            subtitle="2025"
-            className="border-l-4 border-l-secondary-foreground"
-          />
-          
-          <StatCard
-            title="Key Initiatives"
-            value="0"
-            subtitle="2025"
-            className="border-l-4 border-l-secondary-foreground"
-          >
-            <div className="mt-2">
-              <div className="text-xs text-muted-foreground mb-1">Progress</div>
-              <Progress value={0} className="h-2 bg-destructive" />
-            </div>
-          </StatCard>
-
-          <StatCard
-            title="Initiative Status"
-            value=""
-            className="border-l-4 border-l-secondary-foreground"
-          >
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-success" />
-                  <span className="text-muted-foreground">On Track:</span>
-                </div>
-                <span className="font-semibold">2</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-warning" />
-                  <span className="text-muted-foreground">At Risk:</span>
-                </div>
-                <span className="font-semibold">0</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-destructive" />
-                  <span className="text-muted-foreground">Off Track:</span>
-                </div>
-                <span className="font-semibold">2</span>
-              </div>
-            </div>
-          </StatCard>
-
-          <StatCard
-            title="Overall Progress"
-            value="50%"
-            className="border-l-4 border-l-secondary-foreground"
-          >
-            <div className="mt-2">
-              <div className="text-xs text-muted-foreground mb-1">Progress</div>
-              <Progress value={50} className="h-2" />
-            </div>
-          </StatCard>
-        </div>
-
-        {/* Strategic Initiatives */}
-        <Tabs defaultValue="overview" className="w-full">
-          <div className="flex items-center justify-between mb-6">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="goal">By Goal</TabsTrigger>
-              <TabsTrigger value="department">By Department</TabsTrigger>
-            </TabsList>
-            
-            <div className="flex items-center gap-2">
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("list")}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <TabsContent value="overview" className="mt-0">
-            <div className="space-y-8">
-              {goals.map((goal) => (
-                <div key={goal.id}>
-                  <div className="mb-4">
-                    <h3 className="text-xl font-semibold text-foreground mb-1">{goal.title}</h3>
-                    <p className="text-sm text-muted-foreground">{goal.initiatives.length} initiatives</p>
-                  </div>
-
-                  <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
-                    {goal.initiatives.map((initiative) => (
-                      <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-l-4 border-l-secondary-foreground">
-                        <div className="mb-4">
-                          <h4 className="text-lg font-semibold text-foreground mb-2">
-                            {initiative.title}
-                          </h4>
-                          <StatusBadge status={initiative.status} />
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div className="text-sm font-medium text-muted-foreground">
-                            KPIs ({initiative.kpis.length})
-                          </div>
-                          {initiative.kpis.map((kpi, idx) => (
-                            <div
-                              key={idx}
-                              className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                            >
-                              <span className="text-sm text-foreground">{kpi.name}</span>
-                              <StatusBadge status={kpi.status} />
-                            </div>
-                          ))}
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="goal">
-            <Card className="p-8 text-center border-l-4 border-l-secondary-foreground">
-              <p className="text-muted-foreground">View by goal coming soon...</p>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="department">
-            <Card className="p-8 text-center border-l-4 border-l-secondary-foreground">
-              <p className="text-muted-foreground">View by department coming soon...</p>
-            </Card>
-          </TabsContent>
-        </Tabs>
       </main>
     </div>
   );
