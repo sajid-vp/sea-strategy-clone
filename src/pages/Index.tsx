@@ -24,7 +24,7 @@ import {
   Flag,
   Edit,
   Save,
-  ArrowRight,
+  ChevronRight,
 } from "lucide-react";
 
 const goals = [
@@ -246,63 +246,62 @@ const Index = () => {
               const offTrackCount = goal.initiatives.filter(i => i.status === "off-track").length;
               
               return (
-                <Card key={goal.id} className="p-6 bg-gradient-to-br from-secondary/30 to-transparent hover:shadow-lg transition-shadow">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-full bg-primary/10 p-3">
-                        <Target className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-foreground mb-1">
-                          {goal.title}
-                        </h3>
-                        <span className="px-2.5 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
-                          {goal.startYear} - {goal.endYear}
-                        </span>
-                      </div>
+                <Link key={goal.id} to={`/goals/${goal.id}`} className="group">
+                  <Card className="p-6 bg-gradient-to-br from-secondary/30 to-transparent hover:shadow-lg transition-all cursor-pointer relative overflow-hidden">
+                    <div className="absolute top-4 right-4 text-muted-foreground group-hover:text-primary transition-all group-hover:translate-x-1">
+                      <ChevronRight className="h-6 w-6" />
                     </div>
-                  </div>
 
-                  <p className="text-sm text-muted-foreground mb-6">
-                    {goal.description}
-                  </p>
-
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1 text-sm">
-                        <span className="font-bold text-lg text-foreground">{goal.initiatives.length}</span>
-                        <span className="text-muted-foreground">initiatives</span>
-                      </div>
-                      <span className="text-muted-foreground">•</span>
-                      <div className="flex items-center gap-1 text-sm">
-                        <span className="font-bold text-lg text-foreground">{totalKPIs}</span>
-                        <span className="text-muted-foreground">KPIs</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      {onTrackCount > 0 && (
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
-                          <div className="h-2 w-2 rounded-full bg-success" />
-                          <span className="text-xs font-semibold text-success">{onTrackCount}</span>
+                    <div className="flex items-start justify-between mb-4 pr-8">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-full bg-primary/10 p-3 group-hover:bg-primary/20 transition-colors">
+                          <Target className="h-6 w-6 text-primary" />
                         </div>
-                      )}
-                      {offTrackCount > 0 && (
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
-                          <div className="h-2 w-2 rounded-full bg-destructive" />
-                          <span className="text-xs font-semibold text-destructive">{offTrackCount}</span>
+                        <div>
+                          <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-1">
+                            {goal.title}
+                          </h3>
+                          <span className="px-2.5 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
+                            {goal.startYear} - {goal.endYear}
+                          </span>
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
 
-                  <Link to={`/goals/${goal.id}`}>
-                    <Button className="w-full gap-2">
-                      View Details
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </Card>
+                    <p className="text-sm text-muted-foreground mb-6">
+                      {goal.description}
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1 text-sm">
+                          <span className="font-bold text-lg text-foreground">{goal.initiatives.length}</span>
+                          <span className="text-muted-foreground">initiatives</span>
+                        </div>
+                        <span className="text-muted-foreground">•</span>
+                        <div className="flex items-center gap-1 text-sm">
+                          <span className="font-bold text-lg text-foreground">{totalKPIs}</span>
+                          <span className="text-muted-foreground">KPIs</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        {onTrackCount > 0 && (
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
+                            <div className="h-2 w-2 rounded-full bg-success" />
+                            <span className="text-xs font-semibold text-success">{onTrackCount}</span>
+                          </div>
+                        )}
+                        {offTrackCount > 0 && (
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
+                            <div className="h-2 w-2 rounded-full bg-destructive" />
+                            <span className="text-xs font-semibold text-destructive">{offTrackCount}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
               );
             })}
           </div>
