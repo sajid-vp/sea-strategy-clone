@@ -1,11 +1,30 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/StatusBadge";
-import { ArrowLeft, User, Users, Calendar, Target } from "lucide-react";
+import { ArrowLeft, User, Users, Calendar, Target, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 // Same data structure as Initiatives page
 const goals = [
@@ -82,6 +101,12 @@ const goals = [
 
 const InitiativeDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [kpiFormData, setKpiFormData] = useState({
+    name: "",
+    status: "on-track" as "on-track" | "off-track",
+  });
   
   // Find the initiative and its parent goal
   let initiative;
@@ -119,6 +144,32 @@ const InitiativeDetail = () => {
   const totalKpis = initiative.kpis.length;
   const onTrackKpis = initiative.kpis.filter(k => k.status === "on-track").length;
   const progress = totalKpis > 0 ? (onTrackKpis / totalKpis) * 100 : 0;
+
+  const handleKpiSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!kpiFormData.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a KPI name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Here you would normally save to a database
+    toast({
+      title: "Success",
+      description: "KPI created successfully",
+    });
+
+    // Reset form and close dialog
+    setKpiFormData({
+      name: "",
+      status: "on-track",
+    });
+    setIsDialogOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -188,9 +239,71 @@ const InitiativeDetail = () => {
 
             {/* KPIs */}
             <Card className="p-6">
-              <h2 className="text-lg font-semibold mb-4">
-                Key Performance Indicators ({initiative.kpis.length})
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">
+                  Key Performance Indicators ({initiative.kpis.length})
+                </h2>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add KPI
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New KPI</DialogTitle>
+                      <DialogDescription>
+                        Create a new Key Performance Indicator for this initiative
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <form onSubmit={handleKpiSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="kpi-name">KPI Name *</Label>
+                        <Input
+                          id="kpi-name"
+                          placeholder="Enter KPI name"
+                          value={kpiFormData.name}
+                          onChange={(e) => setKpiFormData(prev => ({ ...prev, name: e.target.value }))}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="kpi-status">Status *</Label>
+                        <Select 
+                          value={kpiFormData.status} 
+                          onValueChange={(value: "on-track" | "off-track") => 
+                            setKpiFormData(prev => ({ ...prev, status: value }))
+                          }
+                        >
+                          <SelectTrigger id="kpi-status">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="on-track">On Track</SelectItem>
+                            <SelectItem value="off-track">Off Track</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex justify-end gap-3">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setIsDialogOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button type="submit">
+                          Add KPI
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
               <div className="space-y-3">
                 {initiative.kpis.map((kpi, idx) => (
                   <div
