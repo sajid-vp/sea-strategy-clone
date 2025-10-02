@@ -23,14 +23,8 @@ export const Header = () => {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Dashboard
-              </Link>
-              <a
-                href="#"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
                 Strategy
-              </a>
+              </Link>
               <Link
                 to="/initiatives"
                 className={`text-sm font-medium transition-colors ${
