@@ -399,18 +399,18 @@ const Index = () => {
                         </h4>
                         <div className="space-y-4">
                           {goal.initiatives.map((initiative) => (
-                            <Card key={initiative.id} className="p-4 hover:shadow-md transition-shadow">
-                              <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <h4 className="text-base font-semibold text-foreground">
-                                      {initiative.title}
-                                    </h4>
-                                    <span className="px-2.5 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded">
-                                      {initiative.year}
-                                    </span>
-                                  </div>
-                                  <StatusBadge status={initiative.status} />
+                            <Card key={initiative.id} className="p-4 hover:shadow-md transition-shadow relative">
+                              <div className="absolute top-4 right-4">
+                                <StatusBadge status={initiative.status} />
+                              </div>
+                              <div className="space-y-4 pr-24">
+                                <div className="flex items-center gap-3">
+                                  <h4 className="text-base font-semibold text-foreground">
+                                    {initiative.title}
+                                  </h4>
+                                  <span className="px-2.5 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded">
+                                    {initiative.year}
+                                  </span>
                                 </div>
                                 
                                 <div className="space-y-3">
