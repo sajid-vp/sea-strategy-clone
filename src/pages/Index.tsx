@@ -397,10 +397,9 @@ const Index = () => {
                         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-6">
                           Initiatives
                         </h4>
-                        <div className="space-y-8">
-                          {goal.initiatives.map((initiative, idx) => (
-                            <div key={initiative.id}>
-                              {idx > 0 && <div className="border-t border-border mb-8" />}
+                        <div className="space-y-4">
+                          {goal.initiatives.map((initiative) => (
+                            <Card key={initiative.id} className="p-4 hover:shadow-md transition-shadow">
                               <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-3">
@@ -418,11 +417,11 @@ const Index = () => {
                                   <div className="text-xs font-medium text-muted-foreground">
                                     KPIs ({initiative.kpis.length})
                                   </div>
-                                  <div className="space-y-0.5 pl-4">
+                                  <div className="space-y-1">
                                     {initiative.kpis.map((kpi, idx) => (
                                       <div
                                         key={idx}
-                                        className="flex items-center justify-between py-3 hover:bg-muted/20 rounded px-2 transition-colors"
+                                        className="flex items-center justify-between py-2.5 px-3 bg-muted/30 hover:bg-muted/50 rounded transition-colors"
                                       >
                                         <span className="text-sm text-foreground">{kpi.name}</span>
                                         <StatusBadge status={kpi.status} className="text-xs px-2.5 py-1" />
@@ -431,7 +430,7 @@ const Index = () => {
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            </Card>
                           ))}
                         </div>
                       </div>
