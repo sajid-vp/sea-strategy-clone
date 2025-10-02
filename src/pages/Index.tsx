@@ -255,18 +255,13 @@ const Index = () => {
                     </div>
 
                     <div className="flex items-start justify-between mb-4 pr-12">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-full bg-primary/10 p-3 group-hover:bg-primary/20 transition-colors">
-                          <Target className="h-6 w-6 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-1">
-                            {goal.title}
-                          </h3>
-                          <span className="px-2.5 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
-                            {goal.startYear} - {goal.endYear}
-                          </span>
-                        </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+                          {goal.title}
+                        </h3>
+                        <span className="px-2.5 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
+                          {goal.startYear} - {goal.endYear}
+                        </span>
                       </div>
                     </div>
 
