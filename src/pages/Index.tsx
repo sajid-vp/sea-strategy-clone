@@ -248,11 +248,13 @@ const Index = () => {
               return (
                 <Link key={goal.id} to={`/goals/${goal.id}`} className="group">
                   <Card className="p-6 bg-gradient-to-br from-secondary/30 to-transparent hover:shadow-lg transition-all cursor-pointer relative overflow-hidden">
-                    <div className="absolute top-4 right-4 text-muted-foreground group-hover:text-primary transition-all group-hover:translate-x-1">
-                      <ChevronRight className="h-6 w-6" />
+                    <div className="absolute top-4 right-4 flex items-center gap-0.5">
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 group-hover:translate-x-1 opacity-40" />
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 delay-75 group-hover:translate-x-1 opacity-60" />
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 delay-150 group-hover:translate-x-1" />
                     </div>
 
-                    <div className="flex items-start justify-between mb-4 pr-8">
+                    <div className="flex items-start justify-between mb-4 pr-12">
                       <div className="flex items-center gap-3">
                         <div className="rounded-full bg-primary/10 p-3 group-hover:bg-primary/20 transition-colors">
                           <Target className="h-6 w-6 text-primary" />
