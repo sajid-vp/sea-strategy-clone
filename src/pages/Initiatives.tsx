@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { LayoutGrid, List, Target, Flag, TrendingUp, BarChart3 } from "lucide-react";
+import { LayoutGrid, List, Target, Flag, TrendingUp, BarChart3, Users, User } from "lucide-react";
 
 const goals = [
   {
@@ -28,6 +28,8 @@ const goals = [
         title: "Develop and Implement IT infrastructure",
         year: 2025,
         status: "on-track" as const,
+        owner: "John Smith",
+        team: ["Sarah Johnson", "Mike Chen", "Emma Wilson"],
         kpis: [
           { name: "ISO 27001 Implementation", status: "on-track" as const },
           { name: "Smart Campus Infrastructure", status: "on-track" as const },
@@ -39,6 +41,8 @@ const goals = [
         title: "Digital Transformation initiatives",
         year: 2025,
         status: "off-track" as const,
+        owner: "David Brown",
+        team: ["Lisa Anderson", "Tom Martinez"],
         kpis: [
           { name: "Student Information System Adoption", status: "on-track" as const },
           { name: "AI-Driven Business Intelligence Dashboards", status: "on-track" as const },
@@ -59,6 +63,8 @@ const goals = [
         title: "Support Teaching & Learning",
         year: 2025,
         status: "off-track" as const,
+        owner: "Rachel Green",
+        team: ["Chris Taylor", "Jennifer Lee"],
         kpis: [
           { name: "Education Platform Enhancement", status: "off-track" as const },
           { name: "Nursery Management System", status: "on-track" as const },
@@ -69,6 +75,8 @@ const goals = [
         title: "Increase satisfaction with IT services",
         year: 2026,
         status: "on-track" as const,
+        owner: "Michael Scott",
+        team: ["Pam Beesly", "Jim Halpert", "Dwight Schrute"],
         kpis: [
           { name: "IT Services Employee Satisfaction", status: "on-track" as const },
           { name: "Digital Learning Experience", status: "on-track" as const },
@@ -206,14 +214,32 @@ const Initiatives = () => {
                 goal.initiatives.map((initiative) => (
                   <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground">
                     <div className="mb-4">
-                      <div className="text-xs text-muted-foreground mb-2">{goal.title}</div>
                       <h4 className="text-lg font-semibold text-foreground mb-2">
                         {initiative.title}
                       </h4>
                       <StatusBadge status={initiative.status} />
                     </div>
                     
-                    <div className="space-y-3">
+                    {/* Owner & Team */}
+                    <div className="mb-4 space-y-3">
+                      <div className="flex items-start gap-2">
+                        <User className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <div>
+                          <div className="text-xs font-medium text-muted-foreground">Owner</div>
+                          <div className="text-sm text-foreground">{initiative.owner}</div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <div>
+                          <div className="text-xs font-medium text-muted-foreground">Team Members</div>
+                          <div className="text-sm text-foreground">{initiative.team.join(", ")}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3 pt-3 border-t border-border">
                       <div className="text-sm font-medium text-muted-foreground">
                         KPIs ({initiative.kpis.length})
                       </div>
