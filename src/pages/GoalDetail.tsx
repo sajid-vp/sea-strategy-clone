@@ -155,7 +155,7 @@ const GoalDetail = () => {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6">
+          <Card className="p-6 border-t-4 border-l-4 border-t-primary border-l-primary">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total Initiatives</p>
@@ -165,7 +165,7 @@ const GoalDetail = () => {
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 border-t-4 border-l-4 border-t-primary border-l-primary">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total KPIs</p>
@@ -175,7 +175,7 @@ const GoalDetail = () => {
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 border-t-4 border-l-4 border-t-success border-l-success">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">On Track</p>
@@ -187,7 +187,7 @@ const GoalDetail = () => {
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 border-t-4 border-l-4 border-t-destructive border-l-destructive">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Off Track</p>
@@ -217,9 +217,14 @@ const GoalDetail = () => {
 
         {/* Initiatives List */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-foreground mb-6">
-            Initiatives ({totalInitiatives})
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-foreground">
+              Initiatives ({totalInitiatives})
+            </h2>
+            <Button>
+              Add Initiative
+            </Button>
+          </div>
 
           {/* Filters */}
           <Card className="p-6 mb-6">
