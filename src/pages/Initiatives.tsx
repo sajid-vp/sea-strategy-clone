@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List, Target, Flag, TrendingUp, BarChart3 } from "lucide-react";
 
 const goals = [
   {
@@ -74,6 +81,7 @@ const goals = [
 
 const Initiatives = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [selectedYear, setSelectedYear] = useState("2025");
   const totalInitiatives = goals.reduce((acc, goal) => acc + goal.initiatives.length, 0);
 
   return (
@@ -81,6 +89,24 @@ const Initiatives = () => {
       <Header />
 
       <main className="container mx-auto px-6 py-8">
+        {/* Year Filter */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-foreground">Strategic Initiatives</h1>
+          <div className="w-40">
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2025">2025</SelectItem>
+                <SelectItem value="2026">2026</SelectItem>
+                <SelectItem value="2027">2027</SelectItem>
+                <SelectItem value="2028">2028</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
@@ -88,6 +114,7 @@ const Initiatives = () => {
             value={totalInitiatives}
             subtitle="2025"
             className="border-l-4 border-l-secondary-foreground"
+            icon={<Target className="h-5 w-5 text-primary" />}
           />
           
           <StatCard
@@ -95,6 +122,7 @@ const Initiatives = () => {
             value="0"
             subtitle="2025"
             className="border-l-4 border-l-secondary-foreground"
+            icon={<Flag className="h-5 w-5 text-primary" />}
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
@@ -106,6 +134,7 @@ const Initiatives = () => {
             title="Initiative Status"
             value=""
             className="border-l-4 border-l-secondary-foreground"
+            icon={<BarChart3 className="h-5 w-5 text-primary" />}
           >
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
@@ -136,6 +165,7 @@ const Initiatives = () => {
             title="Overall Progress"
             value="50%"
             className="border-l-4 border-l-secondary-foreground"
+            icon={<TrendingUp className="h-5 w-5 text-primary" />}
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>

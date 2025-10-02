@@ -1,12 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
-  icon?: LucideIcon;
+  icon?: React.ReactNode;
   children?: React.ReactNode;
   className?: string;
 }
@@ -15,7 +14,7 @@ export const StatCard = ({
   title,
   value,
   subtitle,
-  icon: Icon,
+  icon,
   children,
   className,
 }: StatCardProps) => {
@@ -23,7 +22,7 @@ export const StatCard = ({
     <Card className={cn("p-6 hover:shadow-md transition-shadow", className)}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          {Icon && <Icon className="h-4 w-4 text-primary" />}
+          {icon}
           {title}
         </div>
         {subtitle && (
