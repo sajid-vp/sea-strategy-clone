@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -470,48 +471,50 @@ const Initiatives = () => {
             <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
               {goals.flatMap((goal) =>
                 goal.initiatives.map((initiative) => (
-                  <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground">
-                    <div className="mb-4">
-                      <h4 className="text-lg font-semibold text-foreground mb-2">
-                        {initiative.title}
-                      </h4>
-                      <StatusBadge status={initiative.status} />
-                    </div>
-                    
-                    {/* Owner & Team */}
-                    <div className="mb-4 space-y-3">
-                      <div className="flex items-start gap-2">
-                        <User className="h-4 w-4 text-muted-foreground mt-0.5" />
-                        <div>
-                          <div className="text-xs font-medium text-muted-foreground">Owner</div>
-                          <div className="text-sm text-foreground">{initiative.owner}</div>
+                  <Link key={initiative.id} to={`/initiatives/${initiative.id}`}>
+                    <Card className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground cursor-pointer">
+                      <div className="mb-4">
+                        <h4 className="text-lg font-semibold text-foreground mb-2">
+                          {initiative.title}
+                        </h4>
+                        <StatusBadge status={initiative.status} />
+                      </div>
+                      
+                      {/* Owner & Team */}
+                      <div className="mb-4 space-y-3">
+                        <div className="flex items-start gap-2">
+                          <User className="h-4 w-4 text-muted-foreground mt-0.5" />
+                          <div>
+                            <div className="text-xs font-medium text-muted-foreground">Owner</div>
+                            <div className="text-sm text-foreground">{initiative.owner}</div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground mt-0.5" />
+                          <div>
+                            <div className="text-xs font-medium text-muted-foreground">Team Members</div>
+                            <div className="text-sm text-foreground">{initiative.team.join(", ")}</div>
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="flex items-start gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground mt-0.5" />
-                        <div>
-                          <div className="text-xs font-medium text-muted-foreground">Team Members</div>
-                          <div className="text-sm text-foreground">{initiative.team.join(", ")}</div>
+                      <div className="space-y-3 pt-3 border-t border-border">
+                        <div className="text-sm font-medium text-muted-foreground">
+                          KPIs ({initiative.kpis.length})
                         </div>
+                        {initiative.kpis.map((kpi, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                          >
+                            <span className="text-sm text-foreground">{kpi.name}</span>
+                            <StatusBadge status={kpi.status} />
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                    
-                    <div className="space-y-3 pt-3 border-t border-border">
-                      <div className="text-sm font-medium text-muted-foreground">
-                        KPIs ({initiative.kpis.length})
-                      </div>
-                      {initiative.kpis.map((kpi, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                        >
-                          <span className="text-sm text-foreground">{kpi.name}</span>
-                          <StatusBadge status={kpi.status} />
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
+                    </Card>
+                  </Link>
                 ))
               )}
             </div>
@@ -528,29 +531,31 @@ const Initiatives = () => {
 
                   <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
                     {goal.initiatives.map((initiative) => (
-                      <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground">
-                        <div className="mb-4">
-                          <h4 className="text-lg font-semibold text-foreground mb-2">
-                            {initiative.title}
-                          </h4>
-                          <StatusBadge status={initiative.status} />
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div className="text-sm font-medium text-muted-foreground">
-                            KPIs ({initiative.kpis.length})
+                      <Link key={initiative.id} to={`/initiatives/${initiative.id}`}>
+                        <Card className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground cursor-pointer">
+                          <div className="mb-4">
+                            <h4 className="text-lg font-semibold text-foreground mb-2">
+                              {initiative.title}
+                            </h4>
+                            <StatusBadge status={initiative.status} />
                           </div>
-                          {initiative.kpis.map((kpi, idx) => (
-                            <div
-                              key={idx}
-                              className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                            >
-                              <span className="text-sm text-foreground">{kpi.name}</span>
-                              <StatusBadge status={kpi.status} />
+                          
+                          <div className="space-y-3">
+                            <div className="text-sm font-medium text-muted-foreground">
+                              KPIs ({initiative.kpis.length})
                             </div>
-                          ))}
-                        </div>
-                      </Card>
+                            {initiative.kpis.map((kpi, idx) => (
+                              <div
+                                key={idx}
+                                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                              >
+                                <span className="text-sm text-foreground">{kpi.name}</span>
+                                <StatusBadge status={kpi.status} />
+                              </div>
+                            ))}
+                          </div>
+                        </Card>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -577,40 +582,42 @@ const Initiatives = () => {
 
                     <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
                       {ownerInitiatives.map((initiative) => (
-                        <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground">
-                          <div className="mb-4">
-                            <div className="text-xs text-muted-foreground mb-2">{initiative.goalTitle}</div>
-                            <h4 className="text-lg font-semibold text-foreground mb-2">
-                              {initiative.title}
-                            </h4>
-                            <StatusBadge status={initiative.status} />
-                          </div>
-                          
-                          <div className="mb-4">
-                            <div className="flex items-start gap-2">
-                              <Users className="h-4 w-4 text-muted-foreground mt-0.5" />
-                              <div>
-                                <div className="text-xs font-medium text-muted-foreground">Team Members</div>
-                                <div className="text-sm text-foreground">{initiative.team.join(", ")}</div>
+                        <Link key={initiative.id} to={`/initiatives/${initiative.id}`}>
+                          <Card className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground cursor-pointer">
+                            <div className="mb-4">
+                              <div className="text-xs text-muted-foreground mb-2">{initiative.goalTitle}</div>
+                              <h4 className="text-lg font-semibold text-foreground mb-2">
+                                {initiative.title}
+                              </h4>
+                              <StatusBadge status={initiative.status} />
+                            </div>
+                            
+                            <div className="mb-4">
+                              <div className="flex items-start gap-2">
+                                <Users className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                <div>
+                                  <div className="text-xs font-medium text-muted-foreground">Team Members</div>
+                                  <div className="text-sm text-foreground">{initiative.team.join(", ")}</div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          
-                          <div className="space-y-3 pt-3 border-t border-border">
-                            <div className="text-sm font-medium text-muted-foreground">
-                              KPIs ({initiative.kpis.length})
-                            </div>
-                            {initiative.kpis.map((kpi, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                              >
-                                <span className="text-sm text-foreground">{kpi.name}</span>
-                                <StatusBadge status={kpi.status} />
+                            
+                            <div className="space-y-3 pt-3 border-t border-border">
+                              <div className="text-sm font-medium text-muted-foreground">
+                                KPIs ({initiative.kpis.length})
                               </div>
-                            ))}
-                          </div>
-                        </Card>
+                              {initiative.kpis.map((kpi, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                                >
+                                  <span className="text-sm text-foreground">{kpi.name}</span>
+                                  <StatusBadge status={kpi.status} />
+                                </div>
+                              ))}
+                            </div>
+                          </Card>
+                        </Link>
                       ))}
                     </div>
                   </div>
