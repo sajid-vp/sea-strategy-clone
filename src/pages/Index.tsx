@@ -269,60 +269,101 @@ const Index = () => {
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-6">Strategic Goals</h2>
           <Accordion type="multiple" className="space-y-4">
-            {goals.map((goal) => (
-              <AccordionItem key={goal.id} value={`goal-${goal.id}`} className="border-none">
-                <Card className="bg-gradient-to-r from-secondary/30 to-transparent border-l-4 border-l-secondary-foreground hover:shadow-lg transition-shadow">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                    <div className="flex-1 text-left">
-                      <h3 className="text-xl font-bold text-foreground mb-2">{goal.title}</h3>
-                      <p className="text-muted-foreground mb-3 text-sm">{goal.description}</p>
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="text-muted-foreground">
-                          <span className="font-semibold text-foreground">{goal.initiatives.length}</span> initiatives
-                        </span>
-                        <span className="text-muted-foreground">•</span>
-                        <span className="text-muted-foreground">
-                          <span className="font-semibold text-foreground">
-                            {goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0)}
-                          </span> KPIs
-                        </span>
-                      </div>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-6 pb-6">
-                    <div className="space-y-4 mt-4">
-                      {goal.initiatives.map((initiative) => (
-                        <div
-                          key={initiative.id}
-                          className="p-4 rounded-lg bg-card border border-border hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <h4 className="text-base font-semibold text-foreground flex-1">
-                              {initiative.title}
-                            </h4>
-                            <StatusBadge status={initiative.status} />
-                          </div>
-                          <div className="space-y-2">
-                            <div className="text-xs font-medium text-muted-foreground mb-2">
-                              KPIs ({initiative.kpis.length})
-                            </div>
-                            {initiative.kpis.map((kpi, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-center justify-between p-2 rounded bg-muted/30 text-sm"
-                              >
-                                <span className="text-foreground">{kpi.name}</span>
-                                <StatusBadge status={kpi.status} className="text-xs px-2 py-0.5" />
-                              </div>
-                            ))}
+            {goals.map((goal) => {
+              const totalKPIs = goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0);
+              const onTrackCount = goal.initiatives.filter(i => i.status === "on-track").length;
+              const offTrackCount = goal.initiatives.filter(i => i.status === "off-track").length;
+              const progressPercentage = Math.round((onTrackCount / goal.initiatives.length) * 100);
+              
+              return (
+                <AccordionItem key={goal.id} value={`goal-${goal.id}`} className="border-none">
+                  <Card className="bg-gradient-to-r from-secondary/30 to-transparent border-l-4 border-l-secondary-foreground hover:shadow-lg transition-shadow overflow-hidden">
+                    <AccordionTrigger className="px-6 py-5 hover:no-underline group">
+                      <div className="flex-1 text-left pr-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                              {goal.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-4">
+                              {goal.description}
+                            </p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </Card>
-              </AccordionItem>
-            ))}
+                        
+                        <div className="flex items-center gap-6 flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 text-sm">
+                              <span className="font-bold text-lg text-foreground">{goal.initiatives.length}</span>
+                              <span className="text-muted-foreground">initiatives</span>
+                            </div>
+                            <span className="text-muted-foreground">•</span>
+                            <div className="flex items-center gap-1 text-sm">
+                              <span className="font-bold text-lg text-foreground">{totalKPIs}</span>
+                              <span className="text-muted-foreground">KPIs</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            {onTrackCount > 0 && (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
+                                <div className="h-2 w-2 rounded-full bg-success" />
+                                <span className="text-xs font-semibold text-success">{onTrackCount}</span>
+                              </div>
+                            )}
+                            {offTrackCount > 0 && (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
+                                <div className="h-2 w-2 rounded-full bg-destructive" />
+                                <span className="text-xs font-semibold text-destructive">{offTrackCount}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="flex-1 min-w-[120px]">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-muted-foreground">Progress</span>
+                              <span className="text-xs font-semibold text-foreground">{progressPercentage}%</span>
+                            </div>
+                            <Progress value={progressPercentage} className="h-1.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-6 pb-6">
+                      <div className="space-y-4 mt-2">
+                        {goal.initiatives.map((initiative) => (
+                          <div
+                            key={initiative.id}
+                            className="p-4 rounded-lg bg-card border border-border hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex items-start justify-between mb-3">
+                              <h4 className="text-base font-semibold text-foreground flex-1">
+                                {initiative.title}
+                              </h4>
+                              <StatusBadge status={initiative.status} />
+                            </div>
+                            <div className="space-y-2">
+                              <div className="text-xs font-medium text-muted-foreground mb-2">
+                                KPIs ({initiative.kpis.length})
+                              </div>
+                              {initiative.kpis.map((kpi, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-center justify-between p-2 rounded bg-muted/30 text-sm"
+                                >
+                                  <span className="text-foreground">{kpi.name}</span>
+                                  <StatusBadge status={kpi.status} className="text-xs px-2 py-0.5" />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </Card>
+                </AccordionItem>
+              );
+            })}
           </Accordion>
         </div>
 
