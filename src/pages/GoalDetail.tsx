@@ -216,7 +216,7 @@ const GoalDetail = () => {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6 border-t-4 border-l-4 border-t-primary border-l-primary">
+          <Card className="p-6 border-l-4 border-l-primary">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total Initiatives</p>
@@ -226,7 +226,7 @@ const GoalDetail = () => {
             </div>
           </Card>
 
-          <Card className="p-6 border-t-4 border-l-4 border-t-primary border-l-primary">
+          <Card className="p-6 border-l-4 border-l-primary">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total KPIs</p>
@@ -236,7 +236,7 @@ const GoalDetail = () => {
             </div>
           </Card>
 
-          <Card className="p-6 border-t-4 border-l-4 border-t-success border-l-success">
+          <Card className="p-6 border-l-4 border-l-success">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">On Track</p>
@@ -248,7 +248,7 @@ const GoalDetail = () => {
             </div>
           </Card>
 
-          <Card className="p-6 border-t-4 border-l-4 border-t-destructive border-l-destructive">
+          <Card className="p-6 border-l-4 border-l-destructive">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Off Track</p>
