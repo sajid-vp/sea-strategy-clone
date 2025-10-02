@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ArrowLeft, Calendar, Target, TrendingUp, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -500,9 +501,16 @@ const GoalDetail = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Owner: </span>
-                      <span className="font-medium text-foreground">{initiative.owner}</span>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                          {initiative.owner.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="text-sm">
+                        <div className="text-xs text-muted-foreground">Owner</div>
+                        <div className="font-medium text-foreground">{initiative.owner}</div>
+                      </div>
                     </div>
 
                     <div className="pt-3 border-t border-border">
