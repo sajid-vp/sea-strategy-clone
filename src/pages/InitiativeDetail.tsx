@@ -361,16 +361,29 @@ const InitiativeDetail = () => {
           </Card>
         </div>
 
-        {/* Owner Section - Primary Focus */}
-        <Card className="p-6 mb-6 border-l-4 border-l-primary bg-gradient-to-r from-primary/5 to-transparent">
+        {/* Strategic Goal & Owner Combined */}
+        <Card className="p-6 mb-6 border-l-4 border-l-primary">
+          {/* Strategic Goal Section */}
+          <div className="flex items-start gap-4 pb-4 mb-4 border-b border-border">
+            <div className="rounded-full bg-primary/10 p-3">
+              <Target className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-muted-foreground mb-1">Strategic Goal</div>
+              <div className="text-xl font-bold text-foreground mb-2">{parentGoal.title}</div>
+              <div className="text-sm text-muted-foreground">{parentGoal.description}</div>
+            </div>
+          </div>
+          
+          {/* Owner Section */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-primary/10 p-4">
-                <User className="h-6 w-6 text-primary" />
+              <div className="rounded-full bg-primary/10 p-3">
+                <User className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <div className="text-sm font-medium text-muted-foreground mb-1">Initiative Owner</div>
-                <div className="text-2xl font-bold text-foreground">{initiative.owner}</div>
+                <div className="text-xl font-bold text-foreground">{initiative.owner}</div>
                 <div className="text-sm text-muted-foreground">Project Lead</div>
               </div>
             </div>
@@ -421,39 +434,26 @@ const InitiativeDetail = () => {
           </div>
         </Card>
 
-        {/* Compact Goal & Timeline Info */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <Card className="p-4">
-            <div className="flex items-start gap-3">
-              <Target className="h-5 w-5 text-primary mt-0.5" />
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-muted-foreground mb-1">Strategic Goal</div>
-                <div className="font-semibold text-foreground text-sm mb-1">{parentGoal.title}</div>
-                <div className="text-xs text-muted-foreground line-clamp-2">{parentGoal.description}</div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-primary" />
-              <div>
-                <div className="text-xs font-medium text-muted-foreground mb-1">Timeline</div>
-                <div className="flex items-center gap-3">
-                  <div>
-                    <div className="text-xs text-muted-foreground">Target Year</div>
-                    <div className="font-bold text-foreground">{initiative.year}</div>
-                  </div>
-                  <div className="h-8 w-px bg-border"></div>
-                  <div>
-                    <div className="text-xs text-muted-foreground">Goal Period</div>
-                    <div className="font-bold text-foreground">{parentGoal.startYear}-{parentGoal.endYear}</div>
-                  </div>
+        {/* Timeline Info */}
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <Calendar className="h-5 w-5 text-primary" />
+            <div>
+              <div className="text-xs font-medium text-muted-foreground mb-1">Timeline</div>
+              <div className="flex items-center gap-3">
+                <div>
+                  <div className="text-xs text-muted-foreground">Target Year</div>
+                  <div className="font-bold text-foreground">{initiative.year}</div>
+                </div>
+                <div className="h-8 w-px bg-border"></div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Goal Period</div>
+                  <div className="font-bold text-foreground">{parentGoal.startYear}-{parentGoal.endYear}</div>
                 </div>
               </div>
             </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
       </main>
     </div>
   );
