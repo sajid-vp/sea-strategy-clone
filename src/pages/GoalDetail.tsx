@@ -1,10 +1,11 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/StatusBadge";
-import { ArrowLeft, Calendar, Target, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calendar, Target, TrendingUp, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -13,6 +14,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 // Same data structure as Index page
 const goals = [
@@ -87,8 +111,41 @@ const goals = [
   },
 ];
 
+const initiativeFormSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  year: z.string().min(1, "Year is required"),
+  owner: z.string().trim().min(1, "Owner is required").max(100, "Owner name must be less than 100 characters"),
+  status: z.enum(["on-track", "off-track", "at-risk"]),
+  description: z.string().trim().max(500, "Description must be less than 500 characters").optional(),
+});
+
+type InitiativeFormValues = z.infer<typeof initiativeFormSchema>;
+
 const GoalDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  const form = useForm<InitiativeFormValues>({
+    resolver: zodResolver(initiativeFormSchema),
+    defaultValues: {
+      title: "",
+      year: "",
+      owner: "",
+      status: "on-track",
+      description: "",
+    },
+  });
+  
+  const onSubmit = (data: InitiativeFormValues) => {
+    console.log("New initiative:", data);
+    toast({
+      title: "Initiative Created",
+      description: `${data.title} has been added successfully.`,
+    });
+    form.reset();
+    setIsDialogOpen(false);
+  };
   
   // Find the goal
   const goal = goals.find(g => g.id.toString() === id);
@@ -221,9 +278,134 @@ const GoalDetail = () => {
             <h2 className="text-2xl font-bold text-foreground">
               Initiatives ({totalInitiatives})
             </h2>
-            <Button>
-              Add Initiative
-            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Initiative
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Add New Initiative</DialogTitle>
+                  <DialogDescription>
+                    Create a new initiative for {goal.title}
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Title *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter initiative title" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="year"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Year *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select year" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="2025">2025</SelectItem>
+                                <SelectItem value="2026">2026</SelectItem>
+                                <SelectItem value="2027">2027</SelectItem>
+                                <SelectItem value="2028">2028</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Status *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="on-track">On Track</SelectItem>
+                                <SelectItem value="at-risk">At Risk</SelectItem>
+                                <SelectItem value="off-track">Off Track</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="owner"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Owner *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter owner name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Enter initiative description (optional)" 
+                              className="min-h-[100px]"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="flex justify-end gap-3 pt-4">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => {
+                          form.reset();
+                          setIsDialogOpen(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button type="submit">Create Initiative</Button>
+                    </div>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Filters */}
