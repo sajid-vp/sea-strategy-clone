@@ -285,65 +285,6 @@ const Index = () => {
               return (
                 <AccordionItem key={goal.id} value={`goal-${goal.id}`} className="border-none">
                   <Card className="bg-gradient-to-r from-secondary/30 to-transparent hover:shadow-lg transition-shadow overflow-hidden">
-                    {/* Initiatives Filters */}
-                    <div className="px-6 pt-4 pb-2 border-b border-border">
-                      <div className="grid grid-cols-4 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-muted-foreground mb-2 block">Year</label>
-                          <Select defaultValue="2025">
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="2025">2025</SelectItem>
-                              <SelectItem value="2026">2026</SelectItem>
-                              <SelectItem value="2027">2027</SelectItem>
-                              <SelectItem value="2028">2028</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-muted-foreground mb-2 block">Owner</label>
-                          <Select defaultValue="all">
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All owners</SelectItem>
-                              <SelectItem value="owner1">Owner 1</SelectItem>
-                              <SelectItem value="owner2">Owner 2</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-muted-foreground mb-2 block">Department</label>
-                          <Select defaultValue="all">
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All departments</SelectItem>
-                              <SelectItem value="it">IT</SelectItem>
-                              <SelectItem value="hr">HR</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-muted-foreground mb-2 block">KPI Type</label>
-                          <Select defaultValue="all">
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All KPI types</SelectItem>
-                              <SelectItem value="financial">Financial</SelectItem>
-                              <SelectItem value="operational">Operational</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-                    
                     <AccordionTrigger className="px-6 py-5 hover:no-underline group">
                       <div className="flex-1 text-left pr-4">
                         <div className="flex items-start justify-between mb-3">
@@ -393,7 +334,66 @@ const Index = () => {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="px-6 pb-6">
-                      <div className="pt-4 border-t border-border">
+                      {/* Initiatives Filters */}
+                      <div className="pt-4 pb-4 border-b border-border">
+                        <div className="grid grid-cols-4 gap-4">
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground mb-2 block">Year</label>
+                            <Select defaultValue="2025">
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="2025">2025</SelectItem>
+                                <SelectItem value="2026">2026</SelectItem>
+                                <SelectItem value="2027">2027</SelectItem>
+                                <SelectItem value="2028">2028</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground mb-2 block">Owner</label>
+                            <Select defaultValue="all">
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All owners</SelectItem>
+                                <SelectItem value="owner1">Owner 1</SelectItem>
+                                <SelectItem value="owner2">Owner 2</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground mb-2 block">Department</label>
+                            <Select defaultValue="all">
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All departments</SelectItem>
+                                <SelectItem value="it">IT</SelectItem>
+                                <SelectItem value="hr">HR</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground mb-2 block">KPI Type</label>
+                            <Select defaultValue="all">
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All KPI types</SelectItem>
+                                <SelectItem value="financial">Financial</SelectItem>
+                                <SelectItem value="operational">Operational</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-4">
                         <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4">
                           Initiatives
                         </h4>
