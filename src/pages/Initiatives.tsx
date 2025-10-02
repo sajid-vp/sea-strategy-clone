@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { LayoutGrid, List, Target, Flag, TrendingUp, BarChart3, Users, User } from "lucide-react";
+import { LayoutGrid, List, Target, Flag, TrendingUp, BarChart3, Users, User, Plus } from "lucide-react";
 
 const goals = [
   {
@@ -187,11 +187,15 @@ const Initiatives = () => {
           <div className="flex items-center justify-between mb-6">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="goal">By Goal</TabsTrigger>
               <TabsTrigger value="owner">By Owner</TabsTrigger>
+              <TabsTrigger value="goal">By Goal</TabsTrigger>
             </TabsList>
             
             <div className="flex items-center gap-2">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Initiative
+              </Button>
               <Button
                 variant={viewMode === "grid" ? "default" : "ghost"}
                 size="icon"
