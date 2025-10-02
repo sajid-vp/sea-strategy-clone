@@ -14,6 +14,12 @@ import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -262,25 +268,62 @@ const Index = () => {
         {/* Goals Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-6">Strategic Goals</h2>
-          <div className="space-y-6">
+          <Accordion type="multiple" className="space-y-4">
             {goals.map((goal) => (
-              <Card key={goal.id} className="p-6 bg-gradient-to-r from-secondary/30 to-transparent border-l-4 border-l-secondary-foreground hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-bold text-foreground mb-2">{goal.title}</h3>
-                <p className="text-muted-foreground mb-3">{goal.description}</p>
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="text-muted-foreground">
-                    <span className="font-semibold text-foreground">{goal.initiatives.length}</span> initiatives
-                  </span>
-                  <span className="text-muted-foreground">•</span>
-                  <span className="text-muted-foreground">
-                    <span className="font-semibold text-foreground">
-                      {goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0)}
-                    </span> KPIs
-                  </span>
-                </div>
-              </Card>
+              <AccordionItem key={goal.id} value={`goal-${goal.id}`} className="border-none">
+                <Card className="bg-gradient-to-r from-secondary/30 to-transparent border-l-4 border-l-secondary-foreground hover:shadow-lg transition-shadow">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex-1 text-left">
+                      <h3 className="text-xl font-bold text-foreground mb-2">{goal.title}</h3>
+                      <p className="text-muted-foreground mb-3 text-sm">{goal.description}</p>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="text-muted-foreground">
+                          <span className="font-semibold text-foreground">{goal.initiatives.length}</span> initiatives
+                        </span>
+                        <span className="text-muted-foreground">•</span>
+                        <span className="text-muted-foreground">
+                          <span className="font-semibold text-foreground">
+                            {goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0)}
+                          </span> KPIs
+                        </span>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-4 mt-4">
+                      {goal.initiatives.map((initiative) => (
+                        <div
+                          key={initiative.id}
+                          className="p-4 rounded-lg bg-card border border-border hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <h4 className="text-base font-semibold text-foreground flex-1">
+                              {initiative.title}
+                            </h4>
+                            <StatusBadge status={initiative.status} />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="text-xs font-medium text-muted-foreground mb-2">
+                              KPIs ({initiative.kpis.length})
+                            </div>
+                            {initiative.kpis.map((kpi, idx) => (
+                              <div
+                                key={idx}
+                                className="flex items-center justify-between p-2 rounded bg-muted/30 text-sm"
+                              >
+                                <span className="text-foreground">{kpi.name}</span>
+                                <StatusBadge status={kpi.status} className="text-xs px-2 py-0.5" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </Card>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
 
           {/* Filters */}
