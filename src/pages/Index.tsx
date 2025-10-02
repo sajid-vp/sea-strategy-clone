@@ -9,14 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StatusBadge } from "@/components/StatusBadge";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +24,7 @@ import {
   Flag,
   Edit,
   Save,
+  ArrowRight,
 } from "lucide-react";
 
 const goals = [
@@ -245,175 +239,73 @@ const Index = () => {
               </Select>
             </div>
           </div>
-          <Accordion type="multiple" className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-6">
             {goals.map((goal) => {
               const totalKPIs = goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0);
               const onTrackCount = goal.initiatives.filter(i => i.status === "on-track").length;
               const offTrackCount = goal.initiatives.filter(i => i.status === "off-track").length;
               
               return (
-                <AccordionItem key={goal.id} value={`goal-${goal.id}`} className="border-none">
-                  <Card className="bg-gradient-to-r from-secondary/30 to-transparent hover:shadow-lg transition-shadow overflow-hidden">
-                    <AccordionTrigger className="px-6 py-5 hover:no-underline group">
-                      <div className="flex-1 text-left pr-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-                                {goal.title}
-                              </h3>
-                              <span className="px-2.5 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
-                                {goal.startYear} - {goal.endYear}
-                              </span>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-4">
-                              {goal.description}
-                            </p>
-                          </div>
-                          <Link to={`/goals/${goal.id}`} onClick={(e) => e.stopPropagation()}>
-                            <Button variant="outline" size="sm" className="gap-2">
-                              View Details
-                            </Button>
-                          </Link>
-                        </div>
-                        
-                        <div className="flex items-center gap-6 flex-wrap">
-                          <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1 text-sm">
-                              <span className="font-bold text-lg text-foreground">{goal.initiatives.length}</span>
-                              <span className="text-muted-foreground">initiatives</span>
-                            </div>
-                            <span className="text-muted-foreground">•</span>
-                            <div className="flex items-center gap-1 text-sm">
-                              <span className="font-bold text-lg text-foreground">{totalKPIs}</span>
-                              <span className="text-muted-foreground">KPIs</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3">
-                            {onTrackCount > 0 && (
-                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
-                                <div className="h-2 w-2 rounded-full bg-success" />
-                                <span className="text-xs font-semibold text-success">{onTrackCount}</span>
-                              </div>
-                            )}
-                            {offTrackCount > 0 && (
-                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
-                                <div className="h-2 w-2 rounded-full bg-destructive" />
-                                <span className="text-xs font-semibold text-destructive">{offTrackCount}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                <Card key={goal.id} className="p-6 bg-gradient-to-br from-secondary/30 to-transparent hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-full bg-primary/10 p-3">
+                        <Target className="h-6 w-6 text-primary" />
                       </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-6 pb-6">
-                      {/* Initiatives Filters */}
-                      <div className="pt-4 pb-4 border-b border-border">
-                        <div className="grid grid-cols-4 gap-4">
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground mb-2 block">Year</label>
-                            <Select defaultValue="2025">
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="2025">2025</SelectItem>
-                                <SelectItem value="2026">2026</SelectItem>
-                                <SelectItem value="2027">2027</SelectItem>
-                                <SelectItem value="2028">2028</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground mb-2 block">Owner</label>
-                            <Select defaultValue="all">
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">All owners</SelectItem>
-                                <SelectItem value="owner1">Owner 1</SelectItem>
-                                <SelectItem value="owner2">Owner 2</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground mb-2 block">Department</label>
-                            <Select defaultValue="all">
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">All departments</SelectItem>
-                                <SelectItem value="it">IT</SelectItem>
-                                <SelectItem value="hr">HR</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground mb-2 block">KPI Type</label>
-                            <Select defaultValue="all">
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">All KPI types</SelectItem>
-                                <SelectItem value="financial">Financial</SelectItem>
-                                <SelectItem value="operational">Operational</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-foreground mb-1">
+                          {goal.title}
+                        </h3>
+                        <span className="px-2.5 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
+                          {goal.startYear} - {goal.endYear}
+                        </span>
                       </div>
+                    </div>
+                  </div>
 
-                      <div className="pt-4">
-                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-6">
-                          Initiatives
-                        </h4>
-                        <div className="space-y-4">
-                          {goal.initiatives.map((initiative) => (
-                            <Card key={initiative.id} className="p-4 hover:shadow-md transition-shadow">
-                              <div className="space-y-4">
-                                <div>
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <h4 className="text-base font-semibold text-foreground">
-                                      {initiative.title}
-                                    </h4>
-                                    <span className="px-2.5 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded">
-                                      {initiative.year}
-                                    </span>
-                                  </div>
-                                  <StatusBadge status={initiative.status} />
-                                </div>
-                                
-                                <div className="space-y-3">
-                                  <div className="text-xs font-medium text-muted-foreground">
-                                    KPIs ({initiative.kpis.length})
-                                  </div>
-                                  <div className="space-y-1">
-                                    {initiative.kpis.map((kpi, idx) => (
-                                      <div
-                                        key={idx}
-                                        className="flex items-center justify-between py-2.5 px-3 bg-muted/30 hover:bg-muted/50 rounded transition-colors"
-                                      >
-                                        <span className="text-sm text-foreground">{kpi.name}</span>
-                                        <StatusBadge status={kpi.status} className="text-xs px-2.5 py-1" />
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            </Card>
-                          ))}
-                        </div>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    {goal.description}
+                  </p>
+
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1 text-sm">
+                        <span className="font-bold text-lg text-foreground">{goal.initiatives.length}</span>
+                        <span className="text-muted-foreground">initiatives</span>
                       </div>
-                    </AccordionContent>
-                  </Card>
-                </AccordionItem>
+                      <span className="text-muted-foreground">•</span>
+                      <div className="flex items-center gap-1 text-sm">
+                        <span className="font-bold text-lg text-foreground">{totalKPIs}</span>
+                        <span className="text-muted-foreground">KPIs</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      {onTrackCount > 0 && (
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
+                          <div className="h-2 w-2 rounded-full bg-success" />
+                          <span className="text-xs font-semibold text-success">{onTrackCount}</span>
+                        </div>
+                      )}
+                      {offTrackCount > 0 && (
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
+                          <div className="h-2 w-2 rounded-full bg-destructive" />
+                          <span className="text-xs font-semibold text-destructive">{offTrackCount}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <Link to={`/goals/${goal.id}`}>
+                    <Button className="w-full gap-2">
+                      View Details
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </Card>
               );
             })}
-          </Accordion>
+          </div>
         </div>
       </main>
     </div>
