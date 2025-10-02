@@ -361,97 +361,33 @@ const InitiativeDetail = () => {
           </Card>
         </div>
 
-        {/* Compact Progress Bar */}
-        <Card className="p-4 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-muted-foreground">Overall Progress</span>
-                <span className="text-lg font-bold text-foreground">{Math.round(progress)}%</span>
+        {/* Owner Section - Primary Focus */}
+        <Card className="p-6 mb-6 border-l-4 border-l-primary bg-gradient-to-r from-primary/5 to-transparent">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="rounded-full bg-primary/10 p-4">
+                <User className="h-6 w-6 text-primary" />
               </div>
-              <Progress value={progress} className="h-2" />
+              <div>
+                <div className="text-sm font-medium text-muted-foreground mb-1">Initiative Owner</div>
+                <div className="text-2xl font-bold text-foreground">{initiative.owner}</div>
+                <div className="text-sm text-muted-foreground">Project Lead</div>
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground whitespace-nowrap">
-              {onTrackKpis}/{totalKpis} KPIs on track
-            </div>
+            <StatusBadge status={initiative.status} />
           </div>
         </Card>
 
-        {/* Goal Details Section */}
+        {/* KPIs Section */}
         <Card className="p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">Goal Details</h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            {/* Timeline */}
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="h-4 w-4 text-primary" />
-                <div className="text-xs font-medium text-muted-foreground">Target Year</div>
-              </div>
-              <div className="text-xl font-bold text-foreground">{initiative.year}</div>
-            </div>
-            
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Target className="h-4 w-4 text-primary" />
-                <div className="text-xs font-medium text-muted-foreground">Goal Period</div>
-              </div>
-              <div className="text-xl font-bold text-foreground">
-                {parentGoal.startYear}-{parentGoal.endYear}
-              </div>
-            </div>
-
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Target className="h-4 w-4 text-primary" />
-                <div className="text-xs font-medium text-muted-foreground">Status</div>
-              </div>
-              <StatusBadge status={initiative.status} />
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">
+              Key Performance Indicators ({initiative.kpis.length})
+            </h2>
+            <div className="text-sm text-muted-foreground">
+              {onTrackKpis}/{totalKpis} on track
             </div>
           </div>
-        </Card>
-
-        {/* Team Section - Owner and Members Combined */}
-        <Card className="p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">Team</h2>
-          <div className="space-y-4">
-            {/* Owner */}
-            <div className="p-4 bg-primary/5 rounded-lg border-l-4 border-l-primary">
-              <div className="flex items-center gap-3">
-                <div className="rounded-full bg-primary/10 p-2">
-                  <User className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <div className="text-xs font-medium text-muted-foreground mb-1">Initiative Owner</div>
-                  <div className="font-semibold text-foreground">{initiative.owner}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Team Members */}
-            <div>
-              <div className="flex items-center gap-2 mb-3 text-sm font-medium text-muted-foreground">
-                <Users className="h-4 w-4" />
-                <span>Team Members ({initiative.team.length})</span>
-              </div>
-              <div className="grid md:grid-cols-2 gap-2">
-                {initiative.team.map((member, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
-                  >
-                    <div className="font-medium text-foreground text-sm">{member}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* KPIs and Details */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            Key Performance Indicators ({initiative.kpis.length})
-          </h2>
           <div className="space-y-3">
             {initiative.kpis.map((kpi, idx) => (
               <div
@@ -466,6 +402,58 @@ const InitiativeDetail = () => {
             ))}
           </div>
         </Card>
+
+        {/* Team Members */}
+        <Card className="p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold">Team Members ({initiative.team.length})</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-3">
+            {initiative.team.map((member, idx) => (
+              <div
+                key={idx}
+                className="p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+              >
+                <div className="font-medium text-foreground">{member}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Compact Goal & Timeline Info */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card className="p-4">
+            <div className="flex items-start gap-3">
+              <Target className="h-5 w-5 text-primary mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-muted-foreground mb-1">Strategic Goal</div>
+                <div className="font-semibold text-foreground text-sm mb-1">{parentGoal.title}</div>
+                <div className="text-xs text-muted-foreground line-clamp-2">{parentGoal.description}</div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-primary" />
+              <div>
+                <div className="text-xs font-medium text-muted-foreground mb-1">Timeline</div>
+                <div className="flex items-center gap-3">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Target Year</div>
+                    <div className="font-bold text-foreground">{initiative.year}</div>
+                  </div>
+                  <div className="h-8 w-px bg-border"></div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Goal Period</div>
+                    <div className="font-bold text-foreground">{parentGoal.startYear}-{parentGoal.endYear}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
       </main>
     </div>
   );
