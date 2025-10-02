@@ -87,14 +87,14 @@ const Initiatives = () => {
             title="Strategic Initiatives"
             value={totalInitiatives}
             subtitle="2025"
-            className="border-l-4 border-l-secondary-foreground"
+            className="border-t-4 border-t-secondary-foreground"
           />
           
           <StatCard
             title="Key Initiatives"
             value="0"
             subtitle="2025"
-            className="border-l-4 border-l-secondary-foreground"
+            className="border-t-4 border-t-secondary-foreground"
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
@@ -105,7 +105,7 @@ const Initiatives = () => {
           <StatCard
             title="Initiative Status"
             value=""
-            className="border-l-4 border-l-secondary-foreground"
+            className="border-t-4 border-t-secondary-foreground"
           >
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
@@ -135,7 +135,7 @@ const Initiatives = () => {
           <StatCard
             title="Overall Progress"
             value="50%"
-            className="border-l-4 border-l-secondary-foreground"
+            className="border-t-4 border-t-secondary-foreground"
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
@@ -150,7 +150,6 @@ const Initiatives = () => {
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="goal">By Goal</TabsTrigger>
-              <TabsTrigger value="department">By Department</TabsTrigger>
             </TabsList>
             
             <div className="flex items-center gap-2">
@@ -182,7 +181,7 @@ const Initiatives = () => {
 
                   <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
                     {goal.initiatives.map((initiative) => (
-                      <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-l-4 border-l-secondary-foreground">
+                      <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground">
                         <div className="mb-4">
                           <h4 className="text-lg font-semibold text-foreground mb-2">
                             {initiative.title}
@@ -213,14 +212,8 @@ const Initiatives = () => {
           </TabsContent>
 
           <TabsContent value="goal">
-            <Card className="p-8 text-center border-l-4 border-l-secondary-foreground">
+            <Card className="p-8 text-center border-t-4 border-t-secondary-foreground">
               <p className="text-muted-foreground">View by goal coming soon...</p>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="department">
-            <Card className="p-8 text-center border-l-4 border-l-secondary-foreground">
-              <p className="text-muted-foreground">View by department coming soon...</p>
             </Card>
           </TabsContent>
         </Tabs>
