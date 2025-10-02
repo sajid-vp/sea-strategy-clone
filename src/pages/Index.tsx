@@ -276,6 +276,65 @@ const Index = () => {
         {/* Goals Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-6">Strategic Goals</h2>
+          
+          {/* Initiatives Filters */}
+          <Card className="p-4 border-l-4 border-l-secondary-foreground mb-6">
+            <div className="grid grid-cols-4 gap-4">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block">Year</label>
+                <Select defaultValue="2025">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2025">2025</SelectItem>
+                    <SelectItem value="2024">2024</SelectItem>
+                    <SelectItem value="2023">2023</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block">Owner</label>
+                <Select defaultValue="all">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All owners</SelectItem>
+                    <SelectItem value="owner1">Owner 1</SelectItem>
+                    <SelectItem value="owner2">Owner 2</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block">Department</label>
+                <Select defaultValue="all">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All departments</SelectItem>
+                    <SelectItem value="it">IT</SelectItem>
+                    <SelectItem value="hr">HR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block">KPI Type</label>
+                <Select defaultValue="all">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All KPI types</SelectItem>
+                    <SelectItem value="financial">Financial</SelectItem>
+                    <SelectItem value="operational">Operational</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </Card>
+
           <Accordion type="multiple" className="space-y-4">
             {goals.map((goal) => {
               const totalKPIs = goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0);
@@ -383,63 +442,6 @@ const Index = () => {
           </Accordion>
         </div>
 
-          {/* Filters */}
-          <Card className="p-4 border-l-4 border-l-secondary-foreground">
-            <div className="grid grid-cols-4 gap-4">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">Year</label>
-                <Select defaultValue="2025">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="2025">2025</SelectItem>
-                    <SelectItem value="2024">2024</SelectItem>
-                    <SelectItem value="2023">2023</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">Owner</label>
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All owners</SelectItem>
-                    <SelectItem value="owner1">Owner 1</SelectItem>
-                    <SelectItem value="owner2">Owner 2</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">Department</label>
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All departments</SelectItem>
-                    <SelectItem value="it">IT</SelectItem>
-                    <SelectItem value="hr">HR</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">KPI Type</label>
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All KPI types</SelectItem>
-                    <SelectItem value="financial">Financial</SelectItem>
-                    <SelectItem value="operational">Operational</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </Card>
         </div>
 
         {/* Stats */}
