@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -269,6 +270,11 @@ const Index = () => {
                               {goal.description}
                             </p>
                           </div>
+                          <Link to={`/goals/${goal.id}`} onClick={(e) => e.stopPropagation()}>
+                            <Button variant="outline" size="sm" className="gap-2">
+                              View Details
+                            </Button>
+                          </Link>
                         </div>
                         
                         <div className="flex items-center gap-6 flex-wrap">
