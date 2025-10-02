@@ -288,22 +288,7 @@ const Index = () => {
                     <AccordionContent className="px-6 pb-6">
                       {/* Initiatives Filters */}
                       <div className="pt-4 pb-4 border-b border-border">
-                        <div className="grid grid-cols-5 gap-4">
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground mb-2 block">Period</label>
-                            <Select defaultValue={`${goal.startYear}-${goal.endYear}`}>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value={`${goal.startYear}-${goal.endYear}`}>
-                                  {goal.startYear} - {goal.endYear}
-                                </SelectItem>
-                                <SelectItem value="2025-2026">2025 - 2026</SelectItem>
-                                <SelectItem value="2027-2028">2027 - 2028</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
+                        <div className="grid grid-cols-4 gap-4">
                           <div>
                             <label className="text-xs font-medium text-muted-foreground mb-2 block">Year</label>
                             <Select defaultValue="2025">
