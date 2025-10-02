@@ -335,15 +335,13 @@ const Initiatives = () => {
                           {goals.map((goal) => (
                             <div 
                               key={goal.id} 
-                              className="flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer"
-                              onClick={() => handleGoalsChange(goal.id.toString())}
+                              className="flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors"
                             >
                               <Checkbox
                                 id={`goal-${goal.id}`}
                                 checked={formData.goals.includes(goal.id.toString())}
                                 onCheckedChange={() => handleGoalsChange(goal.id.toString())}
                                 className="mt-1"
-                                onClick={(e) => e.stopPropagation()}
                               />
                               <label 
                                 htmlFor={`goal-${goal.id}`}
