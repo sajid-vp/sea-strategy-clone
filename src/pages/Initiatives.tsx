@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { LayoutGrid, List, Target, Flag, TrendingUp, BarChart3, Users, User, Plus } from "lucide-react";
+import { LayoutGrid, List, Target, Flag, TrendingUp, BarChart3, Users, User, Plus, Check, ChevronsUpDown, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -25,8 +25,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 const goals = [
   {
@@ -104,8 +107,14 @@ const Initiatives = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedYear, setSelectedYear] = useState("2025");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [openGoalPopover, setOpenGoalPopover] = useState(false);
   const { toast } = useToast();
   const totalInitiatives = goals.reduce((acc, goal) => acc + goal.initiatives.length, 0);
+
+  // Extract unique owners from existing data
+  const uniqueOwners = Array.from(
+    new Set(goals.flatMap(g => g.initiatives.map(i => i.owner)))
+  ).sort();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -276,6 +285,25 @@ const Initiatives = () => {
                   
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-4">
+                      {/* Year - moved to top */}
+                      <div className="space-y-2">
+                        <Label htmlFor="year">Year *</Label>
+                        <Select 
+                          value={formData.year} 
+                          onValueChange={(value) => handleInputChange("year", value)}
+                        >
+                          <SelectTrigger id="year">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="2025">2025</SelectItem>
+                            <SelectItem value="2026">2026</SelectItem>
+                            <SelectItem value="2027">2027</SelectItem>
+                            <SelectItem value="2028">2028</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
                       <div className="space-y-2">
                         <Label htmlFor="title">Initiative Title *</Label>
                         <Input
@@ -287,6 +315,113 @@ const Initiatives = () => {
                         />
                       </div>
 
+                      {/* Owner - now a dropdown */}
+                      <div className="space-y-2">
+                        <Label htmlFor="owner">Initiative Owner *</Label>
+                        <Select 
+                          value={formData.owner} 
+                          onValueChange={(value) => handleInputChange("owner", value)}
+                        >
+                          <SelectTrigger id="owner">
+                            <SelectValue placeholder="Select owner" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {uniqueOwners.map((owner) => (
+                              <SelectItem key={owner} value={owner}>
+                                {owner}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Goals - searchable multi-select */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Goals * (Select one or more)</Label>
+                        <Popover open={openGoalPopover} onOpenChange={setOpenGoalPopover}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={openGoalPopover}
+                              className="w-full justify-between h-auto min-h-10"
+                            >
+                              <span className="text-muted-foreground">
+                                {formData.goals.length === 0 
+                                  ? "Search and select goals..." 
+                                  : `${formData.goals.length} goal${formData.goals.length > 1 ? 's' : ''} selected`
+                                }
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search goals..." />
+                              <CommandList>
+                                <CommandEmpty>No goals found.</CommandEmpty>
+                                <CommandGroup>
+                                  {goals.map((goal) => (
+                                    <CommandItem
+                                      key={goal.id}
+                                      value={goal.title}
+                                      onSelect={() => handleGoalsChange(goal.id.toString())}
+                                      className="cursor-pointer"
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          formData.goals.includes(goal.id.toString())
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      <div className="flex-1">
+                                        <div className="font-medium text-sm">{goal.title}</div>
+                                        <div className="text-xs text-muted-foreground line-clamp-1">
+                                          {goal.description}
+                                        </div>
+                                      </div>
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        
+                        {/* Selected goals as badges */}
+                        {formData.goals.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {formData.goals.map((goalId) => {
+                              const goal = goals.find(g => g.id.toString() === goalId);
+                              return goal ? (
+                                <Badge 
+                                  key={goalId} 
+                                  variant="secondary"
+                                  className="gap-1 pr-1"
+                                >
+                                  {goal.title}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleGoalsChange(goalId)}
+                                    className="ml-1 hover:bg-muted rounded-sm p-0.5"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </Badge>
+                              ) : null;
+                            })}
+                          </div>
+                        )}
+                        
+                        {formData.goals.length === 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            Please select at least one goal for this initiative
+                          </p>
+                        )}
+                      </div>
+
                       <div className="space-y-2">
                         <Label htmlFor="description">Description</Label>
                         <Textarea
@@ -296,72 +431,6 @@ const Initiatives = () => {
                           onChange={(e) => handleInputChange("description", e.target.value)}
                           rows={3}
                         />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="year">Year *</Label>
-                          <Select 
-                            value={formData.year} 
-                            onValueChange={(value) => handleInputChange("year", value)}
-                          >
-                            <SelectTrigger id="year">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="2025">2025</SelectItem>
-                              <SelectItem value="2026">2026</SelectItem>
-                              <SelectItem value="2027">2027</SelectItem>
-                              <SelectItem value="2028">2028</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="owner">Initiative Owner *</Label>
-                          <Input
-                            id="owner"
-                            placeholder="Enter owner name"
-                            value={formData.owner}
-                            onChange={(e) => handleInputChange("owner", e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">Goals * (Select one or more)</Label>
-                        <div className="border rounded-lg divide-y bg-card">
-                          {goals.map((goal) => (
-                            <div 
-                              key={goal.id} 
-                              className="flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors"
-                            >
-                              <Checkbox
-                                id={`goal-${goal.id}`}
-                                checked={formData.goals.includes(goal.id.toString())}
-                                onCheckedChange={() => handleGoalsChange(goal.id.toString())}
-                                className="mt-1"
-                              />
-                              <label 
-                                htmlFor={`goal-${goal.id}`}
-                                className="flex-1 cursor-pointer space-y-1"
-                              >
-                                <div className="font-medium text-sm text-foreground leading-tight">
-                                  {goal.title}
-                                </div>
-                                <div className="text-xs text-muted-foreground leading-relaxed">
-                                  {goal.description}
-                                </div>
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                        {formData.goals.length === 0 && (
-                          <p className="text-xs text-muted-foreground">
-                            Please select at least one goal for this initiative
-                          </p>
-                        )}
                       </div>
                     </div>
 
