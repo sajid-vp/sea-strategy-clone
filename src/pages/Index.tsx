@@ -394,41 +394,39 @@ const Index = () => {
                       </div>
 
                       <div className="pt-4">
-                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4">
+                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4 px-2">
                           Initiatives
                         </h4>
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                           {goal.initiatives.map((initiative) => (
-                            <div
-                              key={initiative.id}
-                              className="p-4 rounded-lg bg-card border border-border hover:shadow-md transition-shadow"
-                            >
-                              <div className="flex items-start justify-between mb-3">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h4 className="text-base font-semibold text-foreground">
-                                      {initiative.title}
-                                    </h4>
-                                    <span className="px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded">
-                                      {initiative.year}
-                                    </span>
-                                  </div>
+                            <div key={initiative.id} className="space-y-3">
+                              <div className="flex items-start justify-between px-2">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-base font-semibold text-foreground">
+                                    {initiative.title}
+                                  </h4>
+                                  <span className="px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded">
+                                    {initiative.year}
+                                  </span>
                                 </div>
                                 <StatusBadge status={initiative.status} />
                               </div>
+                              
                               <div className="space-y-2">
-                                <div className="text-xs font-medium text-muted-foreground mb-2">
+                                <div className="text-xs font-medium text-muted-foreground px-2">
                                   KPIs ({initiative.kpis.length})
                                 </div>
-                                {initiative.kpis.map((kpi, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="flex items-center justify-between p-2 rounded bg-muted/30 text-sm"
-                                  >
-                                    <span className="text-foreground">{kpi.name}</span>
-                                    <StatusBadge status={kpi.status} className="text-xs px-2 py-0.5" />
-                                  </div>
-                                ))}
+                                <div className="space-y-1 pl-4">
+                                  {initiative.kpis.map((kpi, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="flex items-center justify-between py-2 px-2 hover:bg-muted/30 rounded transition-colors"
+                                    >
+                                      <span className="text-sm text-foreground">{kpi.name}</span>
+                                      <StatusBadge status={kpi.status} className="text-xs px-2 py-0.5" />
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           ))}
