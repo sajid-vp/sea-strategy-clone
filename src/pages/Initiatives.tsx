@@ -188,6 +188,7 @@ const Initiatives = () => {
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="goal">By Goal</TabsTrigger>
+              <TabsTrigger value="owner">By Owner</TabsTrigger>
             </TabsList>
             
             <div className="flex items-center gap-2">
@@ -297,6 +298,67 @@ const Initiatives = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="owner" className="mt-0">
+            <div className="space-y-8">
+              {Array.from(new Set(goals.flatMap(g => g.initiatives.map(i => i.owner)))).map((owner) => {
+                const ownerInitiatives = goals.flatMap(g => 
+                  g.initiatives.filter(i => i.owner === owner).map(i => ({ ...i, goalTitle: g.title }))
+                );
+                
+                return (
+                  <div key={owner}>
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2">
+                        <User className="h-5 w-5 text-primary" />
+                        <h3 className="text-xl font-semibold text-foreground">{owner}</h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground ml-7">{ownerInitiatives.length} initiatives</p>
+                    </div>
+
+                    <div className={viewMode === "grid" ? "grid md:grid-cols-2 gap-6" : "space-y-4"}>
+                      {ownerInitiatives.map((initiative) => (
+                        <Card key={initiative.id} className="p-6 hover:shadow-md transition-shadow border-t-4 border-t-secondary-foreground">
+                          <div className="mb-4">
+                            <div className="text-xs text-muted-foreground mb-2">{initiative.goalTitle}</div>
+                            <h4 className="text-lg font-semibold text-foreground mb-2">
+                              {initiative.title}
+                            </h4>
+                            <StatusBadge status={initiative.status} />
+                          </div>
+                          
+                          <div className="mb-4">
+                            <div className="flex items-start gap-2">
+                              <Users className="h-4 w-4 text-muted-foreground mt-0.5" />
+                              <div>
+                                <div className="text-xs font-medium text-muted-foreground">Team Members</div>
+                                <div className="text-sm text-foreground">{initiative.team.join(", ")}</div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3 pt-3 border-t border-border">
+                            <div className="text-sm font-medium text-muted-foreground">
+                              KPIs ({initiative.kpis.length})
+                            </div>
+                            {initiative.kpis.map((kpi, idx) => (
+                              <div
+                                key={idx}
+                                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                              >
+                                <span className="text-sm text-foreground">{kpi.name}</span>
+                                <StatusBadge status={kpi.status} />
+                              </div>
+                            ))}
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </TabsContent>
         </Tabs>
