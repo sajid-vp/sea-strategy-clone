@@ -278,14 +278,48 @@ const Index = () => {
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1 text-sm">
+                        <div className="flex items-center gap-2 text-sm">
                           <span className="font-bold text-lg text-foreground">{totalObjectives}</span>
                           <span className="text-muted-foreground">objectives</span>
+                          <div className="flex items-center gap-1">
+                            {objOnTrack > 0 && (
+                              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-success/20">
+                                <div className="h-2 w-2 rounded-full bg-success" />
+                              </div>
+                            )}
+                            {objAtRisk > 0 && (
+                              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-warning/20">
+                                <div className="h-2 w-2 rounded-full bg-warning" />
+                              </div>
+                            )}
+                            {objOffTrack > 0 && (
+                              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-destructive/20">
+                                <div className="h-2 w-2 rounded-full bg-destructive" />
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <span className="text-muted-foreground">•</span>
-                        <div className="flex items-center gap-1 text-sm">
+                        <div className="flex items-center gap-2 text-sm">
                           <span className="font-bold text-lg text-foreground">{totalInitiatives}</span>
                           <span className="text-muted-foreground">initiatives</span>
+                          <div className="flex items-center gap-1">
+                            {initOnTrack > 0 && (
+                              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-success/20">
+                                <div className="h-2 w-2 rounded-full bg-success" />
+                              </div>
+                            )}
+                            {initAtRisk > 0 && (
+                              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-warning/20">
+                                <div className="h-2 w-2 rounded-full bg-warning" />
+                              </div>
+                            )}
+                            {initOffTrack > 0 && (
+                              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-destructive/20">
+                                <div className="h-2 w-2 rounded-full bg-destructive" />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                       
