@@ -276,67 +276,85 @@ const Index = () => {
                       {goal.description}
                     </p>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1 text-sm">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-1">
                           <span className="font-bold text-lg text-foreground">{totalObjectives}</span>
                           <span className="text-muted-foreground">objectives</span>
                         </div>
                         <span className="text-muted-foreground">•</span>
-                        <div className="flex items-center gap-1 text-sm">
+                        <div className="flex items-center gap-1">
                           <span className="font-bold text-lg text-foreground">{totalInitiatives}</span>
                           <span className="text-muted-foreground">initiatives</span>
                         </div>
                       </div>
                       
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">Objectives:</span>
-                          <div className="flex items-center gap-2">
-                            {objOnTrack > 0 && (
-                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
-                                <div className="h-2 w-2 rounded-full bg-success" />
-                                <span className="text-xs font-semibold text-success">{objOnTrack}</span>
+                      <div className="space-y-3">
+                        {totalObjectives > 0 && (
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground font-medium">Objectives</span>
+                              <div className="flex items-center gap-3">
+                                {objOnTrack > 0 && <span className="text-success">{objOnTrack} on track</span>}
+                                {objAtRisk > 0 && <span className="text-warning">{objAtRisk} at risk</span>}
+                                {objOffTrack > 0 && <span className="text-destructive">{objOffTrack} off track</span>}
                               </div>
-                            )}
-                            {objAtRisk > 0 && (
-                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10">
-                                <div className="h-2 w-2 rounded-full bg-warning" />
-                                <span className="text-xs font-semibold text-warning">{objAtRisk}</span>
-                              </div>
-                            )}
-                            {objOffTrack > 0 && (
-                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
-                                <div className="h-2 w-2 rounded-full bg-destructive" />
-                                <span className="text-xs font-semibold text-destructive">{objOffTrack}</span>
-                              </div>
-                            )}
+                            </div>
+                            <div className="flex h-2 rounded-full overflow-hidden bg-muted">
+                              {objOnTrack > 0 && (
+                                <div 
+                                  className="bg-success transition-all" 
+                                  style={{ width: `${(objOnTrack / totalObjectives) * 100}%` }}
+                                />
+                              )}
+                              {objAtRisk > 0 && (
+                                <div 
+                                  className="bg-warning transition-all" 
+                                  style={{ width: `${(objAtRisk / totalObjectives) * 100}%` }}
+                                />
+                              )}
+                              {objOffTrack > 0 && (
+                                <div 
+                                  className="bg-destructive transition-all" 
+                                  style={{ width: `${(objOffTrack / totalObjectives) * 100}%` }}
+                                />
+                              )}
+                            </div>
                           </div>
-                        </div>
+                        )}
                         
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">Initiatives:</span>
-                          <div className="flex items-center gap-2">
-                            {initOnTrack > 0 && (
-                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
-                                <div className="h-2 w-2 rounded-full bg-success" />
-                                <span className="text-xs font-semibold text-success">{initOnTrack}</span>
+                        {totalInitiatives > 0 && (
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground font-medium">Initiatives</span>
+                              <div className="flex items-center gap-3">
+                                {initOnTrack > 0 && <span className="text-success">{initOnTrack} on track</span>}
+                                {initAtRisk > 0 && <span className="text-warning">{initAtRisk} at risk</span>}
+                                {initOffTrack > 0 && <span className="text-destructive">{initOffTrack} off track</span>}
                               </div>
-                            )}
-                            {initAtRisk > 0 && (
-                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10">
-                                <div className="h-2 w-2 rounded-full bg-warning" />
-                                <span className="text-xs font-semibold text-warning">{initAtRisk}</span>
-                              </div>
-                            )}
-                            {initOffTrack > 0 && (
-                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
-                                <div className="h-2 w-2 rounded-full bg-destructive" />
-                                <span className="text-xs font-semibold text-destructive">{initOffTrack}</span>
-                              </div>
-                            )}
+                            </div>
+                            <div className="flex h-2 rounded-full overflow-hidden bg-muted">
+                              {initOnTrack > 0 && (
+                                <div 
+                                  className="bg-success transition-all" 
+                                  style={{ width: `${(initOnTrack / totalInitiatives) * 100}%` }}
+                                />
+                              )}
+                              {initAtRisk > 0 && (
+                                <div 
+                                  className="bg-warning transition-all" 
+                                  style={{ width: `${(initAtRisk / totalInitiatives) * 100}%` }}
+                                />
+                              )}
+                              {initOffTrack > 0 && (
+                                <div 
+                                  className="bg-destructive transition-all" 
+                                  style={{ width: `${(initOffTrack / totalInitiatives) * 100}%` }}
+                                />
+                              )}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </Card>
