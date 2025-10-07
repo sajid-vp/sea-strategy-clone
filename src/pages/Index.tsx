@@ -47,7 +47,7 @@ const goals = [
       {
         id: 2,
         title: "Digital Transformation",
-        status: "off-track" as const,
+        status: "at-risk" as const,
         initiatives: [
           { id: 3, title: "Process Automation", status: "off-track" as const },
         ],
@@ -234,20 +234,21 @@ const Index = () => {
               const totalObjectives = goal.objectives.length;
               const totalInitiatives = goal.objectives.reduce((acc, obj) => acc + obj.initiatives.length, 0);
               
-              // Calculate combined status from objectives and initiatives
-              let combinedOnTrack = 0;
-              let combinedOffTrack = 0;
-              let combinedAtRisk = 0;
+              // Calculate status for objectives
+              const objOnTrack = goal.objectives.filter(o => o.status === "on-track").length;
+              const objOffTrack = goal.objectives.filter(o => o.status === "off-track").length;
+              const objAtRisk = goal.objectives.filter(o => o.status === "at-risk").length;
+              
+              // Calculate status for initiatives
+              let initOnTrack = 0;
+              let initOffTrack = 0;
+              let initAtRisk = 0;
               
               goal.objectives.forEach(obj => {
-                if (obj.status === "on-track") combinedOnTrack++;
-                else if (obj.status === "off-track") combinedOffTrack++;
-                else if (obj.status === "at-risk") combinedAtRisk++;
-                
                 obj.initiatives.forEach(init => {
-                  if (init.status === "on-track") combinedOnTrack++;
-                  else if (init.status === "off-track") combinedOffTrack++;
-                  else if (init.status === "at-risk") combinedAtRisk++;
+                  if (init.status === "on-track") initOnTrack++;
+                  else if (init.status === "off-track") initOffTrack++;
+                  else if (init.status === "at-risk") initAtRisk++;
                 });
               });
               
@@ -288,25 +289,54 @@ const Index = () => {
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-3">
-                        {combinedOnTrack > 0 && (
-                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
-                            <div className="h-2 w-2 rounded-full bg-success" />
-                            <span className="text-xs font-semibold text-success">{combinedOnTrack}</span>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Objectives:</span>
+                          <div className="flex items-center gap-2">
+                            {objOnTrack > 0 && (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
+                                <div className="h-2 w-2 rounded-full bg-success" />
+                                <span className="text-xs font-semibold text-success">{objOnTrack}</span>
+                              </div>
+                            )}
+                            {objAtRisk > 0 && (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10">
+                                <div className="h-2 w-2 rounded-full bg-warning" />
+                                <span className="text-xs font-semibold text-warning">{objAtRisk}</span>
+                              </div>
+                            )}
+                            {objOffTrack > 0 && (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
+                                <div className="h-2 w-2 rounded-full bg-destructive" />
+                                <span className="text-xs font-semibold text-destructive">{objOffTrack}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        {combinedAtRisk > 0 && (
-                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10">
-                            <div className="h-2 w-2 rounded-full bg-warning" />
-                            <span className="text-xs font-semibold text-warning">{combinedAtRisk}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Initiatives:</span>
+                          <div className="flex items-center gap-2">
+                            {initOnTrack > 0 && (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
+                                <div className="h-2 w-2 rounded-full bg-success" />
+                                <span className="text-xs font-semibold text-success">{initOnTrack}</span>
+                              </div>
+                            )}
+                            {initAtRisk > 0 && (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10">
+                                <div className="h-2 w-2 rounded-full bg-warning" />
+                                <span className="text-xs font-semibold text-warning">{initAtRisk}</span>
+                              </div>
+                            )}
+                            {initOffTrack > 0 && (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
+                                <div className="h-2 w-2 rounded-full bg-destructive" />
+                                <span className="text-xs font-semibold text-destructive">{initOffTrack}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        {combinedOffTrack > 0 && (
-                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
-                            <div className="h-2 w-2 rounded-full bg-destructive" />
-                            <span className="text-xs font-semibold text-destructive">{combinedOffTrack}</span>
-                          </div>
-                        )}
+                        </div>
                       </div>
                     </div>
                   </Card>
