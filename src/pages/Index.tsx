@@ -39,13 +39,18 @@ const goals = [
         id: 1,
         title: "Infrastructure Modernization",
         status: "on-track" as const,
-        initiativeCount: 2,
+        initiatives: [
+          { id: 1, title: "Cloud Migration", status: "on-track" as const },
+          { id: 2, title: "Security Enhancement", status: "on-track" as const },
+        ],
       },
       {
         id: 2,
         title: "Digital Transformation",
         status: "off-track" as const,
-        initiativeCount: 1,
+        initiatives: [
+          { id: 3, title: "Process Automation", status: "off-track" as const },
+        ],
       },
     ],
   },
@@ -60,13 +65,17 @@ const goals = [
         id: 3,
         title: "Teaching Enhancement",
         status: "off-track" as const,
-        initiativeCount: 1,
+        initiatives: [
+          { id: 4, title: "Learning Platform", status: "at-risk" as const },
+        ],
       },
       {
         id: 4,
         title: "Service Excellence",
         status: "on-track" as const,
-        initiativeCount: 1,
+        initiatives: [
+          { id: 5, title: "Student Portal", status: "on-track" as const },
+        ],
       },
     ],
   },
@@ -223,9 +232,24 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-6">
             {goals.map((goal) => {
               const totalObjectives = goal.objectives.length;
-              const totalInitiatives = goal.objectives.reduce((acc, obj) => acc + obj.initiativeCount, 0);
-              const onTrackCount = goal.objectives.filter(o => o.status === "on-track").length;
-              const offTrackCount = goal.objectives.filter(o => o.status === "off-track").length;
+              const totalInitiatives = goal.objectives.reduce((acc, obj) => acc + obj.initiatives.length, 0);
+              
+              // Calculate combined status from objectives and initiatives
+              let combinedOnTrack = 0;
+              let combinedOffTrack = 0;
+              let combinedAtRisk = 0;
+              
+              goal.objectives.forEach(obj => {
+                if (obj.status === "on-track") combinedOnTrack++;
+                else if (obj.status === "off-track") combinedOffTrack++;
+                else if (obj.status === "at-risk") combinedAtRisk++;
+                
+                obj.initiatives.forEach(init => {
+                  if (init.status === "on-track") combinedOnTrack++;
+                  else if (init.status === "off-track") combinedOffTrack++;
+                  else if (init.status === "at-risk") combinedAtRisk++;
+                });
+              });
               
               return (
                 <Link key={goal.id} to={`/goals/${goal.id}`} className="group">
@@ -265,16 +289,22 @@ const Index = () => {
                       </div>
                       
                       <div className="flex items-center gap-3">
-                        {onTrackCount > 0 && (
+                        {combinedOnTrack > 0 && (
                           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10">
                             <div className="h-2 w-2 rounded-full bg-success" />
-                            <span className="text-xs font-semibold text-success">{onTrackCount}</span>
+                            <span className="text-xs font-semibold text-success">{combinedOnTrack}</span>
                           </div>
                         )}
-                        {offTrackCount > 0 && (
+                        {combinedAtRisk > 0 && (
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10">
+                            <div className="h-2 w-2 rounded-full bg-warning" />
+                            <span className="text-xs font-semibold text-warning">{combinedAtRisk}</span>
+                          </div>
+                        )}
+                        {combinedOffTrack > 0 && (
                           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10">
                             <div className="h-2 w-2 rounded-full bg-destructive" />
-                            <span className="text-xs font-semibold text-destructive">{offTrackCount}</span>
+                            <span className="text-xs font-semibold text-destructive">{combinedOffTrack}</span>
                           </div>
                         )}
                       </div>
