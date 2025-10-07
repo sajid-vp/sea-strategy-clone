@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Objectives from "./pages/Objectives";
+import ObjectiveDetail from "./pages/ObjectiveDetail";
 import Initiatives from "./pages/Initiatives";
 import InitiativeDetail from "./pages/InitiativeDetail";
 import GoalDetail from "./pages/GoalDetail";
@@ -20,6 +22,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/goals/:id" element={<GoalDetail />} />
+          <Route path="/objectives" element={<Objectives />} />
+          <Route path="/objectives/:id" element={<ObjectiveDetail />} />
           <Route path="/initiatives" element={<Initiatives />} />
           <Route path="/initiatives/:id" element={<InitiativeDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

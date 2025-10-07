@@ -34,28 +34,18 @@ const goals = [
     description: "Build and maintain world-class technology infrastructure",
     startYear: 2025,
     endYear: 2028,
-    initiatives: [
+    objectives: [
       {
         id: 1,
-        title: "Develop and Implement IT infrastructure",
-        year: 2025,
+        title: "Infrastructure Modernization",
         status: "on-track" as const,
-        kpis: [
-          { name: "ISO 27001 Implementation", status: "on-track" as const },
-          { name: "Smart Campus Infrastructure", status: "on-track" as const },
-          { name: "Child Safety Geo-tagging", status: "on-track" as const },
-        ],
+        initiativeCount: 2,
       },
       {
         id: 2,
-        title: "Digital Transformation initiatives",
-        year: 2025,
+        title: "Digital Transformation",
         status: "off-track" as const,
-        kpis: [
-          { name: "Student Information System Adoption", status: "on-track" as const },
-          { name: "AI-Driven Business Intelligence Dashboards", status: "on-track" as const },
-          { name: "Unified Mobile App Development", status: "off-track" as const },
-        ],
+        initiativeCount: 1,
       },
     ],
   },
@@ -65,27 +55,18 @@ const goals = [
     description: "Transform teaching and learning through technology",
     startYear: 2025,
     endYear: 2028,
-    initiatives: [
+    objectives: [
       {
         id: 3,
-        title: "Support Teaching & Learning",
-        year: 2025,
+        title: "Teaching Enhancement",
         status: "off-track" as const,
-        kpis: [
-          { name: "Education Platform Enhancement", status: "off-track" as const },
-          { name: "Nursery Management System", status: "on-track" as const },
-        ],
+        initiativeCount: 1,
       },
       {
         id: 4,
-        title: "Increase satisfaction with IT services",
-        year: 2026,
+        title: "Service Excellence",
         status: "on-track" as const,
-        kpis: [
-          { name: "IT Services Employee Satisfaction", status: "on-track" as const },
-          { name: "Digital Learning Experience", status: "on-track" as const },
-          { name: "SIS Stakeholder Satisfaction", status: "on-track" as const },
-        ],
+        initiativeCount: 1,
       },
     ],
   },
@@ -241,9 +222,10 @@ const Index = () => {
           </div>
           <div className="grid md:grid-cols-2 gap-6">
             {goals.map((goal) => {
-              const totalKPIs = goal.initiatives.reduce((acc, init) => acc + init.kpis.length, 0);
-              const onTrackCount = goal.initiatives.filter(i => i.status === "on-track").length;
-              const offTrackCount = goal.initiatives.filter(i => i.status === "off-track").length;
+              const totalObjectives = goal.objectives.length;
+              const totalInitiatives = goal.objectives.reduce((acc, obj) => acc + obj.initiativeCount, 0);
+              const onTrackCount = goal.objectives.filter(o => o.status === "on-track").length;
+              const offTrackCount = goal.objectives.filter(o => o.status === "off-track").length;
               
               return (
                 <Link key={goal.id} to={`/goals/${goal.id}`} className="group">
@@ -272,13 +254,13 @@ const Index = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1 text-sm">
-                          <span className="font-bold text-lg text-foreground">{goal.initiatives.length}</span>
-                          <span className="text-muted-foreground">initiatives</span>
+                          <span className="font-bold text-lg text-foreground">{totalObjectives}</span>
+                          <span className="text-muted-foreground">objectives</span>
                         </div>
                         <span className="text-muted-foreground">•</span>
                         <div className="flex items-center gap-1 text-sm">
-                          <span className="font-bold text-lg text-foreground">{totalKPIs}</span>
-                          <span className="text-muted-foreground">KPIs</span>
+                          <span className="font-bold text-lg text-foreground">{totalInitiatives}</span>
+                          <span className="text-muted-foreground">initiatives</span>
                         </div>
                       </div>
                       

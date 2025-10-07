@@ -27,39 +27,48 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
-// Same data structure as Initiatives page
+// Data structure with objectives
 const goals = [
   {
     id: 1,
     title: "Technology Excellence",
-    description: "Build and maintain world-class technology infrastructure",
-    startYear: 2025,
-    endYear: 2028,
-    initiatives: [
+    objectives: [
       {
         id: 1,
-        title: "Develop and Implement IT infrastructure",
-        year: 2025,
-        status: "on-track" as const,
-        owner: "John Smith",
-        team: ["Sarah Johnson", "Mike Chen", "Emma Wilson"],
-        kpis: [
-          { name: "ISO 27001 Implementation", status: "on-track" as const },
-          { name: "Smart Campus Infrastructure", status: "on-track" as const },
-          { name: "Child Safety Geo-tagging", status: "on-track" as const },
+        title: "Infrastructure Modernization",
+        initiatives: [
+          {
+            id: 1,
+            title: "Develop and Implement IT infrastructure",
+            year: 2025,
+            status: "on-track" as const,
+            owner: "John Smith",
+            team: ["Sarah Johnson", "Mike Chen", "Emma Wilson"],
+            kpis: [
+              { name: "ISO 27001 Implementation", status: "on-track" as const },
+              { name: "Smart Campus Infrastructure", status: "on-track" as const },
+              { name: "Child Safety Geo-tagging", status: "on-track" as const },
+            ],
+          },
         ],
       },
       {
         id: 2,
-        title: "Digital Transformation initiatives",
-        year: 2025,
-        status: "off-track" as const,
-        owner: "David Brown",
-        team: ["Lisa Anderson", "Tom Martinez"],
-        kpis: [
-          { name: "Student Information System Adoption", status: "on-track" as const },
-          { name: "AI-Driven Business Intelligence Dashboards", status: "on-track" as const },
-          { name: "Unified Mobile App Development", status: "off-track" as const },
+        title: "Digital Transformation",
+        initiatives: [
+          {
+            id: 2,
+            title: "Digital Transformation initiatives",
+            year: 2025,
+            status: "off-track" as const,
+            owner: "David Brown",
+            team: ["Lisa Anderson", "Tom Martinez"],
+            kpis: [
+              { name: "Student Information System Adoption", status: "on-track" as const },
+              { name: "AI-Driven Business Intelligence Dashboards", status: "on-track" as const },
+              { name: "Unified Mobile App Development", status: "off-track" as const },
+            ],
+          },
         ],
       },
     ],
@@ -67,33 +76,42 @@ const goals = [
   {
     id: 2,
     title: "Educational Innovation",
-    description: "Transform teaching and learning through technology",
-    startYear: 2025,
-    endYear: 2028,
-    initiatives: [
+    objectives: [
       {
         id: 3,
-        title: "Support Teaching & Learning",
-        year: 2025,
-        status: "off-track" as const,
-        owner: "Rachel Green",
-        team: ["Chris Taylor", "Jennifer Lee"],
-        kpis: [
-          { name: "Education Platform Enhancement", status: "off-track" as const },
-          { name: "Nursery Management System", status: "on-track" as const },
+        title: "Teaching Enhancement",
+        initiatives: [
+          {
+            id: 3,
+            title: "Support Teaching & Learning",
+            year: 2025,
+            status: "off-track" as const,
+            owner: "Rachel Green",
+            team: ["Chris Taylor", "Jennifer Lee"],
+            kpis: [
+              { name: "Education Platform Enhancement", status: "off-track" as const },
+              { name: "Nursery Management System", status: "on-track" as const },
+            ],
+          },
         ],
       },
       {
         id: 4,
-        title: "Increase satisfaction with IT services",
-        year: 2026,
-        status: "on-track" as const,
-        owner: "Michael Scott",
-        team: ["Pam Beesly", "Jim Halpert", "Dwight Schrute"],
-        kpis: [
-          { name: "IT Services Employee Satisfaction", status: "on-track" as const },
-          { name: "Digital Learning Experience", status: "on-track" as const },
-          { name: "SIS Stakeholder Satisfaction", status: "on-track" as const },
+        title: "Service Excellence",
+        initiatives: [
+          {
+            id: 4,
+            title: "Increase satisfaction with IT services",
+            year: 2026,
+            status: "on-track" as const,
+            owner: "Michael Scott",
+            team: ["Pam Beesly", "Jim Halpert", "Dwight Schrute"],
+            kpis: [
+              { name: "IT Services Employee Satisfaction", status: "on-track" as const },
+              { name: "Digital Learning Experience", status: "on-track" as const },
+              { name: "SIS Stakeholder Satisfaction", status: "on-track" as const },
+            ],
+          },
         ],
       },
     ],
@@ -115,20 +133,25 @@ const InitiativeDetail = () => {
     status: "on-track" as "on-track" | "off-track",
   });
   
-  // Find the initiative and its parent goal
+  // Find the initiative, its parent objective, and parent goal
   let initiative;
+  let parentObjective;
   let parentGoal;
   
   for (const goal of goals) {
-    const found = goal.initiatives.find(i => i.id.toString() === id);
-    if (found) {
-      initiative = found;
-      parentGoal = goal;
-      break;
+    for (const objective of goal.objectives) {
+      const found = objective.initiatives.find(i => i.id.toString() === id);
+      if (found) {
+        initiative = found;
+        parentObjective = objective;
+        parentGoal = goal;
+        break;
+      }
     }
+    if (initiative) break;
   }
 
-  if (!initiative || !parentGoal) {
+  if (!initiative || !parentObjective || !parentGoal) {
     return (
       <div className="min-h-screen bg-background">
         <Header />

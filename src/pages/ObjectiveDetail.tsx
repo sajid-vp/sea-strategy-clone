@@ -31,9 +31,6 @@ const goals = [
   {
     id: 1,
     title: "Technology Excellence",
-    description: "Build and maintain world-class technology infrastructure",
-    startYear: 2025,
-    endYear: 2028,
     objectives: [
       {
         id: 1,
@@ -41,8 +38,22 @@ const goals = [
         description: "Upgrade and modernize IT infrastructure",
         year: 2025,
         status: "on-track" as const,
-        owner: "John Smith",
-        initiativeCount: 2,
+        initiatives: [
+          {
+            id: 1,
+            title: "Develop and Implement IT infrastructure",
+            year: 2025,
+            status: "on-track" as const,
+            owner: "John Smith",
+          },
+          {
+            id: 2,
+            title: "ISO 27001 Certification",
+            year: 2025,
+            status: "on-track" as const,
+            owner: "Sarah Johnson",
+          },
+        ],
       },
       {
         id: 2,
@@ -50,17 +61,21 @@ const goals = [
         description: "Transform business processes through digital solutions",
         year: 2025,
         status: "off-track" as const,
-        owner: "David Brown",
-        initiativeCount: 1,
+        initiatives: [
+          {
+            id: 3,
+            title: "Digital Transformation initiatives",
+            year: 2025,
+            status: "off-track" as const,
+            owner: "David Brown",
+          },
+        ],
       },
     ],
   },
   {
     id: 2,
     title: "Educational Innovation",
-    description: "Transform teaching and learning through technology",
-    startYear: 2025,
-    endYear: 2028,
     objectives: [
       {
         id: 3,
@@ -68,8 +83,15 @@ const goals = [
         description: "Improve teaching methods and tools",
         year: 2025,
         status: "off-track" as const,
-        owner: "Rachel Green",
-        initiativeCount: 1,
+        initiatives: [
+          {
+            id: 4,
+            title: "Support Teaching & Learning",
+            year: 2025,
+            status: "off-track" as const,
+            owner: "Rachel Green",
+          },
+        ],
       },
       {
         id: 4,
@@ -77,38 +99,56 @@ const goals = [
         description: "Enhance IT services satisfaction",
         year: 2026,
         status: "on-track" as const,
-        owner: "Michael Scott",
-        initiativeCount: 1,
+        initiatives: [
+          {
+            id: 5,
+            title: "Increase satisfaction with IT services",
+            year: 2026,
+            status: "on-track" as const,
+            owner: "Michael Scott",
+          },
+        ],
       },
     ],
   },
 ];
 
-const GoalDetail = () => {
+const ObjectiveDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  const goal = goals.find(g => g.id.toString() === id);
+  // Find the objective and its parent goal
+  let objective;
+  let parentGoal;
   
+  for (const goal of goals) {
+    const found = goal.objectives.find(o => o.id.toString() === id);
+    if (found) {
+      objective = found;
+      parentGoal = goal;
+      break;
+    }
+  }
+
   const [formData, setFormData] = useState({
     title: "",
-    description: "",
-    year: "2025",
     owner: "",
+    year: objective?.year.toString() || "2025",
+    description: "",
   });
 
-  if (!goal) {
+  if (!objective || !parentGoal) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto px-6 py-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Goal not found</h1>
-            <Link to="/">
+            <h1 className="text-2xl font-bold mb-4">Objective not found</h1>
+            <Link to="/objectives">
               <Button variant="outline">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Goals
+                Back to Objectives
               </Button>
             </Link>
           </div>
@@ -117,12 +157,10 @@ const GoalDetail = () => {
     );
   }
 
-  // Calculate statistics
-  const totalObjectives = goal.objectives.length;
-  const totalInitiatives = goal.objectives.reduce((acc, obj) => acc + obj.initiativeCount, 0);
-  const onTrackObjectives = goal.objectives.filter(o => o.status === "on-track").length;
-  const offTrackObjectives = goal.objectives.filter(o => o.status === "off-track").length;
-  const progress = totalObjectives > 0 ? (onTrackObjectives / totalObjectives) * 100 : 0;
+  const totalInitiatives = objective.initiatives.length;
+  const onTrackInitiatives = objective.initiatives.filter(i => i.status === "on-track").length;
+  const offTrackInitiatives = objective.initiatives.filter(i => i.status === "off-track").length;
+  const progress = totalInitiatives > 0 ? (onTrackInitiatives / totalInitiatives) * 100 : 0;
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -142,14 +180,14 @@ const GoalDetail = () => {
 
     toast({
       title: "Success",
-      description: "Objective created successfully",
+      description: "Initiative created successfully",
     });
 
     setFormData({
       title: "",
-      description: "",
-      year: "2025",
       owner: "",
+      year: objective.year.toString(),
+      description: "",
     });
     setIsDialogOpen(false);
   };
@@ -159,53 +197,53 @@ const GoalDetail = () => {
       <Header />
       
       <main className="container mx-auto px-6 py-8">
-        <Link to="/">
+        {/* Back button */}
+        <Link to="/objectives">
           <Button variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Goals
+            Back to Objectives
           </Button>
         </Link>
 
-        {/* Goal Header */}
+        {/* Objective Header */}
         <div className="mb-8">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <Target className="h-8 w-8 text-primary" />
                 <h1 className="text-3xl font-bold text-foreground">
-                  {goal.title}
+                  {objective.title}
                 </h1>
+                <StatusBadge status={objective.status} />
               </div>
               <p className="text-lg text-muted-foreground mb-4">
-                {goal.description}
+                {objective.description}
               </p>
-              <Badge variant="outline" className="gap-1">
-                <Calendar className="h-3 w-3" />
-                {goal.startYear} - {goal.endYear}
-              </Badge>
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className="gap-1">
+                  <Calendar className="h-3 w-3" />
+                  {objective.year}
+                </Badge>
+                <Link to={`/goals/${parentGoal.id}`}>
+                  <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-secondary/80">
+                    <Target className="h-3 w-3" />
+                    {parentGoal.title}
+                  </Badge>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6 border-l-4 border-l-primary">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Total Objectives</p>
-                <p className="text-3xl font-bold text-foreground">{totalObjectives}</p>
-              </div>
-              <Target className="h-8 w-8 text-primary opacity-50" />
-            </div>
-          </Card>
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="p-6 border-l-4 border-l-primary">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total Initiatives</p>
                 <p className="text-3xl font-bold text-foreground">{totalInitiatives}</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-primary opacity-50" />
+              <Target className="h-8 w-8 text-primary opacity-50" />
             </div>
           </Card>
 
@@ -213,7 +251,7 @@ const GoalDetail = () => {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">On Track</p>
-                <p className="text-3xl font-bold text-success">{onTrackObjectives}</p>
+                <p className="text-3xl font-bold text-success">{onTrackInitiatives}</p>
               </div>
               <div className="h-8 w-8 rounded-full bg-success/20 flex items-center justify-center">
                 <div className="h-4 w-4 rounded-full bg-success" />
@@ -225,7 +263,7 @@ const GoalDetail = () => {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Off Track</p>
-                <p className="text-3xl font-bold text-destructive">{offTrackObjectives}</p>
+                <p className="text-3xl font-bold text-destructive">{offTrackInitiatives}</p>
               </div>
               <div className="h-8 w-8 rounded-full bg-destructive/20 flex items-center justify-center">
                 <div className="h-4 w-4 rounded-full bg-destructive" />
@@ -244,44 +282,44 @@ const GoalDetail = () => {
             </div>
             <Progress value={progress} className="h-3" />
             <div className="text-xs text-muted-foreground">
-              {onTrackObjectives} of {totalObjectives} objectives on track
+              {onTrackInitiatives} of {totalInitiatives} initiatives on track
             </div>
           </div>
         </Card>
 
-        {/* Objectives List */}
+        {/* Initiatives List */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">
-              Objectives ({totalObjectives})
+              Initiatives ({totalInitiatives})
             </h2>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Add Objective
+                  Add Initiative
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>Add New Objective</DialogTitle>
+                  <DialogTitle>Add New Initiative</DialogTitle>
                   <DialogDescription>
-                    Create a new objective for {goal.title}
+                    Create a new initiative for {objective.title}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Goal</Label>
+                    <Label>Objective</Label>
                     <div className="px-3 py-2 border rounded-md bg-muted text-muted-foreground">
-                      {goal.title}
+                      {objective.title}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="title">Objective Title *</Label>
+                    <Label htmlFor="title">Title *</Label>
                     <Input
                       id="title"
-                      placeholder="Enter objective title"
+                      placeholder="Enter initiative title"
                       value={formData.title}
                       onChange={(e) => handleInputChange("title", e.target.value)}
                       required
@@ -323,7 +361,7 @@ const GoalDetail = () => {
                     <Label htmlFor="description">Description</Label>
                     <Textarea
                       id="description"
-                      placeholder="Enter objective description (optional)"
+                      placeholder="Enter initiative description (optional)"
                       className="min-h-[100px]"
                       value={formData.description}
                       onChange={(e) => handleInputChange("description", e.target.value)}
@@ -338,65 +376,16 @@ const GoalDetail = () => {
                     >
                       Cancel
                     </Button>
-                    <Button type="submit">Create Objective</Button>
+                    <Button type="submit">Create Initiative</Button>
                   </div>
                 </form>
               </DialogContent>
             </Dialog>
           </div>
 
-          {/* Filters */}
-          <Card className="p-6 mb-6">
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">Year</label>
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All years</SelectItem>
-                    <SelectItem value="2025">2025</SelectItem>
-                    <SelectItem value="2026">2026</SelectItem>
-                    <SelectItem value="2027">2027</SelectItem>
-                    <SelectItem value="2028">2028</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">Owner</label>
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All owners</SelectItem>
-                    {Array.from(new Set(goal.objectives.map(o => o.owner))).map(owner => (
-                      <SelectItem key={owner} value={owner}>{owner}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">Status</label>
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All statuses</SelectItem>
-                    <SelectItem value="on-track">On Track</SelectItem>
-                    <SelectItem value="off-track">Off Track</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </Card>
-
-          {/* Objectives Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {goal.objectives.map((objective) => (
-              <Link key={objective.id} to={`/objectives/${objective.id}`} className="group">
+          <div className="grid gap-4">
+            {objective.initiatives.map((initiative) => (
+              <Link key={initiative.id} to={`/initiatives/${initiative.id}`} className="group">
                 <Card className="p-6 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden">
                   <div className="absolute top-4 right-4">
                     <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all group-hover:translate-x-1" />
@@ -405,23 +394,14 @@ const GoalDetail = () => {
                   <div className="pr-8">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
-                        {objective.title}
+                        {initiative.title}
                       </h3>
-                      <StatusBadge status={objective.status} />
+                      <StatusBadge status={initiative.status} />
                     </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {objective.description}
-                    </p>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="text-muted-foreground">
-                        <span className="font-semibold">{objective.owner}</span>
-                        <span className="mx-2">•</span>
-                        <span>{objective.year}</span>
-                      </div>
-                      <div>
-                        <span className="font-bold text-foreground">{objective.initiativeCount}</span>
-                        <span className="text-muted-foreground ml-1">initiatives</span>
-                      </div>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>Owner: {initiative.owner}</span>
+                      <span>•</span>
+                      <span>{initiative.year}</span>
                     </div>
                   </div>
                 </Card>
@@ -434,4 +414,4 @@ const GoalDetail = () => {
   );
 };
 
-export default GoalDetail;
+export default ObjectiveDetail;
