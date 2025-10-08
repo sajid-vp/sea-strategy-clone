@@ -514,17 +514,12 @@ const Tasks = () => {
                         onClick={() => project && handleTaskClick(task, project)}
                         className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
                       >
-                         <div className="col-span-4 flex items-center gap-3">
+                        <div className="col-span-4 flex items-center gap-3">
                           {getStatusIcon(task.status)}
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
-                                {task.name}
-                              </h3>
-                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium border ${getTaskTypeColor(task.type)}`}>
-                                {getTaskTypeLabel(task.type)}
-                              </span>
-                            </div>
+                            <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                              {task.name}
+                            </h3>
                             {project && (
                               <p className="text-xs text-muted-foreground truncate">{project.title}</p>
                             )}
@@ -581,13 +576,10 @@ const Tasks = () => {
                         </div>
                         
                           <div className="space-y-3">
-                            <div className="flex items-center gap-2 flex-wrap">
+                            <div className="flex items-center gap-2">
                               <StatusBadge status={task.status} />
                               <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
                                 {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                              </span>
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getTaskTypeColor(task.type)}`}>
-                                {getTaskTypeLabel(task.type)}
                               </span>
                             </div>
                             
