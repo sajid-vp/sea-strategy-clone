@@ -8,6 +8,10 @@ import Objectives from "./pages/Objectives";
 import ObjectiveDetail from "./pages/ObjectiveDetail";
 import Initiatives from "./pages/Initiatives";
 import InitiativeDetail from "./pages/InitiativeDetail";
+import Projects from "./pages/Projects";
+import ProjectDetail from "./pages/ProjectDetail";
+import Tasks from "./pages/Tasks";
+import TaskDetail from "./pages/TaskDetail";
 import GoalDetail from "./pages/GoalDetail";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +30,10 @@ const App = () => (
           <Route path="/objectives/:id" element={<ObjectiveDetail />} />
           <Route path="/initiatives" element={<Initiatives />} />
           <Route path="/initiatives/:id" element={<InitiativeDetail />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/tasks/:id" element={<TaskDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
