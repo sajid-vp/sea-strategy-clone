@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar as CalendarIcon, X, ChevronDown, Flag, Search, Filter, ArrowUpDown } from "lucide-react";
+import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar as CalendarIcon, X, ChevronDown, Flag, Search, Filter, ArrowUpDown, Network, ListChecks } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -39,6 +39,8 @@ type Task = {
   dueDate: string;
   priority: "high" | "medium" | "low";
   type: "procurement" | "finance" | "hr" | "it" | "operations" | "marketing" | "other";
+  dependencies?: number[];
+  subtasks?: number[];
 };
 
 type Project = {
@@ -60,6 +62,8 @@ const projects: Project[] = [
         dueDate: "2025-02-15",
         priority: "high" as const,
         type: "operations" as const,
+        dependencies: [],
+        subtasks: [],
       },
       {
         id: 2,
@@ -69,6 +73,8 @@ const projects: Project[] = [
         dueDate: "2025-04-30",
         priority: "high" as const,
         type: "operations" as const,
+        dependencies: [1],
+        subtasks: [],
       },
       {
         id: 3,
@@ -78,6 +84,8 @@ const projects: Project[] = [
         dueDate: "2025-05-31",
         priority: "medium" as const,
         type: "it" as const,
+        dependencies: [2],
+        subtasks: [],
       },
       {
         id: 4,
@@ -87,6 +95,8 @@ const projects: Project[] = [
         dueDate: "2025-06-15",
         priority: "medium" as const,
         type: "finance" as const,
+        dependencies: [3],
+        subtasks: [],
       },
       {
         id: 5,
@@ -96,6 +106,8 @@ const projects: Project[] = [
         dueDate: "2025-06-30",
         priority: "high" as const,
         type: "operations" as const,
+        dependencies: [4],
+        subtasks: [],
       },
     ],
   },
@@ -213,6 +225,8 @@ const Tasks = () => {
   const [tasksList, setTasksList] = useState(projects);
   const [editingName, setEditingName] = useState(false);
   const [tempName, setTempName] = useState("");
+  const [newDependency, setNewDependency] = useState("");
+  const [newSubtask, setNewSubtask] = useState("");
   
   
   // Filters
@@ -346,6 +360,124 @@ const Tasks = () => {
       title: "Task updated",
       description: "Task status changed",
     });
+  };
+
+  const handleAddDependency = () => {
+    if (!newDependency || !selectedTask) return;
+    
+    setTasksList(prev => prev.map(proj => {
+      if (proj.id === selectedTask.project.id) {
+        return {
+          ...proj,
+          tasks: proj.tasks.map(t => 
+            t.id === selectedTask.task.id 
+              ? { ...t, dependencies: [...(t.dependencies || []), Number(newDependency)] }
+              : t
+          )
+        };
+      }
+      return proj;
+    }));
+
+    setSelectedTask({
+      ...selectedTask,
+      task: { ...selectedTask.task, dependencies: [...(selectedTask.task.dependencies || []), Number(newDependency)] }
+    });
+
+    setNewDependency("");
+    toast({ title: "Dependency added" });
+  };
+
+  const handleRemoveDependency = (depId: number) => {
+    if (!selectedTask) return;
+    
+    setTasksList(prev => prev.map(proj => {
+      if (proj.id === selectedTask.project.id) {
+        return {
+          ...proj,
+          tasks: proj.tasks.map(t => 
+            t.id === selectedTask.task.id 
+              ? { ...t, dependencies: (t.dependencies || []).filter(d => d !== depId) }
+              : t
+          )
+        };
+      }
+      return proj;
+    }));
+
+    setSelectedTask({
+      ...selectedTask,
+      task: { ...selectedTask.task, dependencies: (selectedTask.task.dependencies || []).filter(d => d !== depId) }
+    });
+
+    toast({ title: "Dependency removed" });
+  };
+
+  const handleAddSubtask = () => {
+    if (!newSubtask.trim() || !selectedTask) return;
+    
+    const allTasks = tasksList.flatMap(p => p.tasks);
+    const newTask: Task = {
+      id: Math.max(...allTasks.map(t => t.id)) + 1,
+      name: newSubtask,
+      status: "todo",
+      priority: selectedTask.task.priority,
+      assignee: selectedTask.task.assignee,
+      dueDate: selectedTask.task.dueDate,
+      type: selectedTask.task.type,
+      dependencies: [],
+      subtasks: []
+    };
+
+    setTasksList(prev => prev.map(proj => {
+      if (proj.id === selectedTask.project.id) {
+        return {
+          ...proj,
+          tasks: [
+            ...proj.tasks.map(t => 
+              t.id === selectedTask.task.id 
+                ? { ...t, subtasks: [...(t.subtasks || []), newTask.id] }
+                : t
+            ),
+            newTask
+          ]
+        };
+      }
+      return proj;
+    }));
+
+    setSelectedTask({
+      ...selectedTask,
+      task: { ...selectedTask.task, subtasks: [...(selectedTask.task.subtasks || []), newTask.id] }
+    });
+
+    setNewSubtask("");
+    toast({ title: "Subtask created" });
+  };
+
+  const handleRemoveSubtask = (subtaskId: number) => {
+    if (!selectedTask) return;
+    
+    setTasksList(prev => prev.map(proj => {
+      if (proj.id === selectedTask.project.id) {
+        return {
+          ...proj,
+          tasks: proj.tasks.map(t => 
+            t.id === selectedTask.task.id 
+              ? { ...t, subtasks: (t.subtasks || []).filter(s => s !== subtaskId) }
+              : t
+          )
+        };
+      }
+      return proj;
+    }));
+
+    setSelectedTask({
+      ...selectedTask,
+      task: { ...selectedTask.task, subtasks: (selectedTask.task.subtasks || []).filter(s => s !== subtaskId) }
+    });
+
+    toast({ title: "Subtask removed" });
   };
 
   // Get unique assignees for filter
@@ -1145,6 +1277,122 @@ const Tasks = () => {
                         />
                       </PopoverContent>
                     </Popover>
+                  </div>
+
+                  <Separator />
+
+                  {/* Dependencies */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-muted-foreground flex items-center gap-2">
+                        <Network className="h-4 w-4" />
+                        Dependencies
+                      </Label>
+                    </div>
+                    
+                    {selectedTask.task.dependencies && selectedTask.task.dependencies.length > 0 && (
+                      <div className="space-y-2 mb-2">
+                        {selectedTask.task.dependencies.map(depId => {
+                          const allTasks = tasksList.flatMap(p => p.tasks.map(t => ({ ...t, projectTitle: p.title })));
+                          const depTask = allTasks.find(t => t.id === depId);
+                          return depTask ? (
+                            <div key={depId} className="flex items-center justify-between p-2 border rounded-lg text-sm">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <StatusBadge status={depTask.status} />
+                                  <span className="font-medium">{depTask.name}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-0.5">{depTask.projectTitle}</p>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                onClick={() => handleRemoveDependency(depId)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-2">
+                      <Select value={newDependency} onValueChange={setNewDependency}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Add dependency..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tasksList.flatMap(p => 
+                            p.tasks
+                              .filter(t => t.id !== selectedTask.task.id)
+                              .map(t => (
+                                <SelectItem key={t.id} value={String(t.id)}>
+                                  {t.name} ({p.title})
+                                </SelectItem>
+                              ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        size="sm" 
+                        onClick={handleAddDependency}
+                        disabled={!newDependency}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Subtasks */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-muted-foreground flex items-center gap-2">
+                        <ListChecks className="h-4 w-4" />
+                        Subtasks
+                      </Label>
+                    </div>
+                    
+                    {selectedTask.task.subtasks && selectedTask.task.subtasks.length > 0 && (
+                      <div className="space-y-2 mb-2">
+                        {selectedTask.task.subtasks.map(subtaskId => {
+                          const allTasks = tasksList.flatMap(p => p.tasks);
+                          const subtask = allTasks.find(t => t.id === subtaskId);
+                          return subtask ? (
+                            <div key={subtaskId} className="flex items-center justify-between p-2 border rounded-lg text-sm">
+                              <div className="flex items-center gap-2 flex-1">
+                                <StatusBadge status={subtask.status} />
+                                <span className="font-medium">{subtask.name}</span>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                onClick={() => handleRemoveSubtask(subtaskId)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Add subtask..."
+                        value={newSubtask}
+                        onChange={(e) => setNewSubtask(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddSubtask()}
+                        className="flex-1"
+                      />
+                      <Button 
+                        size="sm" 
+                        onClick={handleAddSubtask}
+                        disabled={!newSubtask.trim()}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </>
