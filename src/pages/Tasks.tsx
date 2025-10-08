@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar as CalendarIcon, X, ChevronDown, Flag } from "lucide-react";
+import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar as CalendarIcon, X, ChevronDown, Flag, Search, Filter, ArrowUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -214,6 +214,17 @@ const Tasks = () => {
   const [editingName, setEditingName] = useState(false);
   const [tempName, setTempName] = useState("");
   
+  // Quick add inline
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [quickTaskName, setQuickTaskName] = useState("");
+  
+  // Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<Task['status'] | "all">("all");
+  const [filterPriority, setFilterPriority] = useState<Task['priority'] | "all">("all");
+  const [filterType, setFilterType] = useState<Task['type'] | "all">("all");
+  const [filterAssignee, setFilterAssignee] = useState<string>("all");
+  
   // Form state for new task
   const [newTaskData, setNewTaskData] = useState({
     name: "",
@@ -317,6 +328,79 @@ const Tasks = () => {
     }
   };
 
+  const handleQuickAdd = () => {
+    if (!quickTaskName.trim()) return;
+
+    const newTask: Task = {
+      id: Date.now(),
+      name: quickTaskName,
+      status: "todo",
+      assignee: "Unassigned",
+      dueDate: new Date().toISOString().split('T')[0],
+      priority: "medium",
+      type: "other",
+    };
+
+    setTasksList(prev => prev.map(proj => 
+      proj.id === projects[0]?.id
+        ? { ...proj, tasks: [...proj.tasks, newTask] }
+        : proj
+    ));
+    
+    setQuickTaskName("");
+    setShowQuickAdd(false);
+    
+    toast({
+      title: "Task created",
+      description: "Quick task added successfully"
+    });
+  };
+
+  // Get unique assignees for filter
+  const uniqueAssignees = useMemo(() => {
+    const assignees = new Set<string>();
+    tasksList.forEach(proj => {
+      proj.tasks.forEach(task => assignees.add(task.assignee));
+    });
+    return Array.from(assignees).sort();
+  }, [tasksList]);
+
+  // Filtered and searched tasks
+  const filteredTasks = useMemo(() => {
+    const allTasks = tasksList.flatMap(proj => 
+      proj.tasks.map(task => ({ task, project: proj }))
+    );
+
+    return allTasks.filter(({ task }) => {
+      // Search filter
+      if (searchQuery && !task.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      
+      // Status filter
+      if (filterStatus !== "all" && task.status !== filterStatus) {
+        return false;
+      }
+      
+      // Priority filter
+      if (filterPriority !== "all" && task.priority !== filterPriority) {
+        return false;
+      }
+      
+      // Type filter
+      if (filterType !== "all" && task.type !== filterType) {
+        return false;
+      }
+      
+      // Assignee filter
+      if (filterAssignee !== "all" && task.assignee !== filterAssignee) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [tasksList, searchQuery, filterStatus, filterPriority, filterType, filterAssignee]);
+
   const getPriorityVariant = (priority: string): "destructive" | "secondary" | "outline" => {
     switch (priority) {
       case "high": return "destructive";
@@ -343,12 +427,13 @@ const Tasks = () => {
     return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
-  const allTasks: Task[] = tasksList.flatMap(p => p.tasks);
+  const allTasks = tasksList.flatMap(p => p.tasks);
   const completedTasks = allTasks.filter(t => t.status === "done").length;
   const onTrackTasks = allTasks.filter(t => t.status === "in-progress").length;
   const atRiskTasks = allTasks.filter(t => t.status === "in-review").length;
   const notStartedTasks = allTasks.filter(t => t.status === "todo").length;
   const highPriorityTasks = allTasks.filter(t => t.priority === "high").length;
+  const activeFiltersCount = [filterStatus, filterPriority, filterType, filterAssignee].filter(f => f !== "all").length;
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -388,21 +473,144 @@ const Tasks = () => {
       <Header />
 
       <main className="container mx-auto px-6 py-8">
-        {/* Year Filter */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Tasks</h1>
-          <div className="w-40">
-            <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select year" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="2025">2025</SelectItem>
-                <SelectItem value="2026">2026</SelectItem>
-                <SelectItem value="2027">2027</SelectItem>
-                <SelectItem value="2028">2028</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Header with Search and Filters */}
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-foreground">Tasks</h1>
+            <Button onClick={handleNewTask} className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Task
+            </Button>
+          </div>
+
+          {/* Search and Filters Bar */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="relative flex-1 min-w-[200px] max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search tasks..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Filter className="h-4 w-4" />
+                  Filters
+                  {activeFiltersCount > 0 && (
+                    <Badge variant="secondary" className="ml-1 px-1 min-w-[20px] h-5">
+                      {activeFiltersCount}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="end">
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Status</Label>
+                    <Select value={filterStatus} onValueChange={(value: any) => setFilterStatus(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="in-review">In Review</SelectItem>
+                        <SelectItem value="blocked">Blocked</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Priority</Label>
+                    <Select value={filterPriority} onValueChange={(value: any) => setFilterPriority(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Priorities</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Type</Label>
+                    <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="procurement">Procurement</SelectItem>
+                        <SelectItem value="finance">Finance</SelectItem>
+                        <SelectItem value="hr">HR</SelectItem>
+                        <SelectItem value="it">IT</SelectItem>
+                        <SelectItem value="operations">Operations</SelectItem>
+                        <SelectItem value="marketing">Marketing</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Assignee</Label>
+                    <Select value={filterAssignee} onValueChange={setFilterAssignee}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Assignees</SelectItem>
+                        {uniqueAssignees.map(assignee => (
+                          <SelectItem key={assignee} value={assignee}>{assignee}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {activeFiltersCount > 0 && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        setFilterStatus("all");
+                        setFilterPriority("all");
+                        setFilterType("all");
+                        setFilterAssignee("all");
+                      }}
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <div className="flex items-center gap-1 border rounded-md p-1">
+              <Button
+                variant={viewMode === "list" ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="h-8 w-8 p-0"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === "grid" ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("grid")}
+                className="h-8 w-8 p-0"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -457,43 +665,58 @@ const Tasks = () => {
           </StatCard>
         </div>
 
-        {/* Tasks */}
-        <Tabs defaultValue="overview" className="w-full">
-          <div className="flex items-center justify-between mb-6">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="assignee">By Assignee</TabsTrigger>
-              <TabsTrigger value="project">By Project</TabsTrigger>
-              <TabsTrigger value="priority">By Priority</TabsTrigger>
-            </TabsList>
-            
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 border rounded-md p-1">
-                <Button
-                  variant={viewMode === "grid" ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="h-8 w-8 p-0"
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="h-8 w-8 p-0"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-              <Button className="gap-2" onClick={handleNewTask}>
-                <Plus className="h-4 w-4" />
-                New Task
-              </Button>
-            </div>
+        {/* Tasks List */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing {filteredTasks.length} of {allTasks.length} tasks
+            </p>
           </div>
 
-          <TabsContent value="overview">
+          <div className="space-y-2">
+            {/* Quick Add Task */}
+            {showQuickAdd ? (
+              <div className="border rounded-lg p-3 bg-muted/30 animate-fade-in">
+                <div className="flex items-center gap-2">
+                  <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                  <Input
+                    placeholder="Task name..."
+                    value={quickTaskName}
+                    onChange={(e) => setQuickTaskName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleQuickAdd();
+                      if (e.key === 'Escape') {
+                        setShowQuickAdd(false);
+                        setQuickTaskName("");
+                      }
+                    }}
+                    className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto"
+                    autoFocus
+                  />
+                  <Button size="sm" onClick={handleQuickAdd}>Add</Button>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    onClick={() => {
+                      setShowQuickAdd(false);
+                      setQuickTaskName("");
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                onClick={() => setShowQuickAdd(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Add task
+              </Button>
+            )}
+
             {viewMode === "list" ? (
               <div className="border rounded-lg overflow-hidden">
                 <div className="bg-muted/30 border-b">
@@ -506,12 +729,30 @@ const Tasks = () => {
                   </div>
                 </div>
                 <div className="divide-y">
-                  {allTasks.map((task) => {
-                    const project = getProjectForTask(task.id);
-                    return (
+                  {filteredTasks.length === 0 ? (
+                    <div className="px-4 py-12 text-center text-muted-foreground">
+                      <p>No tasks found</p>
+                      {activeFiltersCount > 0 && (
+                        <Button
+                          variant="link"
+                          className="mt-2"
+                          onClick={() => {
+                            setFilterStatus("all");
+                            setFilterPriority("all");
+                            setFilterType("all");
+                            setFilterAssignee("all");
+                            setSearchQuery("");
+                          }}
+                        >
+                          Clear all filters
+                        </Button>
+                      )}
+                    </div>
+                  ) : (
+                    filteredTasks.map(({ task, project }) => (
                       <div 
                         key={task.id} 
-                        onClick={() => project && handleTaskClick(task, project)}
+                        onClick={() => handleTaskClick(task, project)}
                         className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
                       >
                         <div className="col-span-4 flex items-center gap-3">
@@ -520,9 +761,7 @@ const Tasks = () => {
                             <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
                               {task.name}
                             </h3>
-                            {project && (
-                              <p className="text-xs text-muted-foreground truncate">{project.title}</p>
-                            )}
+                            <p className="text-xs text-muted-foreground truncate">{project.title}</p>
                           </div>
                         </div>
                         
@@ -552,16 +791,34 @@ const Tasks = () => {
                           </span>
                         </div>
                       </div>
-                    );
-                  })}
+                    ))
+                  )}
                 </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allTasks.map((task) => {
-                  const project = getProjectForTask(task.id);
-                  return (
-                    <div key={task.id} onClick={() => project && handleTaskClick(task, project)} className="block group">
+                {filteredTasks.length === 0 ? (
+                  <div className="col-span-full px-4 py-12 text-center text-muted-foreground">
+                    <p>No tasks found</p>
+                    {activeFiltersCount > 0 && (
+                      <Button
+                        variant="link"
+                        className="mt-2"
+                        onClick={() => {
+                          setFilterStatus("all");
+                          setFilterPriority("all");
+                          setFilterType("all");
+                          setFilterAssignee("all");
+                          setSearchQuery("");
+                        }}
+                      >
+                        Clear all filters
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  filteredTasks.map(({ task, project }) => (
+                    <div key={task.id} onClick={() => handleTaskClick(task, project)} className="block group">
                       <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
                         <div className="flex items-start gap-3 mb-3">
                           {getStatusIcon(task.status)}
@@ -569,362 +826,42 @@ const Tasks = () => {
                             <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
                               {task.name}
                             </h3>
-                            {project && (
-                              <p className="text-xs text-muted-foreground">{project.title}</p>
-                            )}
+                            <p className="text-xs text-muted-foreground">{project.title}</p>
                           </div>
                         </div>
                         
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                              <StatusBadge status={task.status} />
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
-                                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                              </span>
-                            </div>
-                            
-                            <div className="pt-3 border-t space-y-2 text-sm">
-                              <div className="flex items-center gap-2">
-                                <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                  <User className="h-3 w-3 text-primary" />
-                                </div>
-                                <span className="truncate">{task.assignee}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-muted-foreground">
-                                <Clock className="h-4 w-4 flex-shrink-0" />
-                                <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
-                                  month: 'short', 
-                                  day: 'numeric'
-                                })}</span>
-                              </div>
-                            </div>
-                          </div>
-                      </Card>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="assignee" className="space-y-6">
-            {Array.from(new Set(allTasks.map(t => t.assignee))).map((assignee) => {
-              const assigneeTasks = allTasks.filter(t => t.assignee === assignee);
-              
-              return (
-                <div key={assignee} className="space-y-4">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <User className="h-4 w-4 text-primary" />
-                    </div>
-                    <h2 className="text-lg font-semibold text-foreground">{assignee}</h2>
-                    <span className="text-sm text-muted-foreground">
-                      ({assigneeTasks.length} tasks)
-                    </span>
-                  </div>
-
-                  {viewMode === "list" ? (
-                    <div className="border rounded-lg overflow-hidden">
-                      <div className="divide-y">
-                        {assigneeTasks.map((task) => {
-                          const project = getProjectForTask(task.id);
-                          return (
-                            <Link 
-                              key={task.id} 
-                              to={`/tasks/${task.id}`}
-                              className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group"
-                            >
-                              <div className="col-span-5 flex items-center gap-3">
-                                {getStatusIcon(task.status)}
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
-                                    {task.name}
-                                  </h3>
-                                  {project && (
-                                    <p className="text-xs text-muted-foreground truncate">{project.title}</p>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="col-span-3 flex items-center">
-                                <StatusBadge status={task.status} />
-                              </div>
-                              
-                              <div className="col-span-2 flex items-center">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
-                                  {task.priority}
-                                </span>
-                              </div>
-                              
-                              <div className="col-span-2 flex items-center">
-                                <span className="text-sm text-muted-foreground">
-                                  {new Date(task.dueDate).toLocaleDateString('en-US', { 
-                                    month: 'short', 
-                                    day: 'numeric' 
-                                  })}
-                                </span>
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {assigneeTasks.map((task) => {
-                        const project = getProjectForTask(task.id);
-                        return (
-                          <div key={task.id} onClick={() => project && handleTaskClick(task, project)} className="block group">
-                            <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
-                              <div className="flex items-start gap-3 mb-3">
-                                {getStatusIcon(task.status)}
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
-                                    {task.name}
-                                  </h3>
-                                  {project && (
-                                    <p className="text-xs text-muted-foreground">{project.title}</p>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                  <StatusBadge status={task.status} />
-                                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
-                                    {task.priority}
-                                  </span>
-                                </div>
-                                
-                                <div className="pt-3 border-t">
-                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Clock className="h-4 w-4 flex-shrink-0" />
-                                    <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
-                                      month: 'short', 
-                                      day: 'numeric',
-                                      year: 'numeric'
-                                    })}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </Card>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </TabsContent>
-
-          <TabsContent value="project" className="space-y-6">
-            {projects.map((project) => (
-              <div key={project.id} className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <h2 className="text-lg font-semibold text-foreground">{project.title}</h2>
-                  <span className="text-sm text-muted-foreground">
-                    ({project.tasks.length} tasks)
-                  </span>
-                </div>
-
-                {viewMode === "list" ? (
-                  <div className="border rounded-lg overflow-hidden">
-                    <div className="divide-y">
-                      {project.tasks.map((task) => (
-                        <Link 
-                          key={task.id} 
-                          to={`/tasks/${task.id}`}
-                          className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group"
-                        >
-                          <div className="col-span-5 flex items-center gap-3">
-                            {getStatusIcon(task.status)}
-                            <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
-                              {task.name}
-                            </h3>
-                          </div>
-                          
-                          <div className="col-span-3 flex items-center">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
                             <StatusBadge status={task.status} />
-                          </div>
-                          
-                          <div className="col-span-2 flex items-center gap-2">
-                            <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                              <User className="h-3 w-3 text-primary" />
-                            </div>
-                            <span className="text-sm truncate">{task.assignee}</span>
-                          </div>
-                          
-                          <div className="col-span-2 flex items-center">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
-                              {task.priority}
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                             </span>
                           </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {project.tasks.map((task) => (
-                      <div key={task.id} onClick={() => handleTaskClick(task, project)} className="block group">
-                        <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
-                          <div className="flex items-start gap-3 mb-3">
-                            {getStatusIcon(task.status)}
-                            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                              {task.name}
-                            </h3>
-                          </div>
                           
-                          <div className="space-y-3">
+                          <div className="pt-3 border-t space-y-2 text-sm">
                             <div className="flex items-center gap-2">
-                              <StatusBadge status={task.status} />
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
-                                {task.priority}
-                              </span>
+                              <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <User className="h-3 w-3 text-primary" />
+                              </div>
+                              <span className="truncate">{task.assignee}</span>
                             </div>
-                            
-                            <div className="pt-3 border-t space-y-2 text-sm">
-                              <div className="flex items-center gap-2">
-                                <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                  <User className="h-3 w-3 text-primary" />
-                                </div>
-                                <span className="truncate">{task.assignee}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-muted-foreground">
-                                <Clock className="h-4 w-4 flex-shrink-0" />
-                                <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
-                                  month: 'short', 
-                                  day: 'numeric',
-                                  year: 'numeric'
-                                })}</span>
-                              </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Clock className="h-4 w-4 flex-shrink-0" />
+                              <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric'
+                              })}</span>
                             </div>
                           </div>
-                        </Card>
-                      </div>
-                    ))}
-                  </div>
+                        </div>
+                      </Card>
+                    </div>
+                  ))
                 )}
               </div>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="priority" className="space-y-6">
-            {["high", "medium", "low"].map((priority) => {
-              const priorityTasks = allTasks.filter(t => t.priority === priority);
-              
-              if (priorityTasks.length === 0) return null;
-              
-              return (
-                <div key={priority} className="space-y-4">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold border-2 ${getPriorityBadgeColor(priority)}`}>
-                      {priority} Priority
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      ({priorityTasks.length} tasks)
-                    </span>
-                  </div>
-
-                  {viewMode === "list" ? (
-                    <div className="border rounded-lg overflow-hidden">
-                      <div className="divide-y">
-                        {priorityTasks.map((task) => {
-                          const project = getProjectForTask(task.id);
-                          return (
-                            <div 
-                              key={task.id} 
-                              onClick={() => project && handleTaskClick(task, project)}
-                              className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
-                            >
-                              <div className="col-span-4 flex items-center gap-3">
-                                {getStatusIcon(task.status)}
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
-                                    {task.name}
-                                  </h3>
-                                  {project && (
-                                    <p className="text-xs text-muted-foreground truncate">{project.title}</p>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="col-span-3 flex items-center">
-                                <StatusBadge status={task.status} />
-                              </div>
-                              
-                              <div className="col-span-3 flex items-center gap-2">
-                                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                                  <User className="h-3 w-3 text-primary" />
-                                </div>
-                                <span className="text-sm truncate">{task.assignee}</span>
-                              </div>
-                              
-                              <div className="col-span-2 flex items-center">
-                                <span className="text-sm text-muted-foreground">
-                                  {new Date(task.dueDate).toLocaleDateString('en-US', { 
-                                    month: 'short', 
-                                    day: 'numeric'
-                                  })}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {priorityTasks.map((task) => {
-                        const project = getProjectForTask(task.id);
-                        return (
-                          <div key={task.id} onClick={() => project && handleTaskClick(task, project)} className="block group">
-                            <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
-                              <div className="flex items-start gap-3 mb-3">
-                                {getStatusIcon(task.status)}
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
-                                    {task.name}
-                                  </h3>
-                                  {project && (
-                                    <p className="text-xs text-muted-foreground">{project.title}</p>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                  <StatusBadge status={task.status} />
-                                </div>
-                                
-                                <div className="pt-3 border-t space-y-2 text-sm">
-                                  <div className="flex items-center gap-2">
-                                    <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                      <User className="h-3 w-3 text-primary" />
-                                    </div>
-                                    <span className="truncate">{task.assignee}</span>
-                                  </div>
-                                  <div className="flex items-center gap-2 text-muted-foreground">
-                                    <Clock className="h-4 w-4 flex-shrink-0" />
-                                    <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
-                                      month: 'short', 
-                                      day: 'numeric'
-                                    })}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </Card>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </TabsContent>
-        </Tabs>
+            )}
+          </div>
+        </div>
 
         {/* Task Sheet - Modern Inline Editing */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
