@@ -65,6 +65,16 @@ export const Header = () => {
               >
                 Tasks
               </Link>
+              <Link
+                to="/activities"
+                className={`text-sm font-medium transition-colors ${
+                  isActive("/activities")
+                    ? "text-primary border-b-2 border-primary pb-4"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Activities
+              </Link>
               <a
                 href="#"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
