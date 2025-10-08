@@ -3,97 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { ArrowLeft, User, Calendar, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { ArrowLeft, User, Calendar, AlertCircle, CheckCircle2, Clock, Network, ListChecks } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-const projects = [
-  {
-    id: 1,
-    title: "ISO 27001 Implementation",
-    tasks: [
-      {
-        id: 1,
-        name: "Gap Analysis",
-        status: "done" as const,
-        assignee: "John Smith",
-        dueDate: "2025-02-15",
-        priority: "high" as const,
-        description: "Conduct comprehensive gap analysis to identify current state vs. ISO 27001 requirements",
-        completedDate: "2025-02-10",
-      },
-      {
-        id: 2,
-        name: "Policy Documentation",
-        status: "in-progress" as const,
-        assignee: "Sarah Johnson",
-        dueDate: "2025-04-30",
-        priority: "high" as const,
-        description: "Create and document all required information security policies and procedures",
-      },
-      {
-        id: 3,
-        name: "Security Controls Implementation",
-        status: "in-progress" as const,
-        assignee: "Mike Chen",
-        dueDate: "2025-05-31",
-        priority: "medium" as const,
-        description: "Implement technical and organizational security controls as per ISO 27001 requirements",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Smart Campus Infrastructure",
-    tasks: [
-      {
-        id: 6,
-        name: "Requirements Analysis",
-        status: "done" as const,
-        assignee: "Emma Wilson",
-        dueDate: "2025-03-01",
-        priority: "high" as const,
-        description: "Analyze and document all requirements for smart campus infrastructure",
-        completedDate: "2025-02-28",
-      },
-      {
-        id: 9,
-        name: "Software Integration",
-        status: "in-review" as const,
-        assignee: "Tom Martinez",
-        dueDate: "2025-07-31",
-        priority: "high" as const,
-        description: "Integrate all software systems with the smart campus platform",
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: "Unified Mobile App Development",
-    tasks: [
-      {
-        id: 12,
-        name: "Backend API Development",
-        status: "blocked" as const,
-        assignee: "Chris Taylor",
-        dueDate: "2025-05-15",
-        priority: "high" as const,
-        description: "Develop RESTful APIs for mobile app backend services",
-      },
-      {
-        id: 13,
-        name: "Frontend Development",
-        status: "in-review" as const,
-        assignee: "Lisa Anderson",
-        dueDate: "2025-06-15",
-        priority: "high" as const,
-        description: "Build mobile app frontend using React Native",
-      },
-    ],
-  },
-];
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getAllProjects } from "@/data/projectsData";
 
 const TaskDetail = () => {
   const { id } = useParams();
+  const allProjects = getAllProjects();
+  const [projects, setProjects] = useState(allProjects);
   
   let task = null;
   let parentProject = null;
@@ -106,6 +28,103 @@ const TaskDetail = () => {
       break;
     }
   }
+
+  // Get all tasks for dependencies
+  const allTasks = projects.flatMap(p => p.tasks.map(t => ({ ...t, projectId: p.id, projectTitle: p.title })));
+  
+  const [newSubtask, setNewSubtask] = useState("");
+  const [newDependency, setNewDependency] = useState("");
+
+  const handleAddSubtask = () => {
+    if (!newSubtask.trim() || !task) return;
+    
+    const newTask = {
+      id: Math.max(...allTasks.map(t => t.id)) + 1,
+      name: newSubtask,
+      status: "todo" as const,
+      priority: task.priority,
+      assignee: task.assignee,
+      dependencies: [],
+      subtasks: [],
+      dueDate: task.dueDate || "",
+      description: `Subtask of ${task.name}`
+    };
+
+    setProjects(prev => prev.map(p => 
+      p.id === parentProject?.id 
+        ? { ...p, tasks: [...p.tasks, newTask] }
+        : p
+    ));
+
+    // Add subtask reference
+    setProjects(prev => prev.map(p =>
+      p.id === parentProject?.id 
+        ? { 
+            ...p, 
+            tasks: p.tasks.map(t => 
+              t.id === task.id 
+                ? { ...t, subtasks: [...(t.subtasks || []), newTask.id] }
+                : t
+            )
+          }
+        : p
+    ));
+
+    setNewSubtask("");
+  };
+
+  const handleAddDependency = () => {
+    if (!newDependency || !task) return;
+    
+    setProjects(prev => prev.map(p =>
+      p.id === parentProject?.id 
+        ? { 
+            ...p, 
+            tasks: p.tasks.map(t => 
+              t.id === task.id 
+                ? { ...t, dependencies: [...(t.dependencies || []), Number(newDependency)] }
+                : t
+            )
+          }
+        : p
+    ));
+
+    setNewDependency("");
+  };
+
+  const handleRemoveDependency = (depId: number) => {
+    if (!task) return;
+    
+    setProjects(prev => prev.map(p =>
+      p.id === parentProject?.id 
+        ? { 
+            ...p, 
+            tasks: p.tasks.map(t => 
+              t.id === task.id 
+                ? { ...t, dependencies: (t.dependencies || []).filter(d => d !== depId) }
+                : t
+            )
+          }
+        : p
+    ));
+  };
+
+  const handleRemoveSubtask = (subtaskId: number) => {
+    if (!task) return;
+    
+    setProjects(prev => prev.map(p => 
+      p.id === parentProject?.id 
+        ? { 
+            ...p, 
+            tasks: p.tasks.map(t => 
+              t.id === task.id 
+                ? { ...t, subtasks: (t.subtasks || []).filter(s => s !== subtaskId) }
+                : t
+            )
+          }
+        : p
+    ));
+  };
 
   if (!task || !parentProject) {
     return (
@@ -260,6 +279,142 @@ const TaskDetail = () => {
               <Badge variant={getPriorityColor(task.priority)} className="capitalize text-base px-3 py-1">
                 {task.priority}
               </Badge>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Dependencies */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Network className="h-5 w-5 text-primary" />
+                  Dependencies
+                </CardTitle>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline">Add</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Dependency</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 mt-4">
+                      <div>
+                        <Label>Task must wait for:</Label>
+                        <Select value={newDependency} onValueChange={setNewDependency}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a task" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {allTasks.filter(t => t.id !== task?.id).map(t => (
+                              <SelectItem key={t.id} value={String(t.id)}>
+                                {t.name} ({t.projectTitle})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button onClick={handleAddDependency} className="w-full">
+                        Add Dependency
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {task.dependencies && task.dependencies.length > 0 ? (
+                <div className="space-y-2">
+                  {task.dependencies.map(depId => {
+                    const depTask = allTasks.find(t => t.id === depId);
+                    return depTask ? (
+                      <div key={depId} className="flex items-center justify-between p-2 border rounded-lg">
+                        <Link to={`/tasks/${depTask.id}`} className="flex-1 hover:text-primary">
+                          <div className="flex items-center gap-2">
+                            <StatusBadge status={depTask.status} />
+                            <span className="font-medium">{depTask.name}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">{depTask.projectTitle}</p>
+                        </Link>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => handleRemoveDependency(depId)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No dependencies</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Subtasks */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <ListChecks className="h-5 w-5 text-primary" />
+                  Subtasks
+                </CardTitle>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline">Add</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Subtask</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 mt-4">
+                      <div>
+                        <Label>Subtask Name</Label>
+                        <Input 
+                          value={newSubtask}
+                          onChange={(e) => setNewSubtask(e.target.value)}
+                          placeholder="Enter subtask name"
+                        />
+                      </div>
+                      <Button onClick={handleAddSubtask} className="w-full">
+                        Create Subtask
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {task.subtasks && task.subtasks.length > 0 ? (
+                <div className="space-y-2">
+                  {task.subtasks.map(subtaskId => {
+                    const subtask = allTasks.find(t => t.id === subtaskId);
+                    return subtask ? (
+                      <div key={subtaskId} className="flex items-center justify-between p-2 border rounded-lg">
+                        <Link to={`/tasks/${subtask.id}`} className="flex-1 hover:text-primary">
+                          <div className="flex items-center gap-2">
+                            <StatusBadge status={subtask.status} />
+                            <span className="font-medium">{subtask.name}</span>
+                          </div>
+                        </Link>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => handleRemoveSubtask(subtaskId)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No subtasks</p>
+              )}
             </CardContent>
           </Card>
         </div>
