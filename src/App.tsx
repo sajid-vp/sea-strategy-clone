@@ -8,6 +8,8 @@ import Objectives from "./pages/Objectives";
 import ObjectiveDetail from "./pages/ObjectiveDetail";
 import Initiatives from "./pages/Initiatives";
 import InitiativeDetail from "./pages/InitiativeDetail";
+import Programs from "./pages/Programs";
+import ProgramDetail from "./pages/ProgramDetail";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import Tasks from "./pages/Tasks";
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/objectives/:id" element={<ObjectiveDetail />} />
           <Route path="/initiatives" element={<Initiatives />} />
           <Route path="/initiatives/:id" element={<InitiativeDetail />} />
+          <Route path="/programs" element={<Programs />} />
+          <Route path="/programs/:id" element={<ProgramDetail />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/tasks" element={<Tasks />} />

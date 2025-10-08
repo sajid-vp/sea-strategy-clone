@@ -46,6 +46,16 @@ export const Header = () => {
                 Initiatives
               </Link>
               <Link
+                to="/programs"
+                className={`text-sm font-medium transition-colors ${
+                  isActive("/programs")
+                    ? "text-primary border-b-2 border-primary pb-4"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Programs
+              </Link>
+              <Link
                 to="/projects"
                 className={`text-sm font-medium transition-colors ${
                   isActive("/projects")
