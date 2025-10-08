@@ -14,7 +14,7 @@ const projects = [
       {
         id: 1,
         name: "Gap Analysis",
-        status: "completed" as const,
+        status: "done" as const,
         assignee: "John Smith",
         dueDate: "2025-02-15",
         priority: "high" as const,
@@ -24,7 +24,7 @@ const projects = [
       {
         id: 2,
         name: "Policy Documentation",
-        status: "on-track" as const,
+        status: "in-progress" as const,
         assignee: "Sarah Johnson",
         dueDate: "2025-04-30",
         priority: "high" as const,
@@ -33,7 +33,7 @@ const projects = [
       {
         id: 3,
         name: "Security Controls Implementation",
-        status: "on-track" as const,
+        status: "in-progress" as const,
         assignee: "Mike Chen",
         dueDate: "2025-05-31",
         priority: "medium" as const,
@@ -48,7 +48,7 @@ const projects = [
       {
         id: 6,
         name: "Requirements Analysis",
-        status: "completed" as const,
+        status: "done" as const,
         assignee: "Emma Wilson",
         dueDate: "2025-03-01",
         priority: "high" as const,
@@ -58,7 +58,7 @@ const projects = [
       {
         id: 9,
         name: "Software Integration",
-        status: "at-risk" as const,
+        status: "in-review" as const,
         assignee: "Tom Martinez",
         dueDate: "2025-07-31",
         priority: "high" as const,
@@ -73,7 +73,7 @@ const projects = [
       {
         id: 12,
         name: "Backend API Development",
-        status: "off-track" as const,
+        status: "blocked" as const,
         assignee: "Chris Taylor",
         dueDate: "2025-05-15",
         priority: "high" as const,
@@ -82,7 +82,7 @@ const projects = [
       {
         id: 13,
         name: "Frontend Development",
-        status: "at-risk" as const,
+        status: "in-review" as const,
         assignee: "Lisa Anderson",
         dueDate: "2025-06-15",
         priority: "high" as const,
@@ -134,13 +134,13 @@ const TaskDetail = () => {
 
   const getStatusIcon = () => {
     switch (task.status) {
-      case "completed":
+      case "done":
         return <CheckCircle2 className="h-5 w-5 text-success" />;
-      case "on-track":
+      case "in-progress":
         return <Clock className="h-5 w-5 text-success" />;
-      case "at-risk":
+      case "in-review":
         return <AlertCircle className="h-5 w-5 text-warning" />;
-      case "off-track":
+      case "blocked":
         return <AlertCircle className="h-5 w-5 text-destructive" />;
       default:
         return <Clock className="h-5 w-5 text-muted-foreground" />;
@@ -168,11 +168,7 @@ const TaskDetail = () => {
             </h1>
             <p className="text-muted-foreground mb-4">{task.description}</p>
             <div className="flex items-center gap-3">
-              <StatusBadge 
-                status={task.status === "completed" ? "on-track" : 
-                        task.status === "not-started" ? "off-track" : 
-                        task.status} 
-              />
+              <StatusBadge status={task.status} />
               <Badge variant={getPriorityColor(task.priority)} className="capitalize">
                 {task.priority} Priority
               </Badge>
@@ -232,7 +228,7 @@ const TaskDetail = () => {
             </CardContent>
           </Card>
 
-          {task.status === "completed" && task.completedDate && (
+          {task.status === "done" && task.completedDate && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

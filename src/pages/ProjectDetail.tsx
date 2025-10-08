@@ -37,7 +37,7 @@ const ProjectDetail = () => {
     description: "",
     assignee: "",
     priority: "medium",
-    status: "not-started",
+    status: "todo",
   });
   
   let project = null;
@@ -64,7 +64,7 @@ const ProjectDetail = () => {
       description: "",
       assignee: "",
       priority: "medium",
-      status: "not-started",
+      status: "todo",
     });
   };
 
@@ -84,7 +84,7 @@ const ProjectDetail = () => {
     );
   }
 
-  const completedMilestones = project.milestones.filter(m => m.status === "completed").length;
+  const completedMilestones = project.milestones.filter(m => m.status === "done").length;
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -294,11 +294,11 @@ const ProjectDetail = () => {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="not-started">Not Started</SelectItem>
-                                <SelectItem value="on-track">On Track</SelectItem>
-                                <SelectItem value="at-risk">At Risk</SelectItem>
-                                <SelectItem value="off-track">Off Track</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="todo">To Do</SelectItem>
+                                <SelectItem value="in-progress">In Progress</SelectItem>
+                                <SelectItem value="in-review">In Review</SelectItem>
+                                <SelectItem value="blocked">Blocked</SelectItem>
+                                <SelectItem value="done">Done</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -338,7 +338,7 @@ const ProjectDetail = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <StatusBadge status={task.status} />
-                            {task.status === "at-risk" || task.status === "off-track" ? (
+                            {task.status === "in-review" || task.status === "blocked" ? (
                               <AlertCircle className="h-4 w-4 text-destructive" />
                             ) : null}
                           </div>

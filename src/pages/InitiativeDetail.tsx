@@ -37,38 +37,38 @@ const goals = [
         id: 1,
         title: "Infrastructure Modernization",
         initiatives: [
-          {
-            id: 1,
-            title: "Develop and Implement IT infrastructure",
-            year: 2025,
-            status: "on-track" as const,
-            owner: "John Smith",
-            team: ["Sarah Johnson", "Mike Chen", "Emma Wilson"],
-            kpis: [
-              { name: "ISO 27001 Implementation", status: "on-track" as const },
-              { name: "Smart Campus Infrastructure", status: "on-track" as const },
-              { name: "Child Safety Geo-tagging", status: "on-track" as const },
-            ],
-          },
+            {
+              id: 1,
+              title: "Develop and Implement IT infrastructure",
+              year: 2025,
+              status: "in-progress" as const,
+              owner: "John Smith",
+              team: ["Sarah Johnson", "Mike Chen", "Emma Wilson"],
+              kpis: [
+                { name: "ISO 27001 Implementation", status: "in-progress" as const },
+                { name: "Smart Campus Infrastructure", status: "in-progress" as const },
+                { name: "Child Safety Geo-tagging", status: "in-progress" as const },
+              ],
+            },
         ],
       },
       {
         id: 2,
         title: "Digital Transformation",
         initiatives: [
-          {
-            id: 2,
-            title: "Digital Transformation initiatives",
-            year: 2025,
-            status: "off-track" as const,
-            owner: "David Brown",
-            team: ["Lisa Anderson", "Tom Martinez"],
-            kpis: [
-              { name: "Student Information System Adoption", status: "on-track" as const },
-              { name: "AI-Driven Business Intelligence Dashboards", status: "on-track" as const },
-              { name: "Unified Mobile App Development", status: "off-track" as const },
-            ],
-          },
+            {
+              id: 2,
+              title: "Digital Transformation initiatives",
+              year: 2025,
+              status: "blocked" as const,
+              owner: "David Brown",
+              team: ["Lisa Anderson", "Tom Martinez"],
+              kpis: [
+                { name: "Student Information System Adoption", status: "in-progress" as const },
+                { name: "AI-Driven Business Intelligence Dashboards", status: "in-progress" as const },
+                { name: "Unified Mobile App Development", status: "blocked" as const },
+              ],
+            },
         ],
       },
     ],
@@ -81,37 +81,37 @@ const goals = [
         id: 3,
         title: "Teaching Enhancement",
         initiatives: [
-          {
-            id: 3,
-            title: "Support Teaching & Learning",
-            year: 2025,
-            status: "off-track" as const,
-            owner: "Rachel Green",
-            team: ["Chris Taylor", "Jennifer Lee"],
-            kpis: [
-              { name: "Education Platform Enhancement", status: "off-track" as const },
-              { name: "Nursery Management System", status: "on-track" as const },
-            ],
-          },
+            {
+              id: 3,
+              title: "Support Teaching & Learning",
+              year: 2025,
+              status: "blocked" as const,
+              owner: "Rachel Green",
+              team: ["Chris Taylor", "Jennifer Lee"],
+              kpis: [
+                { name: "Education Platform Enhancement", status: "blocked" as const },
+                { name: "Nursery Management System", status: "in-progress" as const },
+              ],
+            },
         ],
       },
       {
         id: 4,
         title: "Service Excellence",
         initiatives: [
-          {
-            id: 4,
-            title: "Increase satisfaction with IT services",
-            year: 2026,
-            status: "on-track" as const,
-            owner: "Michael Scott",
-            team: ["Pam Beesly", "Jim Halpert", "Dwight Schrute"],
-            kpis: [
-              { name: "IT Services Employee Satisfaction", status: "on-track" as const },
-              { name: "Digital Learning Experience", status: "on-track" as const },
-              { name: "SIS Stakeholder Satisfaction", status: "on-track" as const },
-            ],
-          },
+            {
+              id: 4,
+              title: "Increase satisfaction with IT services",
+              year: 2026,
+              status: "in-progress" as const,
+              owner: "Michael Scott",
+              team: ["Pam Beesly", "Jim Halpert", "Dwight Schrute"],
+              kpis: [
+                { name: "IT Services Employee Satisfaction", status: "in-progress" as const },
+                { name: "Digital Learning Experience", status: "in-progress" as const },
+                { name: "SIS Stakeholder Satisfaction", status: "in-progress" as const },
+              ],
+            },
         ],
       },
     ],
@@ -130,7 +130,7 @@ const InitiativeDetail = () => {
     reportingType: "Number",
     reportingUnit: "%",
     target: "",
-    status: "on-track" as "on-track" | "off-track",
+    status: "in-progress" as "in-progress" | "blocked",
   });
   
   // Find the initiative, its parent objective, and parent goal
@@ -172,7 +172,7 @@ const InitiativeDetail = () => {
 
   // Calculate progress (example: based on KPI status)
   const totalKpis = initiative.kpis.length;
-  const onTrackKpis = initiative.kpis.filter(k => k.status === "on-track").length;
+  const onTrackKpis = initiative.kpis.filter(k => k.status === "in-progress").length;
   const progress = totalKpis > 0 ? (onTrackKpis / totalKpis) * 100 : 0;
 
   const handleKpiSubmit = (e: React.FormEvent) => {
@@ -202,7 +202,7 @@ const InitiativeDetail = () => {
       reportingType: "Number",
       reportingUnit: "%",
       target: "",
-      status: "on-track",
+      status: "in-progress",
     });
     setIsDialogOpen(false);
   };

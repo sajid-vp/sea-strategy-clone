@@ -32,83 +32,83 @@ const goals = [
     id: 1,
     title: "Technology Excellence",
     objectives: [
-      {
-        id: 1,
-        title: "Infrastructure Modernization",
-        description: "Upgrade and modernize IT infrastructure",
-        year: 2025,
-        status: "on-track" as const,
-        initiatives: [
-          {
-            id: 1,
-            title: "Develop and Implement IT infrastructure",
-            year: 2025,
-            status: "on-track" as const,
-            owner: "John Smith",
-          },
-          {
-            id: 2,
-            title: "ISO 27001 Certification",
-            year: 2025,
-            status: "on-track" as const,
-            owner: "Sarah Johnson",
-          },
-        ],
-      },
-      {
-        id: 2,
-        title: "Digital Transformation",
-        description: "Transform business processes through digital solutions",
-        year: 2025,
-        status: "off-track" as const,
-        initiatives: [
-          {
-            id: 3,
-            title: "Digital Transformation initiatives",
-            year: 2025,
-            status: "off-track" as const,
-            owner: "David Brown",
-          },
-        ],
-      },
+        {
+          id: 1,
+          title: "Infrastructure Modernization",
+          description: "Upgrade and modernize IT infrastructure",
+          year: 2025,
+          status: "in-progress" as const,
+          initiatives: [
+            {
+              id: 1,
+              title: "Develop and Implement IT infrastructure",
+              year: 2025,
+              status: "in-progress" as const,
+              owner: "John Smith",
+            },
+            {
+              id: 2,
+              title: "ISO 27001 Certification",
+              year: 2025,
+              status: "in-progress" as const,
+              owner: "Sarah Johnson",
+            },
+          ],
+        },
+        {
+          id: 2,
+          title: "Digital Transformation",
+          description: "Transform business processes through digital solutions",
+          year: 2025,
+          status: "blocked" as const,
+          initiatives: [
+            {
+              id: 3,
+              title: "Digital Transformation initiatives",
+              year: 2025,
+              status: "blocked" as const,
+              owner: "David Brown",
+            },
+          ],
+        },
     ],
   },
   {
     id: 2,
     title: "Educational Innovation",
     objectives: [
-      {
-        id: 3,
-        title: "Teaching Enhancement",
-        description: "Improve teaching methods and tools",
-        year: 2025,
-        status: "off-track" as const,
-        initiatives: [
-          {
-            id: 4,
-            title: "Support Teaching & Learning",
-            year: 2025,
-            status: "off-track" as const,
-            owner: "Rachel Green",
-          },
-        ],
-      },
-      {
-        id: 4,
-        title: "Service Excellence",
-        description: "Enhance IT services satisfaction",
-        year: 2026,
-        status: "on-track" as const,
-        initiatives: [
-          {
-            id: 5,
-            title: "Increase satisfaction with IT services",
-            year: 2026,
-            status: "on-track" as const,
-            owner: "Michael Scott",
-          },
-        ],
-      },
+        {
+          id: 3,
+          title: "Teaching Enhancement",
+          description: "Improve teaching methods and tools",
+          year: 2025,
+          status: "blocked" as const,
+          initiatives: [
+            {
+              id: 4,
+              title: "Support Teaching & Learning",
+              year: 2025,
+              status: "blocked" as const,
+              owner: "Rachel Green",
+            },
+          ],
+        },
+        {
+          id: 4,
+          title: "Service Excellence",
+          description: "Enhance IT services satisfaction",
+          year: 2026,
+          status: "in-progress" as const,
+          initiatives: [
+            {
+              id: 5,
+              title: "Increase satisfaction with IT services",
+              year: 2026,
+              status: "in-progress" as const,
+              owner: "Michael Scott",
+            },
+          ],
+        },
     ],
   },
 ];
@@ -158,8 +158,8 @@ const ObjectiveDetail = () => {
   }
 
   const totalInitiatives = objective.initiatives.length;
-  const onTrackInitiatives = objective.initiatives.filter(i => i.status === "on-track").length;
-  const offTrackInitiatives = objective.initiatives.filter(i => i.status === "off-track").length;
+  const onTrackInitiatives = objective.initiatives.filter(i => i.status === "in-progress").length;
+  const offTrackInitiatives = objective.initiatives.filter(i => i.status === "blocked").length;
   const progress = totalInitiatives > 0 ? (onTrackInitiatives / totalInitiatives) * 100 : 0;
 
   const handleInputChange = (field: string, value: string) => {
