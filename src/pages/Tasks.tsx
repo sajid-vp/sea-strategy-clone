@@ -24,8 +24,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar, X } from "lucide-react";
+import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar as CalendarIcon, X, ChevronDown, Flag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 type Task = {
   id: number;
@@ -189,11 +193,13 @@ const Tasks = () => {
   const [selectedYear, setSelectedYear] = useState("2025");
   const [selectedTask, setSelectedTask] = useState<{ task: Task; project: Project } | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isNewTask, setIsNewTask] = useState(false);
   const [tasksList, setTasksList] = useState(projects);
+  const [editingName, setEditingName] = useState(false);
+  const [tempName, setTempName] = useState("");
   
-  // Form state
-  const [formData, setFormData] = useState({
+  // Form state for new task
+  const [newTaskData, setNewTaskData] = useState({
     name: "",
     status: "todo" as Task['status'],
     assignee: "",
@@ -204,21 +210,14 @@ const Tasks = () => {
 
   const handleTaskClick = (task: Task, project: Project) => {
     setSelectedTask({ task, project });
-    setFormData({
-      name: task.name,
-      status: task.status,
-      assignee: task.assignee,
-      dueDate: task.dueDate,
-      priority: task.priority,
-      projectId: project.id
-    });
-    setIsEditing(false);
+    setTempName(task.name);
+    setIsNewTask(false);
     setIsSheetOpen(true);
   };
 
   const handleNewTask = () => {
     setSelectedTask(null);
-    setFormData({
+    setNewTaskData({
       name: "",
       status: "todo",
       assignee: "",
@@ -226,58 +225,77 @@ const Tasks = () => {
       priority: "medium",
       projectId: projects[0]?.id || 1
     });
-    setIsEditing(true);
+    setIsNewTask(true);
     setIsSheetOpen(true);
   };
 
-  const handleSave = () => {
-    if (!formData.name.trim() || !formData.assignee.trim() || !formData.dueDate) {
+  const updateTaskField = (field: keyof Task, value: any) => {
+    if (!selectedTask) return;
+    
+    setTasksList(prev => prev.map(proj => {
+      if (proj.id === selectedTask.project.id) {
+        return {
+          ...proj,
+          tasks: proj.tasks.map(t => 
+            t.id === selectedTask.task.id 
+              ? { ...t, [field]: value }
+              : t
+          )
+        };
+      }
+      return proj;
+    }));
+
+    // Update local state
+    setSelectedTask({
+      ...selectedTask,
+      task: { ...selectedTask.task, [field]: value }
+    });
+
+    toast({
+      title: "Updated",
+      description: `Task ${field} updated`,
+    });
+  };
+
+  const handleCreateTask = () => {
+    if (!newTaskData.name.trim()) {
       toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields",
+        title: "Task name required",
+        description: "Please enter a task name",
         variant: "destructive"
       });
       return;
     }
 
-    if (selectedTask) {
-      // Update existing task
-      setTasksList(prev => prev.map(proj => {
-        if (proj.id === formData.projectId) {
-          return {
-            ...proj,
-            tasks: proj.tasks.map(t => 
-              t.id === selectedTask.task.id 
-                ? { ...t, ...formData }
-                : t
-            )
-          };
-        }
-        return proj;
-      }));
-      toast({
-        title: "Task updated",
-        description: "Your task has been updated successfully"
-      });
-    } else {
-      // Create new task
-      const newTask: Task = {
-        id: Date.now(),
-        ...formData
-      };
-      setTasksList(prev => prev.map(proj => 
-        proj.id === formData.projectId
-          ? { ...proj, tasks: [...proj.tasks, newTask] }
-          : proj
-      ));
-      toast({
-        title: "Task created",
-        description: "Your new task has been created successfully"
-      });
-    }
+    const newTask: Task = {
+      id: Date.now(),
+      name: newTaskData.name,
+      status: newTaskData.status,
+      assignee: newTaskData.assignee || "Unassigned",
+      dueDate: newTaskData.dueDate || new Date().toISOString().split('T')[0],
+      priority: newTaskData.priority,
+    };
+
+    setTasksList(prev => prev.map(proj => 
+      proj.id === newTaskData.projectId
+        ? { ...proj, tasks: [...proj.tasks, newTask] }
+        : proj
+    ));
+    
+    toast({
+      title: "Task created",
+      description: "Your task has been created"
+    });
     
     setIsSheetOpen(false);
-    setIsEditing(false);
+  };
+
+  const handleSaveName = () => {
+    if (tempName.trim()) {
+      updateTaskField('name', tempName);
+      setEditingName(false);
+    }
   };
 
   const getPriorityVariant = (priority: string): "destructive" | "secondary" | "outline" => {
@@ -872,97 +890,69 @@ const Tasks = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Task Detail/Edit Sheet */}
+        {/* Task Sheet - Modern Inline Editing */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetContent className="sm:max-w-md overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>{selectedTask ? (isEditing ? "Edit Task" : formData.name) : "New Task"}</SheetTitle>
-              {selectedTask && !isEditing && (
-                <SheetDescription className="flex items-center gap-2">
-                  Project: 
-                  <Link 
-                    to={`/projects/${selectedTask.project.id}`}
-                    className="text-primary hover:underline"
-                  >
-                    {selectedTask.project.title}
-                  </Link>
-                </SheetDescription>
-              )}
-            </SheetHeader>
+          <SheetContent className="sm:max-w-lg overflow-y-auto">
+            {isNewTask ? (
+              <>
+                {/* New Task Form */}
+                <SheetHeader>
+                  <SheetTitle>Create Task</SheetTitle>
+                </SheetHeader>
 
-            <div className="mt-6 space-y-4">
-              {!isEditing && selectedTask ? (
-                <>
-                  {/* View Mode */}
-                  <div className="flex items-center gap-3">
-                    <StatusBadge status={selectedTask.task.status} />
-                    <Badge variant={getPriorityVariant(selectedTask.task.priority)} className="capitalize">
-                      {selectedTask.task.priority} Priority
-                    </Badge>
+                <div className="mt-6 space-y-4">
+                  <div>
+                    <Input
+                      placeholder="Task name"
+                      value={newTaskData.name}
+                      onChange={(e) => setNewTaskData(prev => ({ ...prev, name: e.target.value }))}
+                      className="text-lg font-medium"
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={newTaskData.status}
+                      onValueChange={(value: Task['status']) => setNewTaskData(prev => ({ ...prev, status: value }))}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="in-review">In Review</SelectItem>
+                        <SelectItem value="blocked">Blocked</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={newTaskData.priority}
+                      onValueChange={(value: Task['priority']) => setNewTaskData(prev => ({ ...prev, priority: value }))}
+                    >
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <Separator />
 
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <User className="h-4 w-4" />
-                      <span>Assigned To</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-sm font-semibold text-primary">
-                          {selectedTask.task.assignee.split(' ').map(n => n[0]).join('')}
-                        </span>
-                      </div>
-                      <span className="font-medium">{selectedTask.task.assignee}</span>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>Due Date</span>
-                    </div>
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <p className="font-semibold">
-                        {new Date(selectedTask.task.dueDate).toLocaleDateString('en-US', {
-                          weekday: 'long',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 pt-4">
-                    <Button onClick={() => setIsEditing(true)} className="flex-1">
-                      Edit Task
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* Edit/Create Mode */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div>
-                      <Label htmlFor="task-name">Task Name *</Label>
-                      <Input
-                        id="task-name"
-                        value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="Enter task name"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="project">Project *</Label>
+                      <Label className="text-xs text-muted-foreground">Project</Label>
                       <Select
-                        value={formData.projectId.toString()}
-                        onValueChange={(value) => setFormData(prev => ({ ...prev, projectId: parseInt(value) }))}
+                        value={newTaskData.projectId.toString()}
+                        onValueChange={(value) => setNewTaskData(prev => ({ ...prev, projectId: parseInt(value) }))}
                       >
-                        <SelectTrigger id="project">
+                        <SelectTrigger className="mt-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -976,75 +966,211 @@ const Tasks = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="status">Status *</Label>
-                      <Select
-                        value={formData.status}
-                        onValueChange={(value: Task['status']) => setFormData(prev => ({ ...prev, status: value }))}
-                      >
-                        <SelectTrigger id="status">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="todo">To Do</SelectItem>
-                          <SelectItem value="in-progress">In Progress</SelectItem>
-                          <SelectItem value="in-review">In Review</SelectItem>
-                          <SelectItem value="blocked">Blocked</SelectItem>
-                          <SelectItem value="done">Done</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="priority">Priority *</Label>
-                      <Select
-                        value={formData.priority}
-                        onValueChange={(value: Task['priority']) => setFormData(prev => ({ ...prev, priority: value }))}
-                      >
-                        <SelectTrigger id="priority">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="low">Low</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="high">High</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="assignee">Assignee *</Label>
+                      <Label className="text-xs text-muted-foreground">Assignee</Label>
                       <Input
-                        id="assignee"
-                        value={formData.assignee}
-                        onChange={(e) => setFormData(prev => ({ ...prev, assignee: e.target.value }))}
-                        placeholder="Enter assignee name"
+                        placeholder="Unassigned"
+                        value={newTaskData.assignee}
+                        onChange={(e) => setNewTaskData(prev => ({ ...prev, assignee: e.target.value }))}
+                        className="mt-1"
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="due-date">Due Date *</Label>
+                      <Label className="text-xs text-muted-foreground">Due Date</Label>
                       <Input
-                        id="due-date"
                         type="date"
-                        value={formData.dueDate}
-                        onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                        value={newTaskData.dueDate}
+                        onChange={(e) => setNewTaskData(prev => ({ ...prev, dueDate: e.target.value }))}
+                        className="mt-1"
                       />
-                    </div>
-
-                    <div className="flex gap-2 pt-4">
-                      <Button onClick={handleSave} className="flex-1">
-                        {selectedTask ? "Update Task" : "Create Task"}
-                      </Button>
-                      {selectedTask && (
-                        <Button variant="outline" onClick={() => setIsEditing(false)}>
-                          Cancel
-                        </Button>
-                      )}
                     </div>
                   </div>
-                </>
-              )}
-            </div>
+
+                  <div className="flex gap-2 pt-4">
+                    <Button onClick={handleCreateTask} className="flex-1">
+                      Create Task
+                    </Button>
+                    <Button variant="outline" onClick={() => setIsSheetOpen(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : selectedTask && (
+              <>
+                {/* View/Edit Task - Inline Editing */}
+                <SheetHeader className="space-y-4">
+                  <div className="flex items-start gap-2">
+                    <button
+                      onClick={() => updateTaskField('status', selectedTask.task.status === 'done' ? 'todo' : 'done')}
+                      className="mt-1 transition-colors"
+                    >
+                      {selectedTask.task.status === 'done' ? (
+                        <CheckCircle2 className="h-5 w-5 text-success" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                      )}
+                    </button>
+                    
+                    {editingName ? (
+                      <Input
+                        value={tempName}
+                        onChange={(e) => setTempName(e.target.value)}
+                        onBlur={handleSaveName}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
+                        className="text-xl font-semibold -ml-1"
+                        autoFocus
+                      />
+                    ) : (
+                      <SheetTitle 
+                        className="text-xl cursor-pointer hover:text-primary transition-colors flex-1"
+                        onClick={() => setEditingName(true)}
+                      >
+                        {selectedTask.task.name}
+                      </SheetTitle>
+                    )}
+                  </div>
+
+                  <Link 
+                    to={`/projects/${selectedTask.project.id}`}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 w-fit"
+                  >
+                    {selectedTask.project.title}
+                  </Link>
+                </SheetHeader>
+
+                <div className="mt-6 space-y-4">
+                  {/* Status Selector */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Status</Label>
+                    <Select
+                      value={selectedTask.task.status}
+                      onValueChange={(value: Task['status']) => updateTaskField('status', value)}
+                    >
+                      <SelectTrigger className="w-full animate-fade-in">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">
+                          <div className="flex items-center gap-2">
+                            <Circle className="h-4 w-4" />
+                            <span>To Do</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="in-progress">
+                          <div className="flex items-center gap-2">
+                            <Clock3 className="h-4 w-4 text-primary" />
+                            <span>In Progress</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="in-review">
+                          <div className="flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4 text-warning" />
+                            <span>In Review</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="blocked">
+                          <div className="flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4 text-destructive" />
+                            <span>Blocked</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="done">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-success" />
+                            <span>Done</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Priority Selector */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Priority</Label>
+                    <Select
+                      value={selectedTask.task.priority}
+                      onValueChange={(value: Task['priority']) => updateTaskField('priority', value)}
+                    >
+                      <SelectTrigger className="w-full animate-fade-in">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">
+                          <div className="flex items-center gap-2">
+                            <Flag className="h-4 w-4 text-success" />
+                            <span>Low</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="medium">
+                          <div className="flex items-center gap-2">
+                            <Flag className="h-4 w-4 text-warning" />
+                            <span>Medium</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="high">
+                          <div className="flex items-center gap-2">
+                            <Flag className="h-4 w-4 text-destructive" />
+                            <span>High</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Separator />
+
+                  {/* Assignee */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Assignee</Label>
+                    <div className="flex items-center gap-3 p-3 rounded-lg border hover:border-primary/50 transition-colors group cursor-pointer">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-xs font-semibold text-primary">
+                          {selectedTask.task.assignee.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                      <Input
+                        value={selectedTask.task.assignee}
+                        onChange={(e) => updateTaskField('assignee', e.target.value)}
+                        className="border-0 bg-transparent p-0 h-auto focus-visible:ring-0 font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Due Date */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Due Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal hover:border-primary/50 transition-colors",
+                            !selectedTask.task.dueDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {selectedTask.task.dueDate ? (
+                            format(new Date(selectedTask.task.dueDate), "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={new Date(selectedTask.task.dueDate)}
+                          onSelect={(date) => date && updateTaskField('dueDate', date.toISOString().split('T')[0])}
+                          initialFocus
+                          className="pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+              </>
+            )}
           </SheetContent>
         </Sheet>
       </main>
