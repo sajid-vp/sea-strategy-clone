@@ -10,23 +10,23 @@ interface StatusBadgeProps {
 const statusConfig = {
   "todo": {
     label: "To Do",
-    className: "bg-muted/80 text-muted-foreground border border-border",
+    className: "bg-muted text-muted-foreground",
   },
   "in-progress": {
     label: "In Progress",
-    className: "bg-primary/10 text-primary border border-primary/30 shadow-sm",
+    className: "bg-primary/10 text-primary border border-primary/20",
   },
   "in-review": {
     label: "In Review",
-    className: "bg-warning/10 text-warning border border-warning/30 shadow-sm",
+    className: "bg-warning/10 text-warning border border-warning/20",
   },
   "blocked": {
     label: "Blocked",
-    className: "bg-destructive/10 text-destructive border border-destructive/30 shadow-sm",
+    className: "bg-destructive text-destructive-foreground",
   },
   "done": {
     label: "Done",
-    className: "bg-success/10 text-success border border-success/30 shadow-sm",
+    className: "bg-success text-success-foreground",
   },
 };
 
@@ -36,7 +36,7 @@ export const StatusBadge = ({ status, className }: StatusBadgeProps) => {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium transition-all",
+        "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold",
         config.className,
         className
       )}

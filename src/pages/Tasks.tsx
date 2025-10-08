@@ -617,41 +617,36 @@ const Tasks = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="container mx-auto px-6 py-8 max-w-[1400px]">
+      <main className="container mx-auto px-6 py-8">
         {/* Header with Search and Filters */}
-        <div className="space-y-6 mb-8">
+        <div className="space-y-4 mb-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground tracking-tight">Tasks</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Manage and track all your tasks across projects
-              </p>
-            </div>
-            <Button onClick={handleNewTask} size="lg" className="gap-2 shadow-sm">
+            <h1 className="text-2xl font-bold text-foreground">Tasks</h1>
+            <Button onClick={handleNewTask} className="gap-2">
               <Plus className="h-4 w-4" />
               New Task
             </Button>
           </div>
 
           {/* Search and Filters Bar */}
-          <div className="flex items-center gap-3 flex-wrap bg-card border rounded-lg p-3 shadow-sm">
-            <div className="relative flex-1 min-w-[240px] max-w-md">
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="relative flex-1 min-w-[200px] max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 border-0 bg-muted/30 focus-visible:ring-1"
+                className="pl-9"
               />
             </div>
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="gap-2 shadow-sm">
+                <Button variant="outline" className="gap-2">
                   <Filter className="h-4 w-4" />
                   Filters
                   {activeFiltersCount > 0 && (
-                    <Badge className="ml-1 px-1.5 min-w-[20px] h-5 bg-primary text-primary-foreground">
+                    <Badge variant="secondary" className="ml-1 px-1 min-w-[20px] h-5">
                       {activeFiltersCount}
                     </Badge>
                   )}
@@ -743,7 +738,7 @@ const Tasks = () => {
               </PopoverContent>
             </Popover>
 
-            <div className="flex items-center gap-1 border rounded-lg p-1 bg-muted/30">
+            <div className="flex items-center gap-1 border rounded-md p-1">
               <Button
                 variant={viewMode === "list" ? "secondary" : "ghost"}
                 size="sm"
@@ -765,78 +760,69 @@ const Tasks = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="p-5 hover:shadow-md transition-shadow border-l-4 border-l-primary bg-gradient-to-br from-card to-card">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <CheckSquare className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Total Tasks</p>
-              <p className="text-3xl font-bold text-foreground">{allTasks.length}</p>
-              <p className="text-xs text-muted-foreground">Across all projects</p>
-            </div>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            title="Total Tasks"
+            value={allTasks.length}
+            subtitle="2025"
+            className="border-l-4 border-l-secondary-foreground"
+            icon={<CheckSquare className="h-5 w-5 text-primary" />}
+          />
 
-          <Card className="p-5 hover:shadow-md transition-shadow border-l-4 border-l-success bg-gradient-to-br from-card to-card">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 rounded-lg bg-success/10">
-                <CheckCircle2 className="h-5 w-5 text-success" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Completed</p>
-              <p className="text-3xl font-bold text-foreground">{completedTasks}</p>
-              <p className="text-xs text-muted-foreground">{Math.round((completedTasks / allTasks.length) * 100)}% complete</p>
-            </div>
-          </Card>
+          <StatCard
+            title="Completed"
+            value={completedTasks}
+            subtitle={`${Math.round((completedTasks / allTasks.length) * 100)}% complete`}
+            className="border-l-4 border-l-secondary-foreground"
+            icon={<BarChart3 className="h-5 w-5 text-primary" />}
+          />
 
-          <Card className="p-5 hover:shadow-md transition-shadow border-l-4 border-l-destructive bg-gradient-to-br from-card to-card">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 rounded-lg bg-destructive/10">
-                <AlertCircle className="h-5 w-5 text-destructive" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">High Priority</p>
-              <p className="text-3xl font-bold text-foreground">{highPriorityTasks}</p>
-              <p className="text-xs text-muted-foreground">Needs attention</p>
-            </div>
-          </Card>
+          <StatCard
+            title="High Priority"
+            value={highPriorityTasks}
+            subtitle="Needs attention"
+            className="border-l-4 border-l-secondary-foreground"
+            icon={<Clock className="h-5 w-5 text-primary" />}
+          />
 
-          <Card className="p-5 hover:shadow-md transition-shadow border-l-4 border-l-warning bg-gradient-to-br from-card to-card">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 rounded-lg bg-warning/10">
-                <Clock className="h-5 w-5 text-warning" />
+          <StatCard
+            title="Task Status"
+            value=""
+            className="border-l-4 border-l-secondary-foreground"
+            icon={<BarChart3 className="h-5 w-5 text-primary" />}
+          >
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-success" />
+                  <span className="text-muted-foreground">On Track:</span>
+                </div>
+                <span className="font-semibold">{onTrackTasks}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-warning" />
+                  <span className="text-muted-foreground">At Risk:</span>
+                </div>
+                <span className="font-semibold">{atRiskTasks}</span>
               </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">In Progress</p>
-              <p className="text-3xl font-bold text-foreground">{onTrackTasks}</p>
-              <p className="text-xs text-muted-foreground">Active tasks</p>
-            </div>
-          </Card>
+          </StatCard>
         </div>
 
         {/* Tasks List */}
-        <Card className="overflow-hidden shadow-sm">
-          <div className="p-6 border-b bg-muted/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">All Tasks</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Showing {filteredTasks.length} of {allTasks.length} tasks
-                </p>
-              </div>
-            </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing {filteredTasks.length} of {allTasks.length} tasks
+            </p>
           </div>
 
-          <div className="divide-y">
+          <div className="space-y-2">
             {viewMode === "list" ? (
-              <>
-                <div className="bg-muted/30 px-6 py-3 border-b">
-                  <div className="grid grid-cols-12 gap-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              <div className="border rounded-lg overflow-hidden">
+                <div className="bg-muted/30 border-b">
+                  <div className="grid grid-cols-12 gap-4 px-4 py-3 text-sm font-medium text-muted-foreground">
                     <div className="col-span-4">Task</div>
                     <div className="col-span-2">Status</div>
                     <div className="col-span-2">Priority</div>
@@ -844,21 +830,13 @@ const Tasks = () => {
                     <div className="col-span-2">Due Date</div>
                   </div>
                 </div>
-                {filteredTasks.length === 0 ? (
-                  <div className="px-6 py-16 text-center">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="p-3 rounded-full bg-muted">
-                        <CheckSquare className="h-6 w-6 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">No tasks found</p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {activeFiltersCount > 0 ? "Try adjusting your filters" : "Create your first task to get started"}
-                        </p>
-                      </div>
+                <div className="divide-y">
+                  {filteredTasks.length === 0 ? (
+                    <div className="px-4 py-12 text-center text-muted-foreground">
+                      <p>No tasks found</p>
                       {activeFiltersCount > 0 && (
                         <Button
-                          variant="outline"
+                          variant="link"
                           className="mt-2"
                           onClick={() => {
                             setFilterStatus("all");
@@ -872,14 +850,12 @@ const Tasks = () => {
                         </Button>
                       )}
                     </div>
-                  </div>
-                ) : (
-                  <div>
-                    {filteredTasks.map(({ task, project }) => (
+                  ) : (
+                    filteredTasks.map(({ task, project }) => (
                       <div 
                         key={task.id} 
                         onClick={() => handleTaskClick(task, project)}
-                        className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-accent/50 transition-all duration-200 group cursor-pointer border-l-4 border-l-transparent hover:border-l-primary"
+                        className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
                       >
                         <div className="col-span-4 flex items-center gap-3">
                           <button
@@ -895,7 +871,7 @@ const Tasks = () => {
                             )}>
                               {task.name}
                             </h3>
-                            <p className="text-xs text-muted-foreground truncate mt-0.5">{project.title}</p>
+                            <p className="text-xs text-muted-foreground truncate">{project.title}</p>
                           </div>
                         </div>
                         
@@ -904,42 +880,35 @@ const Tasks = () => {
                         </div>
                         
                         <div className="col-span-2 flex items-center">
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
-                            <Flag className="h-3 w-3" />
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
                             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                           </span>
                         </div>
                         
                         <div className="col-span-2 flex items-center gap-2">
-                          <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center ring-1 ring-primary/20">
-                            <span className="text-xs font-medium text-primary">
-                              {task.assignee.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                            </span>
+                          <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                            <User className="h-3 w-3 text-primary" />
                           </div>
-                          <span className="text-sm text-foreground truncate">{task.assignee}</span>
+                          <span className="text-sm truncate">{task.assignee}</span>
                         </div>
                         
-                        <div className="col-span-2 flex items-center gap-2">
-                          <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                        <div className="col-span-2 flex items-center">
                           <span className="text-sm text-muted-foreground">
                             {new Date(task.dueDate).toLocaleDateString('en-US', { 
                               month: 'short', 
-                              day: 'numeric',
-                              year: 'numeric'
+                              day: 'numeric'
                             })}
                           </span>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            
+                    ))
+                  )}
+                </div>
+              </div>
             ) : (
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredTasks.length === 0 ? (
-                    <div className="col-span-full px-4 py-16 text-center">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredTasks.length === 0 ? (
+                  <div className="col-span-full px-4 py-12 text-center text-muted-foreground">
                     <p>No tasks found</p>
                     {activeFiltersCount > 0 && (
                       <Button
@@ -1005,13 +974,12 @@ const Tasks = () => {
                         </div>
                       </Card>
                     </div>
-                   ))
+                  ))
                 )}
-                </div>
               </div>
             )}
           </div>
-        </Card>
+        </div>
 
         {/* Task Sheet - Modern Inline Editing */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
