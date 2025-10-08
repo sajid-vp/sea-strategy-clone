@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid } from "lucide-react";
+import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User } from "lucide-react";
 
 type Task = {
   id: number;
@@ -191,6 +191,30 @@ const Tasks = () => {
     }
   };
 
+  const getStatusIcon = (status: Task['status']) => {
+    switch (status) {
+      case "completed": return <CheckCircle2 className="h-4 w-4 text-success" />;
+      case "on-track": return <Circle className="h-4 w-4 text-primary" />;
+      case "at-risk": return <AlertCircle className="h-4 w-4 text-warning" />;
+      case "off-track": return <AlertCircle className="h-4 w-4 text-destructive" />;
+      case "not-started": return <Clock3 className="h-4 w-4 text-muted-foreground" />;
+      default: return <Circle className="h-4 w-4" />;
+    }
+  };
+
+  const getPriorityBadgeColor = (priority: string) => {
+    switch (priority) {
+      case "high": return "bg-destructive/10 text-destructive border-destructive/20";
+      case "medium": return "bg-warning/10 text-warning border-warning/20";
+      case "low": return "bg-success/10 text-success border-success/20";
+      default: return "bg-muted text-muted-foreground";
+    }
+  };
+
+  const getProjectForTask = (taskId: number) => {
+    return projects.find(p => p.tasks.some(t => t.id === taskId));
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -302,44 +326,126 @@ const Tasks = () => {
           </div>
 
           <TabsContent value="overview">
-            <div className={viewMode === "grid" 
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-              : "space-y-3"
-            }>
-              {allTasks.map((task) => (
-                <Link key={task.id} to={`/tasks/${task.id}`} className="block">
-                  <Card className="p-4 hover:shadow-lg transition-all cursor-pointer">
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="font-semibold text-foreground flex-1">{task.name}</h3>
-                      <StatusBadge 
-                        status={task.status === "completed" ? "on-track" : 
-                                task.status === "not-started" ? "off-track" : 
-                                task.status} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Assignee:</span>
-                        <span className="font-medium">{task.assignee}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Due Date:</span>
-                        <span className="font-medium">
-                          {new Date(task.dueDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Priority:</span>
-                        <span className={`font-semibold capitalize ${getPriorityColor(task.priority)}`}>
-                          {task.priority}
-                        </span>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+            {viewMode === "list" ? (
+              <div className="border rounded-lg overflow-hidden">
+                <div className="bg-muted/30 border-b">
+                  <div className="grid grid-cols-12 gap-4 px-4 py-3 text-sm font-medium text-muted-foreground">
+                    <div className="col-span-4">Task</div>
+                    <div className="col-span-2">Status</div>
+                    <div className="col-span-2">Priority</div>
+                    <div className="col-span-2">Assignee</div>
+                    <div className="col-span-2">Due Date</div>
+                  </div>
+                </div>
+                <div className="divide-y">
+                  {allTasks.map((task) => {
+                    const project = getProjectForTask(task.id);
+                    return (
+                      <Link 
+                        key={task.id} 
+                        to={`/tasks/${task.id}`}
+                        className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group"
+                      >
+                        <div className="col-span-4 flex items-center gap-3">
+                          {getStatusIcon(task.status)}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                              {task.name}
+                            </h3>
+                            {project && (
+                              <p className="text-xs text-muted-foreground truncate">{project.title}</p>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="col-span-2 flex items-center">
+                          <StatusBadge 
+                            status={task.status === "completed" ? "on-track" : 
+                                    task.status === "not-started" ? "off-track" : 
+                                    task.status} 
+                          />
+                        </div>
+                        
+                        <div className="col-span-2 flex items-center">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                            {task.priority}
+                          </span>
+                        </div>
+                        
+                        <div className="col-span-2 flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                            <User className="h-3 w-3 text-primary" />
+                          </div>
+                          <span className="text-sm truncate">{task.assignee}</span>
+                        </div>
+                        
+                        <div className="col-span-2 flex items-center">
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(task.dueDate).toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {allTasks.map((task) => {
+                  const project = getProjectForTask(task.id);
+                  return (
+                    <Link key={task.id} to={`/tasks/${task.id}`} className="block group">
+                      <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
+                        <div className="flex items-start gap-3 mb-3">
+                          {getStatusIcon(task.status)}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
+                              {task.name}
+                            </h3>
+                            {project && (
+                              <p className="text-xs text-muted-foreground">{project.title}</p>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <StatusBadge 
+                              status={task.status === "completed" ? "on-track" : 
+                                      task.status === "not-started" ? "off-track" : 
+                                      task.status} 
+                            />
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                              {task.priority}
+                            </span>
+                          </div>
+                          
+                          <div className="pt-3 border-t space-y-2 text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <User className="h-3 w-3 text-primary" />
+                              </div>
+                              <span className="truncate">{task.assignee}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Clock className="h-4 w-4 flex-shrink-0" />
+                              <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="assignee" className="space-y-6">
@@ -348,47 +454,114 @@ const Tasks = () => {
               
               return (
                 <div key={assignee} className="space-y-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <User className="h-4 w-4 text-primary" />
+                    </div>
                     <h2 className="text-lg font-semibold text-foreground">{assignee}</h2>
                     <span className="text-sm text-muted-foreground">
                       ({assigneeTasks.length} tasks)
                     </span>
                   </div>
 
-                  <div className={viewMode === "grid" 
-                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                    : "space-y-3"
-                  }>
-                    {assigneeTasks.map((task) => (
-                      <Link key={task.id} to={`/tasks/${task.id}`} className="block">
-                        <Card className="p-4 hover:shadow-lg transition-all cursor-pointer">
-                          <div className="flex items-start justify-between mb-3">
-                            <h3 className="font-semibold text-foreground flex-1">{task.name}</h3>
-                            <StatusBadge 
-                              status={task.status === "completed" ? "on-track" : 
-                                      task.status === "not-started" ? "off-track" : 
-                                      task.status} 
-                            />
-                          </div>
-                          
-                          <div className="space-y-2 text-sm">
-                            <div className="flex items-center justify-between">
-                              <span className="text-muted-foreground">Due Date:</span>
-                              <span className="font-medium">
-                                {new Date(task.dueDate).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-muted-foreground">Priority:</span>
-                              <span className={`font-semibold capitalize ${getPriorityColor(task.priority)}`}>
-                                {task.priority}
-                              </span>
-                            </div>
-                          </div>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
+                  {viewMode === "list" ? (
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="divide-y">
+                        {assigneeTasks.map((task) => {
+                          const project = getProjectForTask(task.id);
+                          return (
+                            <Link 
+                              key={task.id} 
+                              to={`/tasks/${task.id}`}
+                              className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group"
+                            >
+                              <div className="col-span-5 flex items-center gap-3">
+                                {getStatusIcon(task.status)}
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                                    {task.name}
+                                  </h3>
+                                  {project && (
+                                    <p className="text-xs text-muted-foreground truncate">{project.title}</p>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="col-span-3 flex items-center">
+                                <StatusBadge 
+                                  status={task.status === "completed" ? "on-track" : 
+                                          task.status === "not-started" ? "off-track" : 
+                                          task.status} 
+                                />
+                              </div>
+                              
+                              <div className="col-span-2 flex items-center">
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                                  {task.priority}
+                                </span>
+                              </div>
+                              
+                              <div className="col-span-2 flex items-center">
+                                <span className="text-sm text-muted-foreground">
+                                  {new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                  })}
+                                </span>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {assigneeTasks.map((task) => {
+                        const project = getProjectForTask(task.id);
+                        return (
+                          <Link key={task.id} to={`/tasks/${task.id}`} className="block group">
+                            <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
+                              <div className="flex items-start gap-3 mb-3">
+                                {getStatusIcon(task.status)}
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
+                                    {task.name}
+                                  </h3>
+                                  {project && (
+                                    <p className="text-xs text-muted-foreground">{project.title}</p>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                  <StatusBadge 
+                                    status={task.status === "completed" ? "on-track" : 
+                                            task.status === "not-started" ? "off-track" : 
+                                            task.status} 
+                                  />
+                                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                                    {task.priority}
+                                  </span>
+                                </div>
+                                
+                                <div className="pt-3 border-t">
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Clock className="h-4 w-4 flex-shrink-0" />
+                                    <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                      month: 'short', 
+                                      day: 'numeric',
+                                      year: 'numeric'
+                                    })}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -397,51 +570,99 @@ const Tasks = () => {
           <TabsContent value="project" className="space-y-6">
             {projects.map((project) => (
               <div key={project.id} className="space-y-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mb-4">
                   <h2 className="text-lg font-semibold text-foreground">{project.title}</h2>
                   <span className="text-sm text-muted-foreground">
                     ({project.tasks.length} tasks)
                   </span>
                 </div>
 
-                <div className={viewMode === "grid" 
-                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                  : "space-y-3"
-                }>
-                  {project.tasks.map((task) => (
-                    <Link key={task.id} to={`/tasks/${task.id}`} className="block">
-                      <Card className="p-4 hover:shadow-lg transition-all cursor-pointer">
-                        <div className="flex items-start justify-between mb-3">
-                          <h3 className="font-semibold text-foreground flex-1">{task.name}</h3>
-                          <StatusBadge 
-                            status={task.status === "completed" ? "on-track" : 
-                                    task.status === "not-started" ? "off-track" : 
-                                    task.status} 
-                          />
-                        </div>
-                        
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Assignee:</span>
-                            <span className="font-medium">{task.assignee}</span>
+                {viewMode === "list" ? (
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="divide-y">
+                      {project.tasks.map((task) => (
+                        <Link 
+                          key={task.id} 
+                          to={`/tasks/${task.id}`}
+                          className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group"
+                        >
+                          <div className="col-span-5 flex items-center gap-3">
+                            {getStatusIcon(task.status)}
+                            <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                              {task.name}
+                            </h3>
                           </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Due Date:</span>
-                            <span className="font-medium">
-                              {new Date(task.dueDate).toLocaleDateString()}
-                            </span>
+                          
+                          <div className="col-span-3 flex items-center">
+                            <StatusBadge 
+                              status={task.status === "completed" ? "on-track" : 
+                                      task.status === "not-started" ? "off-track" : 
+                                      task.status} 
+                            />
                           </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Priority:</span>
-                            <span className={`font-semibold capitalize ${getPriorityColor(task.priority)}`}>
+                          
+                          <div className="col-span-2 flex items-center gap-2">
+                            <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="h-3 w-3 text-primary" />
+                            </div>
+                            <span className="text-sm truncate">{task.assignee}</span>
+                          </div>
+                          
+                          <div className="col-span-2 flex items-center">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
                               {task.priority}
                             </span>
                           </div>
-                        </div>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {project.tasks.map((task) => (
+                      <Link key={task.id} to={`/tasks/${task.id}`} className="block group">
+                        <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
+                          <div className="flex items-start gap-3 mb-3">
+                            {getStatusIcon(task.status)}
+                            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                              {task.name}
+                            </h3>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <StatusBadge 
+                                status={task.status === "completed" ? "on-track" : 
+                                        task.status === "not-started" ? "off-track" : 
+                                        task.status} 
+                              />
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                                {task.priority}
+                              </span>
+                            </div>
+                            
+                            <div className="pt-3 border-t space-y-2 text-sm">
+                              <div className="flex items-center gap-2">
+                                <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                  <User className="h-3 w-3 text-primary" />
+                                </div>
+                                <span className="truncate">{task.assignee}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Clock className="h-4 w-4 flex-shrink-0" />
+                                <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </TabsContent>
@@ -454,47 +675,117 @@ const Tasks = () => {
               
               return (
                 <div key={priority} className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <h2 className={`text-lg font-semibold capitalize ${getPriorityColor(priority)}`}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold border-2 ${getPriorityBadgeColor(priority)}`}>
                       {priority} Priority
-                    </h2>
+                    </span>
                     <span className="text-sm text-muted-foreground">
                       ({priorityTasks.length} tasks)
                     </span>
                   </div>
 
-                  <div className={viewMode === "grid" 
-                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                    : "space-y-3"
-                  }>
-                    {priorityTasks.map((task) => (
-                      <Link key={task.id} to={`/tasks/${task.id}`} className="block">
-                        <Card className="p-4 hover:shadow-lg transition-all cursor-pointer">
-                          <div className="flex items-start justify-between mb-3">
-                            <h3 className="font-semibold text-foreground flex-1">{task.name}</h3>
-                            <StatusBadge 
-                              status={task.status === "completed" ? "on-track" : 
-                                      task.status === "not-started" ? "off-track" : 
-                                      task.status} 
-                            />
-                          </div>
-                          
-                          <div className="space-y-2 text-sm">
-                            <div className="flex items-center justify-between">
-                              <span className="text-muted-foreground">Assignee:</span>
-                              <span className="font-medium">{task.assignee}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-muted-foreground">Due Date:</span>
-                              <span className="font-medium">
-                                {new Date(task.dueDate).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
+                  {viewMode === "list" ? (
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="divide-y">
+                        {priorityTasks.map((task) => {
+                          const project = getProjectForTask(task.id);
+                          return (
+                            <Link 
+                              key={task.id} 
+                              to={`/tasks/${task.id}`}
+                              className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group"
+                            >
+                              <div className="col-span-4 flex items-center gap-3">
+                                {getStatusIcon(task.status)}
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                                    {task.name}
+                                  </h3>
+                                  {project && (
+                                    <p className="text-xs text-muted-foreground truncate">{project.title}</p>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="col-span-3 flex items-center">
+                                <StatusBadge 
+                                  status={task.status === "completed" ? "on-track" : 
+                                          task.status === "not-started" ? "off-track" : 
+                                          task.status} 
+                                />
+                              </div>
+                              
+                              <div className="col-span-3 flex items-center gap-2">
+                                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <User className="h-3 w-3 text-primary" />
+                                </div>
+                                <span className="text-sm truncate">{task.assignee}</span>
+                              </div>
+                              
+                              <div className="col-span-2 flex items-center">
+                                <span className="text-sm text-muted-foreground">
+                                  {new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                  })}
+                                </span>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {priorityTasks.map((task) => {
+                        const project = getProjectForTask(task.id);
+                        return (
+                          <Link key={task.id} to={`/tasks/${task.id}`} className="block group">
+                            <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
+                              <div className="flex items-start gap-3 mb-3">
+                                {getStatusIcon(task.status)}
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
+                                    {task.name}
+                                  </h3>
+                                  {project && (
+                                    <p className="text-xs text-muted-foreground">{project.title}</p>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                  <StatusBadge 
+                                    status={task.status === "completed" ? "on-track" : 
+                                            task.status === "not-started" ? "off-track" : 
+                                            task.status} 
+                                  />
+                                </div>
+                                
+                                <div className="pt-3 border-t space-y-2 text-sm">
+                                  <div className="flex items-center gap-2">
+                                    <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                      <User className="h-3 w-3 text-primary" />
+                                    </div>
+                                    <span className="truncate">{task.assignee}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-muted-foreground">
+                                    <Clock className="h-4 w-4 flex-shrink-0" />
+                                    <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                      month: 'short', 
+                                      day: 'numeric',
+                                      year: 'numeric'
+                                    })}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}
