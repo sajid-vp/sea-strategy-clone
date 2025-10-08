@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar as CalendarIcon, X, ChevronDown, Flag, Search, Filter, ArrowUpDown, Network, ListChecks } from "lucide-react";
+import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar as CalendarIcon, X, ChevronDown, Flag, Search, Filter, ArrowUpDown, Network, ListChecks, MessageSquare, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -227,6 +227,8 @@ const Tasks = () => {
   const [tempName, setTempName] = useState("");
   const [newDependency, setNewDependency] = useState("");
   const [newSubtask, setNewSubtask] = useState("");
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState<Record<number, Array<{id: number; user: string; text: string; timestamp: string}>>>({});
   
   
   // Filters
@@ -478,6 +480,25 @@ const Tasks = () => {
     });
 
     toast({ title: "Subtask removed" });
+  };
+
+  const handleAddComment = () => {
+    if (!newComment.trim() || !selectedTask) return;
+    
+    const comment = {
+      id: Date.now(),
+      user: "Current User",
+      text: newComment,
+      timestamp: new Date().toISOString()
+    };
+
+    setComments(prev => ({
+      ...prev,
+      [selectedTask.task.id]: [comment, ...(prev[selectedTask.task.id] || [])]
+    }));
+
+    setNewComment("");
+    toast({ title: "Comment added" });
   };
 
   // Get unique assignees for filter
@@ -1392,6 +1413,63 @@ const Tasks = () => {
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Comments */}
+                  <div className="space-y-3">
+                    <Label className="text-xs text-muted-foreground flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4" />
+                      Comments
+                    </Label>
+                    
+                    {/* Comment Input */}
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Add a comment..."
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
+                        className="flex-1"
+                      />
+                      <Button 
+                        size="sm" 
+                        onClick={handleAddComment}
+                        disabled={!newComment.trim()}
+                      >
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    {/* Comments List */}
+                    <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                      {comments[selectedTask.task.id]?.length > 0 ? (
+                        comments[selectedTask.task.id].map(comment => (
+                          <div key={comment.id} className="p-3 border rounded-lg space-y-1">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <User className="h-3 w-3 text-primary" />
+                                </div>
+                                <span className="text-sm font-medium">{comment.user}</span>
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(comment.timestamp).toLocaleString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                            <p className="text-sm text-foreground pl-8">{comment.text}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center py-4">No comments yet</p>
+                      )}
                     </div>
                   </div>
                 </div>

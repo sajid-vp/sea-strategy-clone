@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle } from "lucide-react";
+import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,8 @@ const ProjectDetail = () => {
     priority: "medium",
     status: "todo",
   });
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
   
   let project = null;
   let parentInitiative = null;
@@ -66,6 +68,21 @@ const ProjectDetail = () => {
       priority: "medium",
       status: "todo",
     });
+  };
+
+  const handleAddComment = () => {
+    if (!newComment.trim()) return;
+    
+    const comment = {
+      id: Date.now(),
+      user: "Current User",
+      text: newComment,
+      timestamp: new Date().toISOString()
+    };
+
+    setComments(prev => [comment, ...prev]);
+    setNewComment("");
+    toast.success("Comment added");
   };
 
   if (!project || !parentInitiative) {
@@ -471,8 +488,67 @@ const ProjectDetail = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground text-center py-4">There are no more activities</p>
+                  <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Comments */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-primary" />
+                  Comments
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">Project discussion and updates</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Comment Input */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add a comment..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
+                    className="flex-1"
+                  />
+                  <Button 
+                    size="sm" 
+                    onClick={handleAddComment}
+                    disabled={!newComment.trim()}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Comments List */}
+                <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                  {comments.length > 0 ? (
+                    comments.map(comment => (
+                      <div key={comment.id} className="p-3 border rounded-lg space-y-1">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="h-3 w-3 text-primary" />
+                            </div>
+                            <span className="text-sm font-medium">{comment.user}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(comment.timestamp).toLocaleString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-sm text-foreground pl-8">{comment.text}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No comments yet</p>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>

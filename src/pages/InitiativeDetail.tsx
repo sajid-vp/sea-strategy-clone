@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/StatusBadge";
-import { ArrowLeft, User, Users, Calendar, Target, Plus } from "lucide-react";
+import { ArrowLeft, User, Users, Calendar, Target, Plus, MessageSquare, Send } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -132,6 +132,8 @@ const InitiativeDetail = () => {
     target: "",
     status: "in-progress" as "in-progress" | "blocked",
   });
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
   
   // Find the initiative, its parent objective, and parent goal
   let initiative;
@@ -205,6 +207,24 @@ const InitiativeDetail = () => {
       status: "in-progress",
     });
     setIsDialogOpen(false);
+  };
+
+  const handleAddComment = () => {
+    if (!newComment.trim()) return;
+    
+    const comment = {
+      id: Date.now(),
+      user: "Current User",
+      text: newComment,
+      timestamp: new Date().toISOString()
+    };
+
+    setComments(prev => [comment, ...prev]);
+    setNewComment("");
+    toast({
+      title: "Comment added",
+      description: "Your comment has been posted"
+    });
   };
 
   return (
@@ -468,6 +488,63 @@ const InitiativeDetail = () => {
                 <StatusBadge status={kpi.status} />
               </div>
             ))}
+          </div>
+        </Card>
+
+        {/* Comments */}
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="rounded-full bg-primary/10 p-2.5">
+              <MessageSquare className="h-5 w-5 text-primary" />
+            </div>
+            <h2 className="text-lg font-semibold">Comments</h2>
+          </div>
+
+          {/* Comment Input */}
+          <div className="flex gap-2 mb-4">
+            <Input
+              placeholder="Add a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
+              className="flex-1"
+            />
+            <Button 
+              size="sm" 
+              onClick={handleAddComment}
+              disabled={!newComment.trim()}
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Comments List */}
+          <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            {comments.length > 0 ? (
+              comments.map(comment => (
+                <div key={comment.id} className="p-4 bg-muted/50 rounded-lg space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="h-4 w-4 text-primary" />
+                      </div>
+                      <span className="font-medium">{comment.user}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(comment.timestamp).toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-sm text-foreground pl-10">{comment.text}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">No comments yet. Be the first to comment!</p>
+            )}
           </div>
         </Card>
       </main>
