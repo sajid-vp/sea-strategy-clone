@@ -1,157 +1,44 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { ArrowLeft, Users, User, Calendar, CheckCircle2, DollarSign, Target, Building2, UserCheck, Activity } from "lucide-react";
+import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-
-const initiatives = [
-  {
-    id: 1,
-    title: "Develop and Implement IT infrastructure",
-    projects: [
-      {
-        id: 1,
-        title: "ISO 27001 Implementation",
-        status: "on-track" as const,
-        owner: "John Smith",
-        team: ["Sarah Johnson", "Mike Chen"],
-        progress: 75,
-        startDate: "2025-01-15",
-        endDate: "2025-06-30",
-        budget: "AED 1,000.00",
-        department: "IT Security",
-        kpis: ["Security Compliance Rate", "Incident Response Time", "Policy Adherence"],
-        stakeholders: ["CTO", "Legal Team", "Compliance Officer"],
-        description: "Implement ISO 27001 information security management system across the organization to ensure data protection and compliance.",
-        milestones: [
-          { id: 1, name: "Gap Analysis", dueDate: "2025-02-15", progress: 100, status: "completed" as const },
-          { id: 2, name: "Policy Documentation", dueDate: "2025-03-30", progress: 80, status: "on-track" as const },
-          { id: 3, name: "Security Controls Implementation", dueDate: "2025-05-15", progress: 60, status: "on-track" as const },
-          { id: 4, name: "Internal Audit", dueDate: "2025-06-15", progress: 0, status: "not-started" as const },
-          { id: 5, name: "Certification Audit", dueDate: "2025-06-30", progress: 0, status: "not-started" as const },
-        ],
-        tasks: [
-          { id: 1, name: "Gap Analysis", status: "completed" as const },
-          { id: 2, name: "Policy Documentation", status: "on-track" as const },
-          { id: 3, name: "Security Controls Implementation", status: "on-track" as const },
-          { id: 4, name: "Internal Audit", status: "not-started" as const },
-          { id: 5, name: "Certification Audit", status: "not-started" as const },
-        ],
-        activities: [
-          { id: 1, user: "John Smith", action: "updated milestone", detail: "Policy Documentation", timestamp: "2025-01-08 10:30" },
-          { id: 2, user: "Sarah Johnson", action: "completed task", detail: "Gap Analysis", timestamp: "2025-01-07 15:45" },
-        ],
-      },
-      {
-        id: 2,
-        title: "Smart Campus Infrastructure",
-        status: "on-track" as const,
-        owner: "Sarah Johnson",
-        team: ["Emma Wilson", "Tom Martinez"],
-        progress: 60,
-        startDate: "2025-02-01",
-        endDate: "2025-08-31",
-        budget: "AED 2,500.00",
-        department: "IT Operations",
-        kpis: ["System Uptime", "Energy Efficiency", "User Satisfaction"],
-        stakeholders: ["Facilities Manager", "Campus Director", "Sustainability Team"],
-        description: "Deploy smart campus infrastructure including IoT sensors, automated systems, and integrated management platform.",
-        milestones: [
-          { id: 6, name: "Requirements Analysis", dueDate: "2025-02-28", progress: 100, status: "completed" as const },
-          { id: 7, name: "Vendor Selection", dueDate: "2025-03-15", progress: 100, status: "completed" as const },
-          { id: 8, name: "Hardware Installation", dueDate: "2025-06-15", progress: 50, status: "on-track" as const },
-          { id: 9, name: "Software Integration", dueDate: "2025-07-31", progress: 30, status: "at-risk" as const },
-          { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "not-started" as const },
-        ],
-        tasks: [
-          { id: 6, name: "Requirements Analysis", status: "completed" as const },
-          { id: 7, name: "Vendor Selection", status: "completed" as const },
-          { id: 8, name: "Hardware Installation", status: "on-track" as const },
-          { id: 9, name: "Software Integration", status: "at-risk" as const },
-          { id: 10, name: "Testing & Deployment", status: "not-started" as const },
-        ],
-        activities: [
-          { id: 3, user: "Emma Wilson", action: "flagged issue", detail: "Software Integration delays", timestamp: "2025-01-08 09:15" },
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Digital Transformation initiatives",
-    projects: [
-      {
-        id: 3,
-        title: "Unified Mobile App Development",
-        status: "off-track" as const,
-        owner: "David Brown",
-        team: ["Lisa Anderson", "Chris Taylor"],
-        progress: 30,
-        startDate: "2025-01-10",
-        endDate: "2025-07-15",
-        budget: "AED 1,800.00",
-        department: "Digital Services",
-        kpis: ["User Adoption Rate", "App Performance", "Feature Completion"],
-        stakeholders: ["Student Affairs", "IT Director", "Marketing Team"],
-        description: "Develop a unified mobile application that integrates all campus services and information for students, staff, and parents.",
-        milestones: [
-          { id: 11, name: "UI/UX Design", dueDate: "2025-02-28", progress: 100, status: "completed" as const },
-          { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "off-track" as const },
-          { id: 13, name: "Frontend Development", dueDate: "2025-06-15", progress: 25, status: "at-risk" as const },
-          { id: 14, name: "Integration Testing", dueDate: "2025-07-01", progress: 0, status: "not-started" as const },
-          { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "not-started" as const },
-        ],
-        tasks: [
-          { id: 11, name: "UI/UX Design", status: "completed" as const },
-          { id: 12, name: "Backend API Development", status: "off-track" as const },
-          { id: 13, name: "Frontend Development", status: "at-risk" as const },
-          { id: 14, name: "Integration Testing", status: "not-started" as const },
-          { id: 15, name: "Beta Testing", status: "not-started" as const },
-        ],
-        activities: [
-          { id: 4, user: "David Brown", action: "requested additional resources", detail: "Backend development team", timestamp: "2025-01-07 14:20" },
-          { id: 5, user: "Lisa Anderson", action: "completed milestone", detail: "UI/UX Design", timestamp: "2025-01-06 11:30" },
-        ],
-      },
-      {
-        id: 4,
-        title: "AI-Driven Business Intelligence",
-        status: "at-risk" as const,
-        owner: "Rachel Green",
-        team: ["Jennifer Lee", "Michael Scott"],
-        progress: 45,
-        startDate: "2025-03-01",
-        endDate: "2025-09-30",
-        budget: "AED 3,200.00",
-        department: "Analytics",
-        kpis: ["Data Accuracy", "Insight Generation Rate", "User Engagement"],
-        stakeholders: ["Executive Team", "Data Analysts", "Department Heads"],
-        description: "Implement AI-powered business intelligence dashboards to provide real-time insights and predictive analytics for decision-making.",
-        milestones: [
-          { id: 16, name: "Data Source Integration", dueDate: "2025-04-15", progress: 70, status: "on-track" as const },
-          { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "at-risk" as const },
-          { id: 18, name: "AI Model Training", dueDate: "2025-08-15", progress: 20, status: "at-risk" as const },
-          { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "not-started" as const },
-        ],
-        tasks: [
-          { id: 16, name: "Data Source Integration", status: "on-track" as const },
-          { id: 17, name: "Dashboard Development", status: "at-risk" as const },
-          { id: 18, name: "AI Model Training", status: "at-risk" as const },
-          { id: 19, name: "User Training", status: "not-started" as const },
-        ],
-        activities: [
-          { id: 6, user: "Rachel Green", action: "updated progress", detail: "Data Source Integration at 70%", timestamp: "2025-01-08 08:00" },
-        ],
-      },
-    ],
-  },
-];
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { initiatives } from "@/data/projectsData";
+import { toast } from "sonner";
 
 const ProjectDetail = () => {
   const { id } = useParams();
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const [newTask, setNewTask] = useState({
+    name: "",
+    description: "",
+    assignee: "",
+    priority: "medium",
+    status: "not-started",
+  });
   
   let project = null;
   let parentInitiative = null;
@@ -164,6 +51,22 @@ const ProjectDetail = () => {
       break;
     }
   }
+
+  const handleAddTask = () => {
+    if (!newTask.name || !newTask.assignee) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    toast.success("Task added successfully!");
+    setIsAddTaskOpen(false);
+    setNewTask({
+      name: "",
+      description: "",
+      assignee: "",
+      priority: "medium",
+      status: "not-started",
+    });
+  };
 
   if (!project || !parentInitiative) {
     return (
@@ -182,6 +85,19 @@ const ProjectDetail = () => {
   }
 
   const completedMilestones = project.milestones.filter(m => m.status === "completed").length;
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-destructive/10 text-destructive hover:bg-destructive/20";
+      case "medium":
+        return "bg-warning/10 text-warning hover:bg-warning/20";
+      case "low":
+        return "bg-muted text-muted-foreground hover:bg-muted/80";
+      default:
+        return "bg-muted text-muted-foreground";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -305,6 +221,134 @@ const ProjectDetail = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Tasks Section - New Design */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Tasks</CardTitle>
+                    <p className="text-sm text-muted-foreground">Manage project tasks and assignments</p>
+                  </div>
+                  <Dialog open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        Add Task
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Task</DialogTitle>
+                        <DialogDescription>
+                          Create a new task with details and assignments
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="taskName">Task Name *</Label>
+                          <Input
+                            id="taskName"
+                            value={newTask.name}
+                            onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
+                            placeholder="Enter task name"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="taskDescription">Description</Label>
+                          <Textarea
+                            id="taskDescription"
+                            value={newTask.description}
+                            onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                            placeholder="Enter task description"
+                            className="min-h-[80px]"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="assignee">Assignee *</Label>
+                          <Input
+                            id="assignee"
+                            value={newTask.assignee}
+                            onChange={(e) => setNewTask({ ...newTask, assignee: e.target.value })}
+                            placeholder="Enter assignee name"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="priority">Priority</Label>
+                            <Select value={newTask.priority} onValueChange={(value) => setNewTask({ ...newTask, priority: value })}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="low">Low</SelectItem>
+                                <SelectItem value="medium">Medium</SelectItem>
+                                <SelectItem value="high">High</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="status">Status</Label>
+                            <Select value={newTask.status} onValueChange={(value) => setNewTask({ ...newTask, status: value })}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="not-started">Not Started</SelectItem>
+                                <SelectItem value="on-track">On Track</SelectItem>
+                                <SelectItem value="at-risk">At Risk</SelectItem>
+                                <SelectItem value="off-track">Off Track</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={() => setIsAddTaskOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={handleAddTask}>Add Task</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {project.tasks.map((task) => (
+                    <Link key={task.id} to={`/tasks/${task.id}`}>
+                      <div className="group border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer bg-card">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                                {task.name}
+                              </h4>
+                              <Badge variant="outline" className={getPriorityColor(task.priority)}>
+                                {task.priority}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                              <div className="flex items-center gap-1">
+                                <User className="h-3.5 w-3.5" />
+                                <span>{task.assignee}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <StatusBadge status={task.status} />
+                            {task.status === "at-risk" || task.status === "off-track" ? (
+                              <AlertCircle className="h-4 w-4 text-destructive" />
+                            ) : null}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right Column - Sidebar */}
@@ -370,7 +414,7 @@ const ProjectDetail = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2">
-                      <UserCheck className="h-4 w-4 text-primary" />
+                      <Users className="h-4 w-4 text-primary" />
                       Stakeholders
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">Project stakeholders and interested parties</p>
@@ -402,7 +446,7 @@ const ProjectDetail = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-primary" />
+                  <Calendar className="h-4 w-4 text-primary" />
                   Activity
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">Recent project activity</p>

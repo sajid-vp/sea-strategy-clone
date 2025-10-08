@@ -1,0 +1,152 @@
+export const initiatives = [
+  {
+    id: 1,
+    title: "Develop and Implement IT infrastructure",
+    projects: [
+      {
+        id: 1,
+        title: "ISO 27001 Implementation",
+        status: "on-track" as const,
+        owner: "John Smith",
+        team: ["Sarah Johnson", "Mike Chen"],
+        progress: 75,
+        startDate: "2025-01-15",
+        endDate: "2025-06-30",
+        budget: "AED 1,000.00",
+        department: "IT Security",
+        kpis: ["Security Compliance Rate", "Incident Response Time", "Policy Adherence"],
+        stakeholders: ["CTO", "Legal Team", "Compliance Officer"],
+        description: "Implement ISO 27001 information security management system across the organization to ensure data protection and compliance.",
+        milestones: [
+          { id: 1, name: "Gap Analysis", dueDate: "2025-02-15", progress: 100, status: "completed" as const },
+          { id: 2, name: "Policy Documentation", dueDate: "2025-03-30", progress: 80, status: "on-track" as const },
+          { id: 3, name: "Security Controls Implementation", dueDate: "2025-05-15", progress: 60, status: "on-track" as const },
+          { id: 4, name: "Internal Audit", dueDate: "2025-06-15", progress: 0, status: "not-started" as const },
+          { id: 5, name: "Certification Audit", dueDate: "2025-06-30", progress: 0, status: "not-started" as const },
+        ],
+        tasks: [
+          { id: 1, name: "Gap Analysis", status: "completed" as const, priority: "high" as const, assignee: "John Smith" },
+          { id: 2, name: "Policy Documentation", status: "on-track" as const, priority: "high" as const, assignee: "Sarah Johnson" },
+          { id: 3, name: "Security Controls Implementation", status: "on-track" as const, priority: "medium" as const, assignee: "Mike Chen" },
+          { id: 4, name: "Internal Audit", status: "not-started" as const, priority: "medium" as const, assignee: "John Smith" },
+          { id: 5, name: "Certification Audit", status: "not-started" as const, priority: "high" as const, assignee: "Sarah Johnson" },
+        ],
+        activities: [
+          { id: 1, user: "John Smith", action: "updated milestone", detail: "Policy Documentation", timestamp: "2025-01-08 10:30" },
+          { id: 2, user: "Sarah Johnson", action: "completed task", detail: "Gap Analysis", timestamp: "2025-01-07 15:45" },
+        ],
+      },
+      {
+        id: 2,
+        title: "Smart Campus Infrastructure",
+        status: "on-track" as const,
+        owner: "Sarah Johnson",
+        team: ["Emma Wilson", "Tom Martinez"],
+        progress: 60,
+        startDate: "2025-02-01",
+        endDate: "2025-08-31",
+        budget: "AED 2,500.00",
+        department: "IT Operations",
+        kpis: ["System Uptime", "Energy Efficiency", "User Satisfaction"],
+        stakeholders: ["Facilities Manager", "Campus Director", "Sustainability Team"],
+        description: "Deploy smart campus infrastructure including IoT sensors, automated systems, and integrated management platform.",
+        milestones: [
+          { id: 6, name: "Requirements Analysis", dueDate: "2025-02-28", progress: 100, status: "completed" as const },
+          { id: 7, name: "Vendor Selection", dueDate: "2025-03-15", progress: 100, status: "completed" as const },
+          { id: 8, name: "Hardware Installation", dueDate: "2025-06-15", progress: 50, status: "on-track" as const },
+          { id: 9, name: "Software Integration", dueDate: "2025-07-31", progress: 30, status: "at-risk" as const },
+          { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "not-started" as const },
+        ],
+        tasks: [
+          { id: 6, name: "Requirements Analysis", status: "completed" as const, priority: "high" as const, assignee: "Sarah Johnson" },
+          { id: 7, name: "Vendor Selection", status: "completed" as const, priority: "high" as const, assignee: "Emma Wilson" },
+          { id: 8, name: "Hardware Installation", status: "on-track" as const, priority: "high" as const, assignee: "Tom Martinez" },
+          { id: 9, name: "Software Integration", status: "at-risk" as const, priority: "high" as const, assignee: "Emma Wilson" },
+          { id: 10, name: "Testing & Deployment", status: "not-started" as const, priority: "medium" as const, assignee: "Sarah Johnson" },
+        ],
+        activities: [
+          { id: 3, user: "Emma Wilson", action: "flagged issue", detail: "Software Integration delays", timestamp: "2025-01-08 09:15" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: "Digital Transformation initiatives",
+    projects: [
+      {
+        id: 3,
+        title: "Unified Mobile App Development",
+        status: "off-track" as const,
+        owner: "David Brown",
+        team: ["Lisa Anderson", "Chris Taylor"],
+        progress: 30,
+        startDate: "2025-01-10",
+        endDate: "2025-07-15",
+        budget: "AED 1,800.00",
+        department: "Digital Services",
+        kpis: ["User Adoption Rate", "App Performance", "Feature Completion"],
+        stakeholders: ["Student Affairs", "IT Director", "Marketing Team"],
+        description: "Develop a unified mobile application that integrates all campus services and information for students, staff, and parents.",
+        milestones: [
+          { id: 11, name: "UI/UX Design", dueDate: "2025-02-28", progress: 100, status: "completed" as const },
+          { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "off-track" as const },
+          { id: 13, name: "Frontend Development", dueDate: "2025-06-15", progress: 25, status: "at-risk" as const },
+          { id: 14, name: "Integration Testing", dueDate: "2025-07-01", progress: 0, status: "not-started" as const },
+          { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "not-started" as const },
+        ],
+        tasks: [
+          { id: 11, name: "UI/UX Design", status: "completed" as const, priority: "high" as const, assignee: "Lisa Anderson" },
+          { id: 12, name: "Backend API Development", status: "off-track" as const, priority: "high" as const, assignee: "David Brown" },
+          { id: 13, name: "Frontend Development", status: "at-risk" as const, priority: "high" as const, assignee: "Chris Taylor" },
+          { id: 14, name: "Integration Testing", status: "not-started" as const, priority: "medium" as const, assignee: "Lisa Anderson" },
+          { id: 15, name: "Beta Testing", status: "not-started" as const, priority: "medium" as const, assignee: "David Brown" },
+        ],
+        activities: [
+          { id: 4, user: "David Brown", action: "requested additional resources", detail: "Backend development team", timestamp: "2025-01-07 14:20" },
+          { id: 5, user: "Lisa Anderson", action: "completed milestone", detail: "UI/UX Design", timestamp: "2025-01-06 11:30" },
+        ],
+      },
+      {
+        id: 4,
+        title: "AI-Driven Business Intelligence",
+        status: "at-risk" as const,
+        owner: "Rachel Green",
+        team: ["Jennifer Lee", "Michael Scott"],
+        progress: 45,
+        startDate: "2025-03-01",
+        endDate: "2025-09-30",
+        budget: "AED 3,200.00",
+        department: "Analytics",
+        kpis: ["Data Accuracy", "Insight Generation Rate", "User Engagement"],
+        stakeholders: ["Executive Team", "Data Analysts", "Department Heads"],
+        description: "Implement AI-powered business intelligence dashboards to provide real-time insights and predictive analytics for decision-making.",
+        milestones: [
+          { id: 16, name: "Data Source Integration", dueDate: "2025-04-15", progress: 70, status: "on-track" as const },
+          { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "at-risk" as const },
+          { id: 18, name: "AI Model Training", dueDate: "2025-08-15", progress: 20, status: "at-risk" as const },
+          { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "not-started" as const },
+        ],
+        tasks: [
+          { id: 16, name: "Data Source Integration", status: "on-track" as const, priority: "high" as const, assignee: "Rachel Green" },
+          { id: 17, name: "Dashboard Development", status: "at-risk" as const, priority: "high" as const, assignee: "Jennifer Lee" },
+          { id: 18, name: "AI Model Training", status: "at-risk" as const, priority: "high" as const, assignee: "Michael Scott" },
+          { id: 19, name: "User Training", status: "not-started" as const, priority: "low" as const, assignee: "Rachel Green" },
+        ],
+        activities: [
+          { id: 6, user: "Rachel Green", action: "updated progress", detail: "Data Source Integration at 70%", timestamp: "2025-01-08 08:00" },
+        ],
+      },
+    ],
+  },
+];
+
+export const getAllProjects = () => {
+  return initiatives.flatMap(initiative => 
+    initiative.projects.map(project => ({
+      ...project,
+      initiativeId: initiative.id,
+      initiativeTitle: initiative.title,
+    }))
+  );
+};

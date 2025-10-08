@@ -15,61 +15,7 @@ import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { FolderKanban, List, BarChart3, TrendingUp, Users, Plus } from "lucide-react";
-
-const initiatives = [
-  {
-    id: 1,
-    title: "Develop and Implement IT infrastructure",
-    projects: [
-      {
-        id: 1,
-        title: "ISO 27001 Implementation",
-        status: "on-track" as const,
-        owner: "John Smith",
-        team: ["Sarah Johnson", "Mike Chen"],
-        progress: 75,
-        startDate: "2025-01-15",
-        endDate: "2025-06-30",
-      },
-      {
-        id: 2,
-        title: "Smart Campus Infrastructure",
-        status: "on-track" as const,
-        owner: "Sarah Johnson",
-        team: ["Emma Wilson", "Tom Martinez"],
-        progress: 60,
-        startDate: "2025-02-01",
-        endDate: "2025-08-31",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Digital Transformation initiatives",
-    projects: [
-      {
-        id: 3,
-        title: "Unified Mobile App Development",
-        status: "off-track" as const,
-        owner: "David Brown",
-        team: ["Lisa Anderson", "Chris Taylor"],
-        progress: 30,
-        startDate: "2025-01-10",
-        endDate: "2025-07-15",
-      },
-      {
-        id: 4,
-        title: "AI-Driven Business Intelligence",
-        status: "at-risk" as const,
-        owner: "Rachel Green",
-        team: ["Jennifer Lee", "Michael Scott"],
-        progress: 45,
-        startDate: "2025-03-01",
-        endDate: "2025-09-30",
-      },
-    ],
-  },
-];
+import { initiatives } from "@/data/projectsData";
 
 const Projects = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -186,28 +132,22 @@ const Projects = () => {
               <TabsTrigger value="initiative">By Initiative</TabsTrigger>
             </TabsList>
             
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 border rounded-md p-1">
-                <Button
-                  variant={viewMode === "grid" ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="h-8 w-8 p-0"
-                >
-                  <FolderKanban className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="h-8 w-8 p-0"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                New Project
+            <div className="flex items-center gap-1 border rounded-md p-1">
+              <Button
+                variant={viewMode === "grid" ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("grid")}
+                className="h-8 w-8 p-0"
+              >
+                <FolderKanban className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="h-8 w-8 p-0"
+              >
+                <List className="h-4 w-4" />
               </Button>
             </div>
           </div>
