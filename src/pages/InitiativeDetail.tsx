@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/StatusBadge";
-import { ArrowLeft, User, Users, Calendar, Target, Plus, MessageSquare, Send } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, User, Users, Calendar, Target, Plus, MessageSquare, Send, FolderKanban, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -26,6 +27,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { initiatives } from "@/data/projectsData";
+import { programs, getProgramsByInitiative } from "@/data/programsData";
+import { getActivitiesByProgram } from "@/data/activitiesData";
 
 // Data structure with objectives
 const goals = [
@@ -136,25 +140,10 @@ const InitiativeDetail = () => {
   const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   
-  // Find the initiative, its parent objective, and parent goal
-  let initiative;
-  let parentObjective;
-  let parentGoal;
+  // Find the initiative from the data
+  const initiative = initiatives.find(i => i.id.toString() === id);
   
-  for (const goal of goals) {
-    for (const objective of goal.objectives) {
-      const found = objective.initiatives.find(i => i.id.toString() === id);
-      if (found) {
-        initiative = found;
-        parentObjective = objective;
-        parentGoal = goal;
-        break;
-      }
-    }
-    if (initiative) break;
-  }
-
-  if (!initiative || !parentObjective || !parentGoal) {
+  if (!initiative) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -173,10 +162,20 @@ const InitiativeDetail = () => {
     );
   }
 
-  // Calculate progress (example: based on KPI status)
-  const totalKpis = initiative.kpis.length;
-  const onTrackKpis = initiative.kpis.filter(k => k.status === "in-progress").length;
-  const progress = totalKpis > 0 ? (onTrackKpis / totalKpis) * 100 : 0;
+  // Get related data
+  const initiativePrograms = getProgramsByInitiative(initiative.id);
+  const initiativeProjects = initiative.projects || [];
+  
+  // Get all activities from all programs
+  const initiativeActivities = initiativePrograms.flatMap(program => 
+    getActivitiesByProgram(program.id)
+  );
+
+  // Calculate progress based on projects
+  const totalProjects = initiativeProjects.length;
+  const avgProgress = totalProjects > 0 
+    ? initiativeProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / totalProjects 
+    : 0;
 
   const handleKpiSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,10 +248,9 @@ const InitiativeDetail = () => {
                 {initiative.title}
               </h1>
               <div className="flex items-center gap-3">
-                <StatusBadge status={initiative.status} />
                 <Badge variant="outline" className="gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {initiative.year}
+                  <Target className="h-3 w-3" />
+                  Initiative #{initiative.id}
                 </Badge>
               </div>
             </div>
@@ -265,242 +263,177 @@ const InitiativeDetail = () => {
                 <MessageSquare className="h-4 w-4" />
                 Comments ({comments.length})
               </Button>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="gap-2 w-full lg:w-auto">
-                    <Plus className="h-4 w-4" />
-                    Add KPI
-                  </Button>
-                </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Create KPI</DialogTitle>
-                  <DialogDescription>
-                    Add a new Key Performance Indicator to track progress
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <form onSubmit={handleKpiSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="kpi-title">Title *</Label>
-                    <Input
-                      id="kpi-title"
-                      placeholder="Title"
-                      value={kpiFormData.title}
-                      onChange={(e) => setKpiFormData(prev => ({ ...prev, title: e.target.value }))}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="kpi-description">Description</Label>
-                    <Textarea
-                      id="kpi-description"
-                      placeholder="Description"
-                      value={kpiFormData.description}
-                      onChange={(e) => setKpiFormData(prev => ({ ...prev, description: e.target.value }))}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="tracking-method">Tracking Method</Label>
-                      <Select 
-                        value={kpiFormData.trackingMethod} 
-                        onValueChange={(value) => setKpiFormData(prev => ({ ...prev, trackingMethod: value }))}
-                      >
-                        <SelectTrigger id="tracking-method">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Manual">Manual</SelectItem>
-                          <SelectItem value="Automatic">Automatic</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="reporting-frequency">Reporting Frequency</Label>
-                      <Select 
-                        value={kpiFormData.reportingFrequency} 
-                        onValueChange={(value) => setKpiFormData(prev => ({ ...prev, reportingFrequency: value }))}
-                      >
-                        <SelectTrigger id="reporting-frequency">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Weekly">Weekly</SelectItem>
-                          <SelectItem value="Monthly">Monthly</SelectItem>
-                          <SelectItem value="Quarterly">Quarterly</SelectItem>
-                          <SelectItem value="Annually">Annually</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="reporting-type">Reporting Type</Label>
-                      <Select 
-                        value={kpiFormData.reportingType} 
-                        onValueChange={(value) => setKpiFormData(prev => ({ ...prev, reportingType: value }))}
-                      >
-                        <SelectTrigger id="reporting-type">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Number">Number</SelectItem>
-                          <SelectItem value="Percentage">Percentage</SelectItem>
-                          <SelectItem value="Currency">Currency</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="reporting-unit">Reporting Unit</Label>
-                      <Input
-                        id="reporting-unit"
-                        placeholder="%"
-                        value={kpiFormData.reportingUnit}
-                        onChange={(e) => setKpiFormData(prev => ({ ...prev, reportingUnit: e.target.value }))}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="target">Target</Label>
-                      <Input
-                        id="target"
-                        placeholder="100"
-                        value={kpiFormData.target}
-                        onChange={(e) => setKpiFormData(prev => ({ ...prev, target: e.target.value }))}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setIsDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">
-                      Create KPI
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
             </div>
           </div>
 
-          {/* Parent Goal */}
-          <Card className="p-6 bg-muted/50 border-l-4 border-l-primary">
-            <div className="flex items-start gap-4">
-              <div className="rounded-full bg-primary/10 p-3">
-                <Target className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-medium text-muted-foreground mb-1">
-                  Strategic Goal
-                </div>
-                <div className="text-lg font-semibold text-foreground mb-2">{parentGoal.title}</div>
-                <div className="text-sm text-muted-foreground">
-                  {parentGoal.description}
-                </div>
-              </div>
-            </div>
-          </Card>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground mb-1">Programs</div>
+              <div className="text-2xl font-bold text-foreground">{initiativePrograms.length}</div>
+            </Card>
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground mb-1">Projects</div>
+              <div className="text-2xl font-bold text-foreground">{initiativeProjects.length}</div>
+            </Card>
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground mb-1">Activities</div>
+              <div className="text-2xl font-bold text-foreground">{initiativeActivities.length}</div>
+            </Card>
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground mb-1">Avg Progress</div>
+              <div className="text-2xl font-bold text-foreground">{Math.round(avgProgress)}%</div>
+            </Card>
+          </div>
         </div>
 
-        {/* Initiative Owner */}
-        <Card className="p-6 mb-6 border-l-4 border-l-primary">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="rounded-full bg-primary/10 p-3">
-                <User className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <div className="text-sm font-medium text-muted-foreground mb-1">Initiative Owner</div>
-                <div className="text-2xl font-bold text-foreground">{initiative.owner}</div>
-                <div className="text-sm text-muted-foreground">Project Lead</div>
-              </div>
-            </div>
-            <StatusBadge status={initiative.status} />
-          </div>
-        </Card>
+        {/* Tabbed Content */}
+        <Tabs defaultValue="programs" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="programs">Programs</TabsTrigger>
+            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="activities">Activities</TabsTrigger>
+          </TabsList>
 
-        {/* Contributors */}
-        <Card className="p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="rounded-full bg-primary/10 p-2.5">
-              <Users className="h-5 w-5 text-primary" />
-            </div>
-            <h2 className="text-lg font-semibold">Contributors ({initiative.team.length})</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-3">
-            {initiative.team.map((member, idx) => (
-              <div
-                key={idx}
-                className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
-              >
-                <div className="font-medium text-foreground">{member}</div>
-              </div>
-            ))}
-          </div>
-        </Card>
+          {/* Programs Tab */}
+          <TabsContent value="programs" className="space-y-4">
+            {initiativePrograms.length > 0 ? (
+              initiativePrograms.map((program) => (
+                <Link key={program.id} to={`/programs/${program.id}`}>
+                  <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FolderKanban className="h-5 w-5 text-primary" />
+                          <h3 className="text-lg font-bold text-foreground">{program.title}</h3>
+                          <Badge variant="outline" className="text-xs">{program.code}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
+                      </div>
+                      <StatusBadge status={program.status === "planned" ? "todo" : program.status === "active" ? "in-progress" : program.status === "on-hold" ? "blocked" : "done"} />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Manager</p>
+                        <p className="text-sm font-medium">{program.manager}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Budget</p>
+                        <p className="text-sm font-medium">{program.budget}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Start Date</p>
+                        <p className="text-sm font-medium">{new Date(program.startDate).toLocaleDateString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Progress</p>
+                        <p className="text-sm font-medium">{program.progress}%</p>
+                      </div>
+                    </div>
+                    <Progress value={program.progress} className="h-2" />
+                  </Card>
+                </Link>
+              ))
+            ) : (
+              <Card className="p-12 text-center">
+                <FolderKanban className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground">No programs linked to this initiative yet.</p>
+              </Card>
+            )}
+          </TabsContent>
 
-        {/* Supporting Goals */}
-        <Card className="p-6 mb-6">
-          <div className="flex items-start gap-4">
-            <div className="rounded-full bg-primary/10 p-3">
-              <Target className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1">
-              <div className="text-sm font-medium text-muted-foreground mb-1">Supporting Goal</div>
-              <div className="text-xl font-bold text-foreground mb-2">{parentGoal.title}</div>
-              <div className="text-sm text-muted-foreground mb-3">{parentGoal.description}</div>
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Goal Period:</span>
-                  <span className="font-semibold text-foreground">{parentGoal.startYear}-{parentGoal.endYear}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Target Year:</span>
-                  <span className="font-semibold text-foreground">{initiative.year}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
+          {/* Projects Tab */}
+          <TabsContent value="projects" className="space-y-4">
+            {initiativeProjects.length > 0 ? (
+              initiativeProjects.map((project) => (
+                <Link key={project.id} to={`/projects/${project.id}`}>
+                  <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FolderKanban className="h-5 w-5 text-primary" />
+                          <h3 className="text-lg font-bold text-foreground">{project.title}</h3>
+                          {project.code && <Badge variant="outline" className="text-xs">{project.code}</Badge>}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{project.description}</p>
+                      </div>
+                      <StatusBadge status={project.status} />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Owner</p>
+                        <p className="text-sm font-medium">{project.owner}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Budget</p>
+                        <p className="text-sm font-medium">{project.budget}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Start Date</p>
+                        <p className="text-sm font-medium">{new Date(project.startDate).toLocaleDateString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Progress</p>
+                        <p className="text-sm font-medium">{project.progress}%</p>
+                      </div>
+                    </div>
+                    <Progress value={project.progress} className="h-2" />
+                  </Card>
+                </Link>
+              ))
+            ) : (
+              <Card className="p-12 text-center">
+                <FolderKanban className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground">No projects linked to this initiative yet.</p>
+              </Card>
+            )}
+          </TabsContent>
 
-        {/* KPIs for the Initiative */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">
-              KPIs for the Initiative ({initiative.kpis.length})
-            </h2>
-            <div className="text-sm text-muted-foreground">
-              {onTrackKpis}/{totalKpis} on track
-            </div>
-          </div>
-          <div className="space-y-3">
-            {initiative.kpis.map((kpi, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-transparent hover:border-border"
-              >
-                <div className="flex-1">
-                  <div className="font-medium text-foreground">{kpi.name}</div>
-                </div>
-                <StatusBadge status={kpi.status} />
-              </div>
-            ))}
-          </div>
-        </Card>
+          {/* Activities Tab */}
+          <TabsContent value="activities" className="space-y-4">
+            {initiativeActivities.length > 0 ? (
+              initiativeActivities.map((activity) => (
+                <Link key={activity.id} to={`/activities/${activity.id}`}>
+                  <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Activity className="h-5 w-5 text-primary" />
+                          <h3 className="text-lg font-bold text-foreground">{activity.title}</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{activity.description}</p>
+                      </div>
+                      <StatusBadge status={activity.status} />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Type:</span>
+                        <Badge variant="outline" className="ml-2 text-xs">{activity.type}</Badge>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Frequency:</span>
+                        <span className="ml-2 font-medium capitalize">{activity.frequency}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Owner:</span>
+                        <span className="ml-2 font-medium">{activity.owner}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Duration:</span>
+                        <span className="ml-2 font-medium">{activity.duration} min</span>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              ))
+            ) : (
+              <Card className="p-12 text-center">
+                <Activity className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground">No activities linked to this initiative yet.</p>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
 
         {/* Comments Dialog */}
         <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
