@@ -40,7 +40,7 @@ const goals = [
         title: "Infrastructure Modernization",
         description: "Upgrade and modernize IT infrastructure",
         year: 2025,
-        status: "on-track" as const,
+        status: "in-progress" as const,
         owner: "John Smith",
         initiativeCount: 2,
       },
@@ -49,7 +49,7 @@ const goals = [
         title: "Digital Transformation",
         description: "Transform business processes through digital solutions",
         year: 2025,
-        status: "off-track" as const,
+        status: "blocked" as const,
         owner: "David Brown",
         initiativeCount: 1,
       },
@@ -120,8 +120,8 @@ const GoalDetail = () => {
   // Calculate statistics
   const totalObjectives = goal.objectives.length;
   const totalInitiatives = goal.objectives.reduce((acc, obj) => acc + obj.initiativeCount, 0);
-  const onTrackObjectives = goal.objectives.filter(o => o.status === "on-track").length;
-  const offTrackObjectives = goal.objectives.filter(o => o.status === "off-track").length;
+  const onTrackObjectives = goal.objectives.filter(o => o.status === "in-progress").length;
+  const offTrackObjectives = goal.objectives.filter(o => o.status === "blocked").length;
   const progress = totalObjectives > 0 ? (onTrackObjectives / totalObjectives) * 100 : 0;
 
   const handleInputChange = (field: string, value: string) => {
@@ -385,8 +385,8 @@ const GoalDetail = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All statuses</SelectItem>
-                    <SelectItem value="on-track">On Track</SelectItem>
-                    <SelectItem value="off-track">Off Track</SelectItem>
+                    <SelectItem value="in-progress">In Progress</SelectItem>
+                    <SelectItem value="blocked">Blocked</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -18,7 +18,7 @@ import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCirc
 type Task = {
   id: number;
   name: string;
-  status: "completed" | "on-track" | "at-risk" | "not-started" | "off-track";
+  status: "done" | "in-progress" | "in-review" | "todo" | "blocked";
   assignee: string;
   dueDate: string;
   priority: "high" | "medium" | "low";
@@ -38,7 +38,7 @@ const projects: Project[] = [
       {
         id: 1,
         name: "Gap Analysis",
-        status: "completed" as const,
+        status: "done" as const,
         assignee: "John Smith",
         dueDate: "2025-02-15",
         priority: "high" as const,
@@ -46,7 +46,7 @@ const projects: Project[] = [
       {
         id: 2,
         name: "Policy Documentation",
-        status: "on-track" as const,
+        status: "in-progress" as const,
         assignee: "Sarah Johnson",
         dueDate: "2025-04-30",
         priority: "high" as const,
@@ -54,7 +54,7 @@ const projects: Project[] = [
       {
         id: 3,
         name: "Security Controls Implementation",
-        status: "on-track" as const,
+        status: "in-progress" as const,
         assignee: "Mike Chen",
         dueDate: "2025-05-31",
         priority: "medium" as const,
@@ -62,7 +62,7 @@ const projects: Project[] = [
       {
         id: 4,
         name: "Internal Audit",
-        status: "not-started" as const,
+        status: "todo" as const,
         assignee: "John Smith",
         dueDate: "2025-06-15",
         priority: "medium" as const,
@@ -70,7 +70,7 @@ const projects: Project[] = [
       {
         id: 5,
         name: "Certification Audit",
-        status: "not-started" as const,
+        status: "todo" as const,
         assignee: "Sarah Johnson",
         dueDate: "2025-06-30",
         priority: "high" as const,
@@ -84,7 +84,7 @@ const projects: Project[] = [
       {
         id: 6,
         name: "Requirements Analysis",
-        status: "completed" as const,
+        status: "done" as const,
         assignee: "Emma Wilson",
         dueDate: "2025-03-01",
         priority: "high" as const,
@@ -92,7 +92,7 @@ const projects: Project[] = [
       {
         id: 7,
         name: "Vendor Selection",
-        status: "completed" as const,
+        status: "done" as const,
         assignee: "Tom Martinez",
         dueDate: "2025-03-31",
         priority: "high" as const,
@@ -100,7 +100,7 @@ const projects: Project[] = [
       {
         id: 8,
         name: "Hardware Installation",
-        status: "on-track" as const,
+        status: "in-progress" as const,
         assignee: "Emma Wilson",
         dueDate: "2025-06-30",
         priority: "medium" as const,
@@ -108,7 +108,7 @@ const projects: Project[] = [
       {
         id: 9,
         name: "Software Integration",
-        status: "at-risk" as const,
+        status: "in-review" as const,
         assignee: "Tom Martinez",
         dueDate: "2025-07-31",
         priority: "high" as const,
@@ -116,7 +116,7 @@ const projects: Project[] = [
       {
         id: 10,
         name: "Testing & Deployment",
-        status: "not-started" as const,
+        status: "todo" as const,
         assignee: "Emma Wilson",
         dueDate: "2025-08-31",
         priority: "medium" as const,
@@ -130,7 +130,7 @@ const projects: Project[] = [
       {
         id: 11,
         name: "UI/UX Design",
-        status: "completed" as const,
+        status: "done" as const,
         assignee: "Lisa Anderson",
         dueDate: "2025-02-28",
         priority: "high" as const,
@@ -138,7 +138,7 @@ const projects: Project[] = [
       {
         id: 12,
         name: "Backend API Development",
-        status: "off-track" as const,
+        status: "blocked" as const,
         assignee: "Chris Taylor",
         dueDate: "2025-05-15",
         priority: "high" as const,
@@ -146,7 +146,7 @@ const projects: Project[] = [
       {
         id: 13,
         name: "Frontend Development",
-        status: "at-risk" as const,
+        status: "in-review" as const,
         assignee: "Lisa Anderson",
         dueDate: "2025-06-15",
         priority: "high" as const,
@@ -154,7 +154,7 @@ const projects: Project[] = [
       {
         id: 14,
         name: "Integration Testing",
-        status: "not-started" as const,
+        status: "todo" as const,
         assignee: "Chris Taylor",
         dueDate: "2025-06-30",
         priority: "medium" as const,
@@ -162,7 +162,7 @@ const projects: Project[] = [
       {
         id: 15,
         name: "Beta Testing",
-        status: "not-started" as const,
+        status: "todo" as const,
         assignee: "David Brown",
         dueDate: "2025-07-15",
         priority: "low" as const,
@@ -176,10 +176,10 @@ const Tasks = () => {
   const [selectedYear, setSelectedYear] = useState("2025");
 
   const allTasks: Task[] = projects.flatMap(p => p.tasks);
-  const completedTasks = allTasks.filter(t => t.status === "completed").length;
-  const onTrackTasks = allTasks.filter(t => t.status === "on-track").length;
-  const atRiskTasks = allTasks.filter(t => t.status === "at-risk").length;
-  const notStartedTasks = allTasks.filter(t => t.status === "not-started").length;
+  const completedTasks = allTasks.filter(t => t.status === "done").length;
+  const onTrackTasks = allTasks.filter(t => t.status === "in-progress").length;
+  const atRiskTasks = allTasks.filter(t => t.status === "in-review").length;
+  const notStartedTasks = allTasks.filter(t => t.status === "todo").length;
   const highPriorityTasks = allTasks.filter(t => t.priority === "high").length;
 
   const getPriorityColor = (priority: string) => {
@@ -193,11 +193,11 @@ const Tasks = () => {
 
   const getStatusIcon = (status: Task['status']) => {
     switch (status) {
-      case "completed": return <CheckCircle2 className="h-4 w-4 text-success" />;
-      case "on-track": return <Circle className="h-4 w-4 text-primary" />;
-      case "at-risk": return <AlertCircle className="h-4 w-4 text-warning" />;
-      case "off-track": return <AlertCircle className="h-4 w-4 text-destructive" />;
-      case "not-started": return <Clock3 className="h-4 w-4 text-muted-foreground" />;
+      case "done": return <CheckCircle2 className="h-4 w-4 text-success" />;
+      case "in-progress": return <Circle className="h-4 w-4 text-primary" />;
+      case "in-review": return <AlertCircle className="h-4 w-4 text-warning" />;
+      case "blocked": return <AlertCircle className="h-4 w-4 text-destructive" />;
+      case "todo": return <Clock3 className="h-4 w-4 text-muted-foreground" />;
       default: return <Circle className="h-4 w-4" />;
     }
   };
@@ -359,11 +359,7 @@ const Tasks = () => {
                         </div>
                         
                         <div className="col-span-2 flex items-center">
-                          <StatusBadge 
-                            status={task.status === "completed" ? "on-track" : 
-                                    task.status === "not-started" ? "off-track" : 
-                                    task.status} 
-                          />
+                          <StatusBadge status={task.status} />
                         </div>
                         
                         <div className="col-span-2 flex items-center">
@@ -413,11 +409,7 @@ const Tasks = () => {
                         
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
-                            <StatusBadge 
-                              status={task.status === "completed" ? "on-track" : 
-                                      task.status === "not-started" ? "off-track" : 
-                                      task.status} 
-                            />
+                            <StatusBadge status={task.status} />
                             <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
                               {task.priority}
                             </span>
@@ -488,11 +480,7 @@ const Tasks = () => {
                               </div>
                               
                               <div className="col-span-3 flex items-center">
-                                <StatusBadge 
-                                  status={task.status === "completed" ? "on-track" : 
-                                          task.status === "not-started" ? "off-track" : 
-                                          task.status} 
-                                />
+                                <StatusBadge status={task.status} />
                               </div>
                               
                               <div className="col-span-2 flex items-center">
@@ -535,11 +523,7 @@ const Tasks = () => {
                               
                               <div className="space-y-3">
                                 <div className="flex items-center gap-2">
-                                  <StatusBadge 
-                                    status={task.status === "completed" ? "on-track" : 
-                                            task.status === "not-started" ? "off-track" : 
-                                            task.status} 
-                                  />
+                                  <StatusBadge status={task.status} />
                                   <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
                                     {task.priority}
                                   </span>
@@ -594,11 +578,7 @@ const Tasks = () => {
                           </div>
                           
                           <div className="col-span-3 flex items-center">
-                            <StatusBadge 
-                              status={task.status === "completed" ? "on-track" : 
-                                      task.status === "not-started" ? "off-track" : 
-                                      task.status} 
-                            />
+                            <StatusBadge status={task.status} />
                           </div>
                           
                           <div className="col-span-2 flex items-center gap-2">
@@ -631,11 +611,7 @@ const Tasks = () => {
                           
                           <div className="space-y-3">
                             <div className="flex items-center gap-2">
-                              <StatusBadge 
-                                status={task.status === "completed" ? "on-track" : 
-                                        task.status === "not-started" ? "off-track" : 
-                                        task.status} 
-                              />
+                              <StatusBadge status={task.status} />
                               <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
                                 {task.priority}
                               </span>
@@ -708,11 +684,7 @@ const Tasks = () => {
                               </div>
                               
                               <div className="col-span-3 flex items-center">
-                                <StatusBadge 
-                                  status={task.status === "completed" ? "on-track" : 
-                                          task.status === "not-started" ? "off-track" : 
-                                          task.status} 
-                                />
+                                <StatusBadge status={task.status} />
                               </div>
                               
                               <div className="col-span-3 flex items-center gap-2">
@@ -756,11 +728,7 @@ const Tasks = () => {
                               
                               <div className="space-y-3">
                                 <div className="flex items-center gap-2">
-                                  <StatusBadge 
-                                    status={task.status === "completed" ? "on-track" : 
-                                            task.status === "not-started" ? "off-track" : 
-                                            task.status} 
-                                  />
+                                  <StatusBadge status={task.status} />
                                 </div>
                                 
                                 <div className="pt-3 border-t space-y-2 text-sm">

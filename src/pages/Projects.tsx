@@ -25,13 +25,13 @@ const Projects = () => {
 
   const totalProjects = initiatives.reduce((acc, init) => acc + init.projects.length, 0);
   const onTrackProjects = initiatives.reduce((acc, init) => 
-    acc + init.projects.filter(p => p.status === "on-track").length, 0
+    acc + init.projects.filter(p => p.status === "in-progress").length, 0
   );
   const atRiskProjects = initiatives.reduce((acc, init) => 
-    acc + init.projects.filter(p => p.status === "at-risk").length, 0
+    acc + init.projects.filter(p => p.status === "in-review").length, 0
   );
   const offTrackProjects = initiatives.reduce((acc, init) => 
-    acc + init.projects.filter(p => p.status === "off-track").length, 0
+    acc + init.projects.filter(p => p.status === "blocked").length, 0
   );
   
   const avgProgress = Math.round(

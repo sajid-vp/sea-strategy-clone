@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type Status = "on-track" | "off-track" | "at-risk" | "completed" | "not-started";
+type Status = "todo" | "in-progress" | "in-review" | "blocked" | "done";
 
 interface StatusBadgeProps {
   status: Status;
@@ -8,25 +8,25 @@ interface StatusBadgeProps {
 }
 
 const statusConfig = {
-  "on-track": {
-    label: "On Track",
-    className: "bg-success text-success-foreground",
+  "todo": {
+    label: "To Do",
+    className: "bg-muted text-muted-foreground",
   },
-  "off-track": {
-    label: "Off Track",
+  "in-progress": {
+    label: "In Progress",
+    className: "bg-primary/10 text-primary border border-primary/20",
+  },
+  "in-review": {
+    label: "In Review",
+    className: "bg-warning/10 text-warning border border-warning/20",
+  },
+  "blocked": {
+    label: "Blocked",
     className: "bg-destructive text-destructive-foreground",
   },
-  "at-risk": {
-    label: "At Risk",
-    className: "bg-warning text-warning-foreground",
-  },
-  "completed": {
-    label: "Completed",
+  "done": {
+    label: "Done",
     className: "bg-success text-success-foreground",
-  },
-  "not-started": {
-    label: "Not Started",
-    className: "bg-muted text-muted-foreground",
   },
 };
 

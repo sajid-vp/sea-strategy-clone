@@ -41,7 +41,7 @@ const goals = [
         title: "Infrastructure Modernization",
         description: "Upgrade and modernize IT infrastructure",
         year: 2025,
-        status: "on-track" as const,
+        status: "in-progress" as const,
         goalId: 1,
         initiativeCount: 2,
       },
@@ -50,7 +50,7 @@ const goals = [
         title: "Digital Transformation",
         description: "Transform business processes through digital solutions",
         year: 2025,
-        status: "off-track" as const,
+        status: "blocked" as const,
         goalId: 1,
         initiativeCount: 1,
       },
@@ -68,7 +68,7 @@ const goals = [
         title: "Teaching Enhancement",
         description: "Improve teaching methods and tools",
         year: 2025,
-        status: "off-track" as const,
+        status: "blocked" as const,
         goalId: 2,
         initiativeCount: 1,
       },
@@ -77,7 +77,7 @@ const goals = [
         title: "Service Excellence",
         description: "Enhance IT services satisfaction",
         year: 2026,
-        status: "on-track" as const,
+        status: "in-progress" as const,
         goalId: 2,
         initiativeCount: 1,
       },
@@ -92,8 +92,8 @@ const Objectives = () => {
   
   const allObjectives = goals.flatMap(g => g.objectives);
   const totalObjectives = allObjectives.length;
-  const onTrackCount = allObjectives.filter(o => o.status === "on-track").length;
-  const offTrackCount = allObjectives.filter(o => o.status === "off-track").length;
+  const onTrackCount = allObjectives.filter(o => o.status === "in-progress").length;
+  const offTrackCount = allObjectives.filter(o => o.status === "blocked").length;
   const progress = totalObjectives > 0 ? (onTrackCount / totalObjectives) * 100 : 0;
 
   const [formData, setFormData] = useState({

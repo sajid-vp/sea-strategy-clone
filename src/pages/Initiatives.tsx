@@ -44,26 +44,26 @@ const goals = [
         id: 1,
         title: "Develop and Implement IT infrastructure",
         year: 2025,
-        status: "on-track" as const,
+        status: "in-progress" as const,
         owner: "John Smith",
         team: ["Sarah Johnson", "Mike Chen", "Emma Wilson"],
         kpis: [
-          { name: "ISO 27001 Implementation", status: "on-track" as const },
-          { name: "Smart Campus Infrastructure", status: "on-track" as const },
-          { name: "Child Safety Geo-tagging", status: "on-track" as const },
+          { name: "ISO 27001 Implementation", status: "in-progress" as const },
+          { name: "Smart Campus Infrastructure", status: "in-progress" as const },
+          { name: "Child Safety Geo-tagging", status: "in-progress" as const },
         ],
       },
       {
         id: 2,
         title: "Digital Transformation initiatives",
         year: 2025,
-        status: "off-track" as const,
+        status: "blocked" as const,
         owner: "David Brown",
         team: ["Lisa Anderson", "Tom Martinez"],
         kpis: [
-          { name: "Student Information System Adoption", status: "on-track" as const },
-          { name: "AI-Driven Business Intelligence Dashboards", status: "on-track" as const },
-          { name: "Unified Mobile App Development", status: "off-track" as const },
+          { name: "Student Information System Adoption", status: "in-progress" as const },
+          { name: "AI-Driven Business Intelligence Dashboards", status: "in-progress" as const },
+          { name: "Unified Mobile App Development", status: "blocked" as const },
         ],
       },
     ],
@@ -79,25 +79,25 @@ const goals = [
         id: 3,
         title: "Support Teaching & Learning",
         year: 2025,
-        status: "off-track" as const,
+        status: "blocked" as const,
         owner: "Rachel Green",
         team: ["Chris Taylor", "Jennifer Lee"],
         kpis: [
-          { name: "Education Platform Enhancement", status: "off-track" as const },
-          { name: "Nursery Management System", status: "on-track" as const },
+          { name: "Education Platform Enhancement", status: "blocked" as const },
+          { name: "Nursery Management System", status: "in-progress" as const },
         ],
       },
       {
         id: 4,
         title: "Increase satisfaction with IT services",
         year: 2026,
-        status: "on-track" as const,
+        status: "in-progress" as const,
         owner: "Michael Scott",
         team: ["Pam Beesly", "Jim Halpert", "Dwight Schrute"],
         kpis: [
-          { name: "IT Services Employee Satisfaction", status: "on-track" as const },
-          { name: "Digital Learning Experience", status: "on-track" as const },
-          { name: "SIS Stakeholder Satisfaction", status: "on-track" as const },
+          { name: "IT Services Employee Satisfaction", status: "in-progress" as const },
+          { name: "Digital Learning Experience", status: "in-progress" as const },
+          { name: "SIS Stakeholder Satisfaction", status: "in-progress" as const },
         ],
       },
     ],
@@ -507,11 +507,11 @@ const Initiatives = () => {
                           <div className="flex items-center gap-3 text-xs">
                             <div className="flex items-center gap-1">
                               <div className="h-2 w-2 rounded-full bg-success" />
-                              <span>{initiative.kpis.filter(k => k.status === "on-track").length}</span>
+                              <span>{initiative.kpis.filter(k => k.status === "in-progress").length}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <div className="h-2 w-2 rounded-full bg-destructive" />
-                              <span>{initiative.kpis.filter(k => k.status !== "on-track").length}</span>
+                              <span>{initiative.kpis.filter(k => k.status !== "in-progress").length}</span>
                             </div>
                           </div>
                         </div>
@@ -551,11 +551,11 @@ const Initiatives = () => {
                               <div className="flex items-center gap-3 text-xs">
                                 <div className="flex items-center gap-1">
                                   <div className="h-2 w-2 rounded-full bg-success" />
-                                  <span>{initiative.kpis.filter(k => k.status === "on-track").length}</span>
+                                  <span>{initiative.kpis.filter(k => k.status === "in-progress").length}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <div className="h-2 w-2 rounded-full bg-destructive" />
-                                  <span>{initiative.kpis.filter(k => k.status !== "on-track").length}</span>
+                                  <span>{initiative.kpis.filter(k => k.status !== "in-progress").length}</span>
                                 </div>
                               </div>
                             </div>
@@ -616,11 +616,11 @@ const Initiatives = () => {
                                 <div className="flex items-center gap-3 text-xs">
                                   <div className="flex items-center gap-1">
                                     <div className="h-2 w-2 rounded-full bg-success" />
-                                    <span>{initiative.kpis.filter(k => k.status === "on-track").length}</span>
+                                    <span>{initiative.kpis.filter(k => k.status === "in-progress").length}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <div className="h-2 w-2 rounded-full bg-destructive" />
-                                    <span>{initiative.kpis.filter(k => k.status !== "on-track").length}</span>
+                                    <span>{initiative.kpis.filter(k => k.status !== "in-progress").length}</span>
                                   </div>
                                 </div>
                               </div>
