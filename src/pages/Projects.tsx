@@ -15,11 +15,13 @@ import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { FolderKanban, List, BarChart3, TrendingUp, Users, Plus } from "lucide-react";
-import { initiatives } from "@/data/projectsData";
+import { initiatives, getAllProjects } from "@/data/projectsData";
 
 const Projects = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedYear, setSelectedYear] = useState("2025");
+  
+  const allProjects = getAllProjects();
 
   const totalProjects = initiatives.reduce((acc, init) => acc + init.projects.length, 0);
   const onTrackProjects = initiatives.reduce((acc, init) => 
@@ -152,66 +154,52 @@ const Projects = () => {
             </div>
           </div>
 
-          <TabsContent value="overview" className="space-y-6">
-            {initiatives.map((initiative) => (
-              <div key={initiative.id} className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {initiative.title}
-                  </h2>
-                  <span className="text-sm text-muted-foreground">
-                    ({initiative.projects.length} projects)
-                  </span>
-                </div>
+          <TabsContent value="overview">
+            <div className={viewMode === "grid" 
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              : "space-y-3"
+            }>
+              {allProjects.map((project) => (
+                <Link
+                  key={project.id}
+                  to={`/projects/${project.id}`}
+                  className="block"
+                >
+                  <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground mb-2">
+                          {project.title}
+                        </h3>
+                        <StatusBadge status={project.status} />
+                      </div>
+                    </div>
 
-                <div className={viewMode === "grid" 
-                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                  : "space-y-3"
-                }>
-                  {initiative.projects.map((project) => (
-                    <Link
-                      key={project.id}
-                      to={`/projects/${project.id}`}
-                      className="block"
-                    >
-                      <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-foreground mb-2">
-                              {project.title}
-                            </h3>
-                            <StatusBadge status={project.status} />
-                          </div>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="text-muted-foreground">Progress</span>
+                          <span className="font-semibold">{project.progress}%</span>
                         </div>
+                        <Progress value={project.progress} className="h-2" />
+                      </div>
 
-                        <div className="space-y-3">
-                          <div>
-                            <div className="flex items-center justify-between text-sm mb-1">
-                              <span className="text-muted-foreground">Progress</span>
-                              <span className="font-semibold">{project.progress}%</span>
-                            </div>
-                            <Progress value={project.progress} className="h-2" />
-                          </div>
-
-                          <div className="pt-3 border-t space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Owner:</span>
-                              <span className="font-medium">{project.owner}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Team:</span>
-                              <span className="font-medium">{project.team.length} members</span>
-                            </div>
-                          </div>
+                      <div className="pt-3 border-t space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Owner:</span>
+                          <span className="font-medium">{project.owner}</span>
                         </div>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Team:</span>
+                          <span className="font-medium">{project.team.length} members</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
           </TabsContent>
-
           <TabsContent value="owner" className="space-y-4">
             {Array.from(
               new Set(initiatives.flatMap(i => i.projects.map(p => p.owner)))

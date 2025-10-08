@@ -301,56 +301,45 @@ const Tasks = () => {
             </div>
           </div>
 
-          <TabsContent value="overview" className="space-y-6">
-            {projects.map((project) => (
-              <div key={project.id} className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-semibold text-foreground">{project.title}</h2>
-                  <span className="text-sm text-muted-foreground">
-                    ({project.tasks.length} tasks)
-                  </span>
-                </div>
-
-                <div className={viewMode === "grid" 
-                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                  : "space-y-3"
-                }>
-                  {project.tasks.map((task) => (
-                    <Link key={task.id} to={`/tasks/${task.id}`} className="block">
-                      <Card className="p-4 hover:shadow-lg transition-all cursor-pointer">
-                        <div className="flex items-start justify-between mb-3">
-                          <h3 className="font-semibold text-foreground flex-1">{task.name}</h3>
-                          <StatusBadge 
-                            status={task.status === "completed" ? "on-track" : 
-                                    task.status === "not-started" ? "off-track" : 
-                                    task.status} 
-                          />
-                        </div>
-                        
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Assignee:</span>
-                            <span className="font-medium">{task.assignee}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Due Date:</span>
-                            <span className="font-medium">
-                              {new Date(task.dueDate).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Priority:</span>
-                            <span className={`font-semibold capitalize ${getPriorityColor(task.priority)}`}>
-                              {task.priority}
-                            </span>
-                          </div>
-                        </div>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <TabsContent value="overview">
+            <div className={viewMode === "grid" 
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              : "space-y-3"
+            }>
+              {allTasks.map((task) => (
+                <Link key={task.id} to={`/tasks/${task.id}`} className="block">
+                  <Card className="p-4 hover:shadow-lg transition-all cursor-pointer">
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="font-semibold text-foreground flex-1">{task.name}</h3>
+                      <StatusBadge 
+                        status={task.status === "completed" ? "on-track" : 
+                                task.status === "not-started" ? "off-track" : 
+                                task.status} 
+                      />
+                    </div>
+                    
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Assignee:</span>
+                        <span className="font-medium">{task.assignee}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Due Date:</span>
+                        <span className="font-medium">
+                          {new Date(task.dueDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Priority:</span>
+                        <span className={`font-semibold capitalize ${getPriorityColor(task.priority)}`}>
+                          {task.priority}
+                        </span>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
           </TabsContent>
 
           <TabsContent value="assignee" className="space-y-6">
