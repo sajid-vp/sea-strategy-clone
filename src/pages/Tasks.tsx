@@ -25,7 +25,6 @@ import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar as CalendarIcon, X, ChevronDown, Flag, Search, Filter, ArrowUpDown, Network, ListChecks, MessageSquare, Send } from "lucide-react";
-import { initiatives } from "@/data/projectsData";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -560,19 +559,15 @@ const Tasks = () => {
     return grouped;
   }, [filteredTasks]);
 
-  // Group tasks by initiative
-  const tasksByInitiative = useMemo(() => {
+  // Group tasks by project
+  const tasksByProject = useMemo(() => {
     const grouped: Record<string, typeof filteredTasks> = {};
     filteredTasks.forEach(item => {
-      // Find initiative for this project
-      const initiative = initiatives.find(init => 
-        init.projects.some(p => p.id === item.project.id)
-      );
-      const initiativeTitle = initiative?.title || "Other";
-      if (!grouped[initiativeTitle]) {
-        grouped[initiativeTitle] = [];
+      const projectTitle = item.project.title;
+      if (!grouped[projectTitle]) {
+        grouped[projectTitle] = [];
       }
-      grouped[initiativeTitle].push(item);
+      grouped[projectTitle].push(item);
     });
     return grouped;
   }, [filteredTasks]);
@@ -846,7 +841,7 @@ const Tasks = () => {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="owner">By Owner</TabsTrigger>
-            <TabsTrigger value="initiative">By Initiative</TabsTrigger>
+            <TabsTrigger value="project">By Project</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
@@ -1131,22 +1126,22 @@ const Tasks = () => {
           ))}
         </TabsContent>
 
-        <TabsContent value="initiative" className="space-y-6">
-          {Object.entries(tasksByInitiative).map(([initiative, initiativeTasks]) => (
-            <div key={initiative} className="space-y-4">
+        <TabsContent value="project" className="space-y-6">
+          {Object.entries(tasksByProject).map(([projectName, projectTasks]) => (
+            <div key={projectName} className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Network className="h-5 w-5 text-primary" />
-                  {initiative}
+                  {projectName}
                 </h3>
-                <Badge variant="secondary">{initiativeTasks.length} tasks</Badge>
+                <Badge variant="secondary">{projectTasks.length} tasks</Badge>
               </div>
               
               <div className="space-y-2">
                 {viewMode === "list" ? (
                   <div className="border rounded-lg overflow-hidden">
                     <div className="divide-y">
-                      {initiativeTasks.map(({ task, project }) => (
+                      {projectTasks.map(({ task, project }) => (
                         <div 
                           key={task.id} 
                           onClick={() => handleTaskClick(task, project)}
@@ -1194,7 +1189,7 @@ const Tasks = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {initiativeTasks.map(({ task, project }) => (
+                    {projectTasks.map(({ task, project }) => (
                       <div key={task.id} onClick={() => handleTaskClick(task, project)} className="block group">
                         <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
                           <div className="flex items-start gap-3 mb-3">
