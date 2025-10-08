@@ -28,6 +28,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { initiatives } from "@/data/projectsData";
+import { getActivitiesByProject } from "@/data/activitiesData";
 import { toast } from "sonner";
 
 const ProjectDetail = () => {
@@ -200,11 +201,12 @@ const ProjectDetail = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-4 lg:grid-cols-10 w-full">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-11 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="objectives">Objectives</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
             <TabsTrigger value="milestones">Milestones</TabsTrigger>
+            <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
             <TabsTrigger value="budget">Budget</TabsTrigger>
             <TabsTrigger value="risks">Risks</TabsTrigger>
@@ -584,6 +586,108 @@ const ProjectDetail = () => {
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+
+          {/* 5️⃣ Activities Tab */}
+          <TabsContent value="activities" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-primary" />
+                      Project Activities
+                    </CardTitle>
+                    <CardDescription>Recurring meetings, operations, and support activities</CardDescription>
+                  </div>
+                  <Link to="/activities">
+                    <Button variant="outline" size="sm">View All Activities</Button>
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {(() => {
+                  const projectActivities = getActivitiesByProject(project.id);
+                  
+                  if (projectActivities.length === 0) {
+                    return (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p>No activities linked to this project yet</p>
+                      </div>
+                    );
+                  }
+
+                  const getTypeColor = (type: string) => {
+                    const colors = {
+                      meeting: "bg-primary/10 text-primary border border-primary/20",
+                      operational: "bg-secondary/10 text-secondary-foreground border border-secondary/20",
+                      support: "bg-warning/10 text-warning border border-warning/20",
+                      review: "bg-success/10 text-success border border-success/20",
+                      planning: "bg-accent/10 text-accent-foreground border border-accent/20",
+                    };
+                    return colors[type as keyof typeof colors] || colors.meeting;
+                  };
+
+                  const getFrequencyLabel = (frequency: string) => {
+                    const labels = {
+                      daily: "Daily",
+                      weekly: "Weekly",
+                      "bi-weekly": "Bi-weekly",
+                      monthly: "Monthly",
+                      quarterly: "Quarterly",
+                      "one-time": "One-time",
+                    };
+                    return labels[frequency as keyof typeof labels] || frequency;
+                  };
+
+                  return (
+                    <div className="space-y-3">
+                      {projectActivities.map((activity) => (
+                        <Link key={activity.id} to={`/activities/${activity.id}`}>
+                          <div className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer">
+                            <div className="flex items-start justify-between gap-4 mb-3">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h4 className="font-semibold">{activity.title}</h4>
+                                  <StatusBadge status={activity.status} />
+                                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${getTypeColor(activity.type)}`}>
+                                    {activity.type}
+                                  </span>
+                                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-muted text-muted-foreground">
+                                    {getFrequencyLabel(activity.frequency)}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground mb-3">{activity.description}</p>
+                                <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                                  <div className="flex items-center gap-1">
+                                    <User className="h-3.5 w-3.5" />
+                                    <span>{activity.owner}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Users className="h-3.5 w-3.5" />
+                                    <span>{activity.participants.length} participants</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Calendar className="h-3.5 w-3.5" />
+                                    <span>Next: {activity.nextOccurrence}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="h-3.5 w-3.5" />
+                                    <span>{activity.duration} min</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           </TabsContent>
