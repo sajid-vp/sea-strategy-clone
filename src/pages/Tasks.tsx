@@ -18,11 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 type Task = {
   id: number;
@@ -181,14 +184,100 @@ const projects: Project[] = [
 ];
 
 const Tasks = () => {
+  const { toast } = useToast();
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [selectedYear, setSelectedYear] = useState("2025");
   const [selectedTask, setSelectedTask] = useState<{ task: Task; project: Project } | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [tasksList, setTasksList] = useState(projects);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    status: "todo" as Task['status'],
+    assignee: "",
+    dueDate: "",
+    priority: "medium" as Task['priority'],
+    projectId: projects[0]?.id || 1
+  });
 
   const handleTaskClick = (task: Task, project: Project) => {
     setSelectedTask({ task, project });
+    setFormData({
+      name: task.name,
+      status: task.status,
+      assignee: task.assignee,
+      dueDate: task.dueDate,
+      priority: task.priority,
+      projectId: project.id
+    });
+    setIsEditing(false);
     setIsSheetOpen(true);
+  };
+
+  const handleNewTask = () => {
+    setSelectedTask(null);
+    setFormData({
+      name: "",
+      status: "todo",
+      assignee: "",
+      dueDate: "",
+      priority: "medium",
+      projectId: projects[0]?.id || 1
+    });
+    setIsEditing(true);
+    setIsSheetOpen(true);
+  };
+
+  const handleSave = () => {
+    if (!formData.name.trim() || !formData.assignee.trim() || !formData.dueDate) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (selectedTask) {
+      // Update existing task
+      setTasksList(prev => prev.map(proj => {
+        if (proj.id === formData.projectId) {
+          return {
+            ...proj,
+            tasks: proj.tasks.map(t => 
+              t.id === selectedTask.task.id 
+                ? { ...t, ...formData }
+                : t
+            )
+          };
+        }
+        return proj;
+      }));
+      toast({
+        title: "Task updated",
+        description: "Your task has been updated successfully"
+      });
+    } else {
+      // Create new task
+      const newTask: Task = {
+        id: Date.now(),
+        ...formData
+      };
+      setTasksList(prev => prev.map(proj => 
+        proj.id === formData.projectId
+          ? { ...proj, tasks: [...proj.tasks, newTask] }
+          : proj
+      ));
+      toast({
+        title: "Task created",
+        description: "Your new task has been created successfully"
+      });
+    }
+    
+    setIsSheetOpen(false);
+    setIsEditing(false);
   };
 
   const getPriorityVariant = (priority: string): "destructive" | "secondary" | "outline" => {
@@ -200,7 +289,7 @@ const Tasks = () => {
     }
   };
 
-  const allTasks: Task[] = projects.flatMap(p => p.tasks);
+  const allTasks: Task[] = tasksList.flatMap(p => p.tasks);
   const completedTasks = allTasks.filter(t => t.status === "done").length;
   const onTrackTasks = allTasks.filter(t => t.status === "in-progress").length;
   const atRiskTasks = allTasks.filter(t => t.status === "in-review").length;
@@ -237,7 +326,7 @@ const Tasks = () => {
   };
 
   const getProjectForTask = (taskId: number) => {
-    return projects.find(p => p.tasks.some(t => t.id === taskId));
+    return tasksList.find(p => p.tasks.some(t => t.id === taskId));
   };
 
   return (
@@ -343,7 +432,7 @@ const Tasks = () => {
                   <List className="h-4 w-4" />
                 </Button>
               </div>
-              <Button className="gap-2">
+              <Button className="gap-2" onClick={handleNewTask}>
                 <Plus className="h-4 w-4" />
                 New Task
               </Button>
@@ -691,10 +780,10 @@ const Tasks = () => {
                         {priorityTasks.map((task) => {
                           const project = getProjectForTask(task.id);
                           return (
-                            <Link 
+                            <div 
                               key={task.id} 
-                              to={`/tasks/${task.id}`}
-                              className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group"
+                              onClick={() => project && handleTaskClick(task, project)}
+                              className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
                             >
                               <div className="col-span-4 flex items-center gap-3">
                                 {getStatusIcon(task.status)}
@@ -727,7 +816,7 @@ const Tasks = () => {
                                   })}
                                 </span>
                               </div>
-                            </Link>
+                            </div>
                           );
                         })}
                       </div>
@@ -785,29 +874,28 @@ const Tasks = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Task Detail Sheet */}
+        {/* Task Detail/Edit Sheet */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-            {selectedTask && (
-              <>
-                <SheetHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <SheetTitle className="text-2xl pr-8">{selectedTask.task.name}</SheetTitle>
-                      <SheetDescription className="text-sm mt-2">
-                        <Link 
-                          to={`/projects/${selectedTask.project.id}`}
-                          className="text-primary hover:underline"
-                        >
-                          {selectedTask.project.title}
-                        </Link>
-                      </SheetDescription>
-                    </div>
-                  </div>
-                </SheetHeader>
+          <SheetContent className="sm:max-w-md overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>{selectedTask ? (isEditing ? "Edit Task" : formData.name) : "New Task"}</SheetTitle>
+              {selectedTask && !isEditing && (
+                <SheetDescription className="flex items-center gap-2">
+                  Project: 
+                  <Link 
+                    to={`/projects/${selectedTask.project.id}`}
+                    className="text-primary hover:underline"
+                  >
+                    {selectedTask.project.title}
+                  </Link>
+                </SheetDescription>
+              )}
+            </SheetHeader>
 
-                <div className="mt-6 space-y-6">
-                  {/* Status and Priority */}
+            <div className="mt-6 space-y-4">
+              {!isEditing && selectedTask ? (
+                <>
+                  {/* View Mode */}
                   <div className="flex items-center gap-3">
                     <StatusBadge status={selectedTask.task.status} />
                     <Badge variant={getPriorityVariant(selectedTask.task.priority)} className="capitalize">
@@ -817,7 +905,6 @@ const Tasks = () => {
 
                   <Separator />
 
-                  {/* Assignee */}
                   <div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <User className="h-4 w-4" />
@@ -835,7 +922,6 @@ const Tasks = () => {
 
                   <Separator />
 
-                  {/* Due Date */}
                   <div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <Calendar className="h-4 w-4" />
@@ -853,22 +939,115 @@ const Tasks = () => {
                     </div>
                   </div>
 
-                  <Separator />
+                  <div className="flex gap-2 pt-4">
+                    <Button onClick={() => setIsEditing(true)} className="flex-1">
+                      Edit Task
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Edit/Create Mode */}
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="task-name">Task Name *</Label>
+                      <Input
+                        id="task-name"
+                        value={formData.name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="Enter task name"
+                      />
+                    </div>
 
-                  {/* Status Icon Display */}
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-3">Task Status</div>
-                    <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-                      {getStatusIcon(selectedTask.task.status)}
-                      <div>
-                        <p className="font-medium capitalize">{selectedTask.task.status.replace('-', ' ')}</p>
-                        <p className="text-xs text-muted-foreground">Current task state</p>
-                      </div>
+                    <div>
+                      <Label htmlFor="project">Project *</Label>
+                      <Select
+                        value={formData.projectId.toString()}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, projectId: parseInt(value) }))}
+                      >
+                        <SelectTrigger id="project">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tasksList.map(proj => (
+                            <SelectItem key={proj.id} value={proj.id.toString()}>
+                              {proj.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="status">Status *</Label>
+                      <Select
+                        value={formData.status}
+                        onValueChange={(value: Task['status']) => setFormData(prev => ({ ...prev, status: value }))}
+                      >
+                        <SelectTrigger id="status">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="todo">To Do</SelectItem>
+                          <SelectItem value="in-progress">In Progress</SelectItem>
+                          <SelectItem value="in-review">In Review</SelectItem>
+                          <SelectItem value="blocked">Blocked</SelectItem>
+                          <SelectItem value="done">Done</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="priority">Priority *</Label>
+                      <Select
+                        value={formData.priority}
+                        onValueChange={(value: Task['priority']) => setFormData(prev => ({ ...prev, priority: value }))}
+                      >
+                        <SelectTrigger id="priority">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="assignee">Assignee *</Label>
+                      <Input
+                        id="assignee"
+                        value={formData.assignee}
+                        onChange={(e) => setFormData(prev => ({ ...prev, assignee: e.target.value }))}
+                        placeholder="Enter assignee name"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="due-date">Due Date *</Label>
+                      <Input
+                        id="due-date"
+                        type="date"
+                        value={formData.dueDate}
+                        onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                      />
+                    </div>
+
+                    <div className="flex gap-2 pt-4">
+                      <Button onClick={handleSave} className="flex-1">
+                        {selectedTask ? "Update Task" : "Create Task"}
+                      </Button>
+                      {selectedTask && (
+                        <Button variant="outline" onClick={() => setIsEditing(false)}>
+                          Cancel
+                        </Button>
+                      )}
                     </div>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </SheetContent>
         </Sheet>
       </main>
