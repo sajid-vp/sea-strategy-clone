@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type Status = "on-track" | "off-track" | "at-risk";
+type Status = "on-track" | "off-track" | "at-risk" | "completed" | "not-started";
 
 interface StatusBadgeProps {
   status: Status;
@@ -19,6 +19,14 @@ const statusConfig = {
   "at-risk": {
     label: "At Risk",
     className: "bg-warning text-warning-foreground",
+  },
+  "completed": {
+    label: "Completed",
+    className: "bg-success text-success-foreground",
+  },
+  "not-started": {
+    label: "Not Started",
+    className: "bg-muted text-muted-foreground",
   },
 };
 
