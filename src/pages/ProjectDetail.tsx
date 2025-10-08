@@ -41,6 +41,7 @@ const ProjectDetail = () => {
   });
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   
   let project = null;
   let parentInitiative = null;
@@ -502,53 +503,72 @@ const ProjectDetail = () => {
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">Project discussion and updates</p>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Comment Input */}
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Add a comment..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
-                    className="flex-1"
-                  />
-                  <Button 
-                    size="sm" 
-                    onClick={handleAddComment}
-                    disabled={!newComment.trim()}
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Comments List */}
-                <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                  {comments.length > 0 ? (
-                    comments.map(comment => (
-                      <div key={comment.id} className="p-3 border rounded-lg space-y-1">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                              <User className="h-3 w-3 text-primary" />
-                            </div>
-                            <span className="text-sm font-medium">{comment.user}</span>
-                          </div>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(comment.timestamp).toLocaleString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
-                        </div>
-                        <p className="text-sm text-foreground pl-8">{comment.text}</p>
+              <CardContent>
+                <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full gap-2">
+                      <MessageSquare className="h-4 w-4" />
+                      View Comments ({comments.length})
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[80vh]">
+                    <DialogHeader>
+                      <DialogTitle>Project Comments</DialogTitle>
+                      <DialogDescription>
+                        Discussion and updates for {project.title}
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="space-y-4">
+                      {/* Comment Input */}
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Add a comment..."
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
+                          className="flex-1"
+                        />
+                        <Button 
+                          size="sm" 
+                          onClick={handleAddComment}
+                          disabled={!newComment.trim()}
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-4">No comments yet</p>
-                  )}
-                </div>
+
+                      {/* Comments List */}
+                      <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+                        {comments.length > 0 ? (
+                          comments.map(comment => (
+                            <div key={comment.id} className="p-3 border rounded-lg space-y-1">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <User className="h-3 w-3 text-primary" />
+                                  </div>
+                                  <span className="text-sm font-medium">{comment.user}</span>
+                                </div>
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(comment.timestamp).toLocaleString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                              </div>
+                              <p className="text-sm text-foreground pl-8">{comment.text}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-muted-foreground text-center py-8">No comments yet</p>
+                        )}
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </CardContent>
             </Card>
           </div>

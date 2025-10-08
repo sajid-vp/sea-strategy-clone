@@ -134,6 +134,7 @@ const InitiativeDetail = () => {
   });
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   
   // Find the initiative, its parent objective, and parent goal
   let initiative;
@@ -493,59 +494,80 @@ const InitiativeDetail = () => {
 
         {/* Comments */}
         <Card className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="rounded-full bg-primary/10 p-2.5">
-              <MessageSquare className="h-5 w-5 text-primary" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-primary/10 p-2.5">
+                <MessageSquare className="h-5 w-5 text-primary" />
+              </div>
+              <h2 className="text-lg font-semibold">Comments</h2>
             </div>
-            <h2 className="text-lg font-semibold">Comments</h2>
           </div>
 
-          {/* Comment Input */}
-          <div className="flex gap-2 mb-4">
-            <Input
-              placeholder="Add a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
-              className="flex-1"
-            />
-            <Button 
-              size="sm" 
-              onClick={handleAddComment}
-              disabled={!newComment.trim()}
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Comments List */}
-          <div className="space-y-3 max-h-[400px] overflow-y-auto">
-            {comments.length > 0 ? (
-              comments.map(comment => (
-                <div key={comment.id} className="p-4 bg-muted/50 rounded-lg space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="h-4 w-4 text-primary" />
-                      </div>
-                      <span className="font-medium">{comment.user}</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(comment.timestamp).toLocaleString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  </div>
-                  <p className="text-sm text-foreground pl-10">{comment.text}</p>
+          <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="w-full gap-2">
+                <MessageSquare className="h-4 w-4" />
+                View All Comments ({comments.length})
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh]">
+              <DialogHeader>
+                <DialogTitle>Initiative Comments</DialogTitle>
+                <DialogDescription>
+                  Discussion and updates for {initiative.title}
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4">
+                {/* Comment Input */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add a comment..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
+                    className="flex-1"
+                  />
+                  <Button 
+                    size="sm" 
+                    onClick={handleAddComment}
+                    disabled={!newComment.trim()}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
                 </div>
-              ))
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">No comments yet. Be the first to comment!</p>
-            )}
-          </div>
+
+                {/* Comments List */}
+                <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+                  {comments.length > 0 ? (
+                    comments.map(comment => (
+                      <div key={comment.id} className="p-4 bg-muted/50 rounded-lg space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="h-4 w-4 text-primary" />
+                            </div>
+                            <span className="font-medium">{comment.user}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(comment.timestamp).toLocaleString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-sm text-foreground pl-10">{comment.text}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-8">No comments yet. Be the first to comment!</p>
+                  )}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </Card>
       </main>
     </div>
