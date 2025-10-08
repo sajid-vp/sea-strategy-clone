@@ -478,7 +478,7 @@ const Tasks = () => {
                         
                         <div className="col-span-2 flex items-center">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
-                            {task.priority}
+                            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                           </span>
                         </div>
                         
@@ -493,7 +493,7 @@ const Tasks = () => {
                           <span className="text-sm text-muted-foreground">
                             {new Date(task.dueDate).toLocaleDateString('en-US', { 
                               month: 'short', 
-                              day: 'numeric' 
+                              day: 'numeric'
                             })}
                           </span>
                         </div>
@@ -521,31 +521,30 @@ const Tasks = () => {
                           </div>
                         </div>
                         
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <StatusBadge status={task.status} />
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
-                              {task.priority}
-                            </span>
-                          </div>
-                          
-                          <div className="pt-3 border-t space-y-2 text-sm">
+                          <div className="space-y-3">
                             <div className="flex items-center gap-2">
-                              <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                <User className="h-3 w-3 text-primary" />
-                              </div>
-                              <span className="truncate">{task.assignee}</span>
+                              <StatusBadge status={task.status} />
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                              </span>
                             </div>
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Clock className="h-4 w-4 flex-shrink-0" />
-                              <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric',
-                                year: 'numeric'
-                              })}</span>
+                            
+                            <div className="pt-3 border-t space-y-2 text-sm">
+                              <div className="flex items-center gap-2">
+                                <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                  <User className="h-3 w-3 text-primary" />
+                                </div>
+                                <span className="truncate">{task.assignee}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Clock className="h-4 w-4 flex-shrink-0" />
+                                <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric'
+                                })}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
                       </Card>
                     </div>
                   );
@@ -812,7 +811,7 @@ const Tasks = () => {
                                 <span className="text-sm text-muted-foreground">
                                   {new Date(task.dueDate).toLocaleDateString('en-US', { 
                                     month: 'short', 
-                                    day: 'numeric' 
+                                    day: 'numeric'
                                   })}
                                 </span>
                               </div>
@@ -856,8 +855,7 @@ const Tasks = () => {
                                     <Clock className="h-4 w-4 flex-shrink-0" />
                                     <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
                                       month: 'short', 
-                                      day: 'numeric',
-                                      year: 'numeric'
+                                      day: 'numeric'
                                     })}</span>
                                   </div>
                                 </div>
@@ -931,7 +929,6 @@ const Tasks = () => {
                       <p className="font-semibold">
                         {new Date(selectedTask.task.dueDate).toLocaleDateString('en-US', {
                           weekday: 'long',
-                          year: 'numeric',
                           month: 'long',
                           day: 'numeric'
                         })}
