@@ -3,6 +3,15 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -13,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User } from "lucide-react";
+import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar, X } from "lucide-react";
 
 type Task = {
   id: number;
@@ -174,6 +183,22 @@ const projects: Project[] = [
 const Tasks = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [selectedYear, setSelectedYear] = useState("2025");
+  const [selectedTask, setSelectedTask] = useState<{ task: Task; project: Project } | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const handleTaskClick = (task: Task, project: Project) => {
+    setSelectedTask({ task, project });
+    setIsSheetOpen(true);
+  };
+
+  const getPriorityVariant = (priority: string): "destructive" | "secondary" | "outline" => {
+    switch (priority) {
+      case "high": return "destructive";
+      case "medium": return "secondary";
+      case "low": return "outline";
+      default: return "outline";
+    }
+  };
 
   const allTasks: Task[] = projects.flatMap(p => p.tasks);
   const completedTasks = allTasks.filter(t => t.status === "done").length;
@@ -341,10 +366,10 @@ const Tasks = () => {
                   {allTasks.map((task) => {
                     const project = getProjectForTask(task.id);
                     return (
-                      <Link 
+                      <div 
                         key={task.id} 
-                        to={`/tasks/${task.id}`}
-                        className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group"
+                        onClick={() => project && handleTaskClick(task, project)}
+                        className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
                       >
                         <div className="col-span-4 flex items-center gap-3">
                           {getStatusIcon(task.status)}
@@ -383,7 +408,7 @@ const Tasks = () => {
                             })}
                           </span>
                         </div>
-                      </Link>
+                      </div>
                     );
                   })}
                 </div>
@@ -393,7 +418,7 @@ const Tasks = () => {
                 {allTasks.map((task) => {
                   const project = getProjectForTask(task.id);
                   return (
-                    <Link key={task.id} to={`/tasks/${task.id}`} className="block group">
+                    <div key={task.id} onClick={() => project && handleTaskClick(task, project)} className="block group">
                       <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
                         <div className="flex items-start gap-3 mb-3">
                           {getStatusIcon(task.status)}
@@ -433,7 +458,7 @@ const Tasks = () => {
                           </div>
                         </div>
                       </Card>
-                    </Link>
+                    </div>
                   );
                 })}
               </div>
@@ -507,7 +532,7 @@ const Tasks = () => {
                       {assigneeTasks.map((task) => {
                         const project = getProjectForTask(task.id);
                         return (
-                          <Link key={task.id} to={`/tasks/${task.id}`} className="block group">
+                          <div key={task.id} onClick={() => project && handleTaskClick(task, project)} className="block group">
                             <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
                               <div className="flex items-start gap-3 mb-3">
                                 {getStatusIcon(task.status)}
@@ -541,7 +566,7 @@ const Tasks = () => {
                                 </div>
                               </div>
                             </Card>
-                          </Link>
+                          </div>
                         );
                       })}
                     </div>
@@ -600,7 +625,7 @@ const Tasks = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {project.tasks.map((task) => (
-                      <Link key={task.id} to={`/tasks/${task.id}`} className="block group">
+                      <div key={task.id} onClick={() => handleTaskClick(task, project)} className="block group">
                         <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
                           <div className="flex items-start gap-3 mb-3">
                             {getStatusIcon(task.status)}
@@ -635,7 +660,7 @@ const Tasks = () => {
                             </div>
                           </div>
                         </Card>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -712,7 +737,7 @@ const Tasks = () => {
                       {priorityTasks.map((task) => {
                         const project = getProjectForTask(task.id);
                         return (
-                          <Link key={task.id} to={`/tasks/${task.id}`} className="block group">
+                          <div key={task.id} onClick={() => project && handleTaskClick(task, project)} className="block group">
                             <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
                               <div className="flex items-start gap-3 mb-3">
                                 {getStatusIcon(task.status)}
@@ -749,7 +774,7 @@ const Tasks = () => {
                                 </div>
                               </div>
                             </Card>
-                          </Link>
+                          </div>
                         );
                       })}
                     </div>
@@ -759,6 +784,93 @@ const Tasks = () => {
             })}
           </TabsContent>
         </Tabs>
+
+        {/* Task Detail Sheet */}
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+            {selectedTask && (
+              <>
+                <SheetHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <SheetTitle className="text-2xl pr-8">{selectedTask.task.name}</SheetTitle>
+                      <SheetDescription className="text-sm mt-2">
+                        <Link 
+                          to={`/projects/${selectedTask.project.id}`}
+                          className="text-primary hover:underline"
+                        >
+                          {selectedTask.project.title}
+                        </Link>
+                      </SheetDescription>
+                    </div>
+                  </div>
+                </SheetHeader>
+
+                <div className="mt-6 space-y-6">
+                  {/* Status and Priority */}
+                  <div className="flex items-center gap-3">
+                    <StatusBadge status={selectedTask.task.status} />
+                    <Badge variant={getPriorityVariant(selectedTask.task.priority)} className="capitalize">
+                      {selectedTask.task.priority} Priority
+                    </Badge>
+                  </div>
+
+                  <Separator />
+
+                  {/* Assignee */}
+                  <div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <User className="h-4 w-4" />
+                      <span>Assigned To</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-sm font-semibold text-primary">
+                          {selectedTask.task.assignee.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                      <span className="font-medium">{selectedTask.task.assignee}</span>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Due Date */}
+                  <div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <Calendar className="h-4 w-4" />
+                      <span>Due Date</span>
+                    </div>
+                    <div className="p-3 bg-muted/50 rounded-lg">
+                      <p className="font-semibold">
+                        {new Date(selectedTask.task.dueDate).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Status Icon Display */}
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-3">Task Status</div>
+                    <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                      {getStatusIcon(selectedTask.task.status)}
+                      <div>
+                        <p className="font-medium capitalize">{selectedTask.task.status.replace('-', ' ')}</p>
+                        <p className="text-xs text-muted-foreground">Current task state</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </SheetContent>
+        </Sheet>
       </main>
     </div>
   );
