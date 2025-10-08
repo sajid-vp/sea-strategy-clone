@@ -32,7 +32,6 @@ import {
   Plus,
   FolderKanban,
 } from "lucide-react";
-import { getAllProjects } from "@/data/projectsData";
 import { toast } from "sonner";
 
 const goals = [
@@ -97,18 +96,6 @@ const Index = () => {
   const [tempVision, setTempVision] = useState(vision);
   const [tempMission, setTempMission] = useState(mission);
   const [selectedPeriod, setSelectedPeriod] = useState("all");
-  const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
-  const [newProject, setNewProject] = useState({
-    title: "",
-    description: "",
-    owner: "",
-    startDate: "",
-    endDate: "",
-    budget: "",
-    department: "",
-  });
-
-  const allProjects = getAllProjects();
 
   const handleSaveVision = () => {
     setVision(tempVision);
@@ -118,24 +105,6 @@ const Index = () => {
   const handleSaveMission = () => {
     setMission(tempMission);
     setIsEditingMission(false);
-  };
-
-  const handleAddProject = () => {
-    if (!newProject.title || !newProject.owner || !newProject.startDate || !newProject.endDate) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-    toast.success("Project added successfully!");
-    setIsAddProjectOpen(false);
-    setNewProject({
-      title: "",
-      description: "",
-      owner: "",
-      startDate: "",
-      endDate: "",
-      budget: "",
-      department: "",
-    });
   };
 
   return (
@@ -372,141 +341,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Projects Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground">All Projects</h2>
-            <Dialog open={isAddProjectOpen} onOpenChange={setIsAddProjectOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Project
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Add New Project</DialogTitle>
-                  <DialogDescription>
-                    Create a new project with details and assignments
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="title">Project Title *</Label>
-                    <Input
-                      id="title"
-                      value={newProject.title}
-                      onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
-                      placeholder="Enter project title"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={newProject.description}
-                      onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                      placeholder="Enter project description"
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="owner">Project Owner *</Label>
-                      <Input
-                        id="owner"
-                        value={newProject.owner}
-                        onChange={(e) => setNewProject({ ...newProject, owner: e.target.value })}
-                        placeholder="Enter owner name"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="department">Department</Label>
-                      <Input
-                        id="department"
-                        value={newProject.department}
-                        onChange={(e) => setNewProject({ ...newProject, department: e.target.value })}
-                        placeholder="Enter department"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="startDate">Start Date *</Label>
-                      <Input
-                        id="startDate"
-                        type="date"
-                        value={newProject.startDate}
-                        onChange={(e) => setNewProject({ ...newProject, startDate: e.target.value })}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="endDate">End Date *</Label>
-                      <Input
-                        id="endDate"
-                        type="date"
-                        value={newProject.endDate}
-                        onChange={(e) => setNewProject({ ...newProject, endDate: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="budget">Budget</Label>
-                    <Input
-                      id="budget"
-                      value={newProject.budget}
-                      onChange={(e) => setNewProject({ ...newProject, budget: e.target.value })}
-                      placeholder="e.g., AED 10,000.00"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setIsAddProjectOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddProject}>Add Project</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allProjects.map((project) => (
-              <Link key={project.id} to={`/projects/${project.id}`}>
-                <Card className="p-6 hover:shadow-lg transition-all cursor-pointer h-full">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="rounded-full bg-primary/10 p-2">
-                      <FolderKanban className="h-5 w-5 text-primary" />
-                    </div>
-                    <StatusBadge status={project.status} />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2">
-                    {project.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {project.description}
-                  </p>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                        <span>Progress</span>
-                        <span className="font-semibold">{project.progress}%</span>
-                      </div>
-                      <Progress value={project.progress} className="h-1.5" />
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Owner:</span>
-                      <span className="font-semibold">{project.owner}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Initiative:</span>
-                      <span className="font-semibold text-primary truncate ml-2">{project.initiativeTitle}</span>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
       </main>
     </div>
   );
