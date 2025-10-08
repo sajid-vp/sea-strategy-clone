@@ -214,9 +214,6 @@ const Tasks = () => {
   const [editingName, setEditingName] = useState(false);
   const [tempName, setTempName] = useState("");
   
-  // Quick add inline
-  const [showQuickAdd, setShowQuickAdd] = useState(false);
-  const [quickTaskName, setQuickTaskName] = useState("");
   
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -328,31 +325,26 @@ const Tasks = () => {
     }
   };
 
-  const handleQuickAdd = () => {
-    if (!quickTaskName.trim()) return;
-
-    const newTask: Task = {
-      id: Date.now(),
-      name: quickTaskName,
-      status: "todo",
-      assignee: "Unassigned",
-      dueDate: new Date().toISOString().split('T')[0],
-      priority: "medium",
-      type: "other",
-    };
-
-    setTasksList(prev => prev.map(proj => 
-      proj.id === projects[0]?.id
-        ? { ...proj, tasks: [...proj.tasks, newTask] }
-        : proj
-    ));
+  const handleToggleComplete = (taskId: number, projectId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
     
-    setQuickTaskName("");
-    setShowQuickAdd(false);
-    
+    setTasksList(prev => prev.map(proj => {
+      if (proj.id === projectId) {
+        return {
+          ...proj,
+          tasks: proj.tasks.map(t => 
+            t.id === taskId 
+              ? { ...t, status: t.status === "done" ? "todo" : "done" }
+              : t
+          )
+        };
+      }
+      return proj;
+    }));
+
     toast({
-      title: "Task created",
-      description: "Quick task added successfully"
+      title: "Task updated",
+      description: "Task status changed",
     });
   };
 
@@ -674,49 +666,6 @@ const Tasks = () => {
           </div>
 
           <div className="space-y-2">
-            {/* Quick Add Task */}
-            {showQuickAdd ? (
-              <div className="border rounded-lg p-3 bg-muted/30 animate-fade-in">
-                <div className="flex items-center gap-2">
-                  <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                  <Input
-                    placeholder="Task name..."
-                    value={quickTaskName}
-                    onChange={(e) => setQuickTaskName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleQuickAdd();
-                      if (e.key === 'Escape') {
-                        setShowQuickAdd(false);
-                        setQuickTaskName("");
-                      }
-                    }}
-                    className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto"
-                    autoFocus
-                  />
-                  <Button size="sm" onClick={handleQuickAdd}>Add</Button>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    onClick={() => {
-                      setShowQuickAdd(false);
-                      setQuickTaskName("");
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-                onClick={() => setShowQuickAdd(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Add task
-              </Button>
-            )}
-
             {viewMode === "list" ? (
               <div className="border rounded-lg overflow-hidden">
                 <div className="bg-muted/30 border-b">
@@ -756,9 +705,17 @@ const Tasks = () => {
                         className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
                       >
                         <div className="col-span-4 flex items-center gap-3">
-                          {getStatusIcon(task.status)}
+                          <button
+                            onClick={(e) => handleToggleComplete(task.id, project.id, e)}
+                            className="flex-shrink-0 hover:scale-110 transition-transform"
+                          >
+                            {getStatusIcon(task.status)}
+                          </button>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                            <h3 className={cn(
+                              "font-medium text-foreground group-hover:text-primary transition-colors truncate",
+                              task.status === "done" && "line-through opacity-60"
+                            )}>
                               {task.name}
                             </h3>
                             <p className="text-xs text-muted-foreground truncate">{project.title}</p>
@@ -821,9 +778,17 @@ const Tasks = () => {
                     <div key={task.id} onClick={() => handleTaskClick(task, project)} className="block group">
                       <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
                         <div className="flex items-start gap-3 mb-3">
-                          {getStatusIcon(task.status)}
+                          <button
+                            onClick={(e) => handleToggleComplete(task.id, project.id, e)}
+                            className="flex-shrink-0 hover:scale-110 transition-transform mt-0.5"
+                          >
+                            {getStatusIcon(task.status)}
+                          </button>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
+                            <h3 className={cn(
+                              "font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1",
+                              task.status === "done" && "line-through opacity-60"
+                            )}>
                               {task.name}
                             </h3>
                             <p className="text-xs text-muted-foreground">{project.title}</p>
