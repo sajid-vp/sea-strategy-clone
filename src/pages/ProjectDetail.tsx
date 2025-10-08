@@ -200,17 +200,15 @@ const ProjectDetail = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-4 lg:grid-cols-12 w-full">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-10 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="objectives">Objectives</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
             <TabsTrigger value="milestones">Milestones</TabsTrigger>
-            <TabsTrigger value="timeline">Timeline</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
             <TabsTrigger value="budget">Budget</TabsTrigger>
             <TabsTrigger value="risks">Risks</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
-            <TabsTrigger value="communication">Updates</TabsTrigger>
             <TabsTrigger value="kpis">KPIs</TabsTrigger>
             <TabsTrigger value="dependencies">Links</TabsTrigger>
           </TabsList>
@@ -590,52 +588,6 @@ const ProjectDetail = () => {
             </Card>
           </TabsContent>
 
-          {/* 5️⃣ Timeline Tab */}
-          <TabsContent value="timeline" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  Project Timeline
-                </CardTitle>
-                <CardDescription>Visual representation of tasks and milestones</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded bg-primary"></div>
-                      <span>Milestones</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded bg-accent"></div>
-                      <span>Tasks</span>
-                    </div>
-                  </div>
-                  <Separator />
-                  <div className="relative pl-6 space-y-6">
-                    {project.milestones.map((milestone, idx) => (
-                      <div key={milestone.id} className="relative">
-                        <div className={`absolute left-[-1.5rem] top-2 w-4 h-4 rounded-full ${milestone.status === 'done' ? 'bg-primary' : 'bg-muted border-2 border-primary'}`}></div>
-                        {idx < project.milestones.length - 1 && (
-                          <div className="absolute left-[-1.15rem] top-6 w-0.5 h-[calc(100%+1rem)] bg-border"></div>
-                        )}
-                        <div className="pb-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold">{milestone.name}</h4>
-                            <Badge variant="outline" className="text-xs">
-                              {new Date(milestone.dueDate).toLocaleDateString()}
-                            </Badge>
-                          </div>
-                          <Progress value={milestone.progress} className="h-1.5" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           {/* 6️⃣ Resources & Team Tab */}
           <TabsContent value="team" className="space-y-6">
@@ -903,51 +855,6 @@ const ProjectDetail = () => {
             </Card>
           </TabsContent>
 
-          {/* 🔟 Communication Tab */}
-          <TabsContent value="communication" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-primary" />
-                  Project Updates & Notes
-                </CardTitle>
-                <CardDescription>Team communication and project notes</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Add a project update..."
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
-                    />
-                    <Button onClick={handleAddComment} disabled={!newComment.trim()}>
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <Separator />
-                  <div className="space-y-3">
-                    {comments.length > 0 ? (
-                      comments.map(comment => (
-                        <div key={comment.id} className="p-3 border rounded-lg space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">{comment.user}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(comment.timestamp).toLocaleString()}
-                            </span>
-                          </div>
-                          <p className="text-sm">{comment.text}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm text-muted-foreground text-center py-8">No updates yet</p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           {/* 1️⃣1️⃣ KPIs Tab */}
           <TabsContent value="kpis" className="space-y-6">
