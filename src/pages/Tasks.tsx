@@ -38,6 +38,7 @@ type Task = {
   assignee: string;
   dueDate: string;
   priority: "high" | "medium" | "low";
+  type: "procurement" | "finance" | "hr" | "it" | "operations" | "marketing" | "other";
 };
 
 type Project = {
@@ -58,6 +59,7 @@ const projects: Project[] = [
         assignee: "John Smith",
         dueDate: "2025-02-15",
         priority: "high" as const,
+        type: "operations" as const,
       },
       {
         id: 2,
@@ -66,6 +68,7 @@ const projects: Project[] = [
         assignee: "Sarah Johnson",
         dueDate: "2025-04-30",
         priority: "high" as const,
+        type: "operations" as const,
       },
       {
         id: 3,
@@ -74,6 +77,7 @@ const projects: Project[] = [
         assignee: "Mike Chen",
         dueDate: "2025-05-31",
         priority: "medium" as const,
+        type: "it" as const,
       },
       {
         id: 4,
@@ -82,6 +86,7 @@ const projects: Project[] = [
         assignee: "John Smith",
         dueDate: "2025-06-15",
         priority: "medium" as const,
+        type: "finance" as const,
       },
       {
         id: 5,
@@ -90,6 +95,7 @@ const projects: Project[] = [
         assignee: "Sarah Johnson",
         dueDate: "2025-06-30",
         priority: "high" as const,
+        type: "operations" as const,
       },
     ],
   },
@@ -104,6 +110,7 @@ const projects: Project[] = [
         assignee: "Emma Wilson",
         dueDate: "2025-03-01",
         priority: "high" as const,
+        type: "it" as const,
       },
       {
         id: 7,
@@ -112,6 +119,7 @@ const projects: Project[] = [
         assignee: "Tom Martinez",
         dueDate: "2025-03-31",
         priority: "high" as const,
+        type: "procurement" as const,
       },
       {
         id: 8,
@@ -120,6 +128,7 @@ const projects: Project[] = [
         assignee: "Emma Wilson",
         dueDate: "2025-06-30",
         priority: "medium" as const,
+        type: "it" as const,
       },
       {
         id: 9,
@@ -128,6 +137,7 @@ const projects: Project[] = [
         assignee: "Tom Martinez",
         dueDate: "2025-07-31",
         priority: "high" as const,
+        type: "it" as const,
       },
       {
         id: 10,
@@ -136,6 +146,7 @@ const projects: Project[] = [
         assignee: "Emma Wilson",
         dueDate: "2025-08-31",
         priority: "medium" as const,
+        type: "it" as const,
       },
     ],
   },
@@ -150,6 +161,7 @@ const projects: Project[] = [
         assignee: "Lisa Anderson",
         dueDate: "2025-02-28",
         priority: "high" as const,
+        type: "it" as const,
       },
       {
         id: 12,
@@ -158,6 +170,7 @@ const projects: Project[] = [
         assignee: "Chris Taylor",
         dueDate: "2025-05-15",
         priority: "high" as const,
+        type: "it" as const,
       },
       {
         id: 13,
@@ -166,6 +179,7 @@ const projects: Project[] = [
         assignee: "Lisa Anderson",
         dueDate: "2025-06-15",
         priority: "high" as const,
+        type: "it" as const,
       },
       {
         id: 14,
@@ -174,6 +188,7 @@ const projects: Project[] = [
         assignee: "Chris Taylor",
         dueDate: "2025-06-30",
         priority: "medium" as const,
+        type: "it" as const,
       },
       {
         id: 15,
@@ -182,6 +197,7 @@ const projects: Project[] = [
         assignee: "David Brown",
         dueDate: "2025-07-15",
         priority: "low" as const,
+        type: "marketing" as const,
       },
     ],
   },
@@ -205,6 +221,7 @@ const Tasks = () => {
     assignee: "",
     dueDate: "",
     priority: "medium" as Task['priority'],
+    type: "other" as Task['type'],
     projectId: projects[0]?.id || 1
   });
 
@@ -223,6 +240,7 @@ const Tasks = () => {
       assignee: "",
       dueDate: "",
       priority: "medium",
+      type: "other",
       projectId: projects[0]?.id || 1
     });
     setIsNewTask(true);
@@ -275,6 +293,7 @@ const Tasks = () => {
       assignee: newTaskData.assignee || "Unassigned",
       dueDate: newTaskData.dueDate || new Date().toISOString().split('T')[0],
       priority: newTaskData.priority,
+      type: newTaskData.type,
     };
 
     setTasksList(prev => prev.map(proj => 
@@ -305,6 +324,23 @@ const Tasks = () => {
       case "low": return "outline";
       default: return "outline";
     }
+  };
+
+  const getTaskTypeColor = (type: Task['type']) => {
+    switch (type) {
+      case "procurement": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
+      case "finance": return "bg-green-500/10 text-green-500 border-green-500/20";
+      case "hr": return "bg-purple-500/10 text-purple-500 border-purple-500/20";
+      case "it": return "bg-cyan-500/10 text-cyan-500 border-cyan-500/20";
+      case "operations": return "bg-orange-500/10 text-orange-500 border-orange-500/20";
+      case "marketing": return "bg-pink-500/10 text-pink-500 border-pink-500/20";
+      case "other": return "bg-muted text-muted-foreground border-border";
+      default: return "bg-muted text-muted-foreground border-border";
+    }
+  };
+
+  const getTaskTypeLabel = (type: Task['type']) => {
+    return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
   const allTasks: Task[] = tasksList.flatMap(p => p.tasks);
@@ -478,12 +514,17 @@ const Tasks = () => {
                         onClick={() => project && handleTaskClick(task, project)}
                         className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
                       >
-                        <div className="col-span-4 flex items-center gap-3">
+                         <div className="col-span-4 flex items-center gap-3">
                           {getStatusIcon(task.status)}
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
-                              {task.name}
-                            </h3>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                                {task.name}
+                              </h3>
+                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium border ${getTaskTypeColor(task.type)}`}>
+                                {getTaskTypeLabel(task.type)}
+                              </span>
+                            </div>
                             {project && (
                               <p className="text-xs text-muted-foreground truncate">{project.title}</p>
                             )}
@@ -540,10 +581,13 @@ const Tasks = () => {
                         </div>
                         
                           <div className="space-y-3">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <StatusBadge status={task.status} />
                               <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
                                 {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                              </span>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getTaskTypeColor(task.type)}`}>
+                                {getTaskTypeLabel(task.type)}
                               </span>
                             </div>
                             
@@ -911,7 +955,7 @@ const Tasks = () => {
                     />
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <Select
                       value={newTaskData.status}
                       onValueChange={(value: Task['status']) => setNewTaskData(prev => ({ ...prev, status: value }))}
@@ -939,6 +983,24 @@ const Tasks = () => {
                         <SelectItem value="low">Low</SelectItem>
                         <SelectItem value="medium">Medium</SelectItem>
                         <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={newTaskData.type}
+                      onValueChange={(value: Task['type']) => setNewTaskData(prev => ({ ...prev, type: value }))}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="procurement">Procurement</SelectItem>
+                        <SelectItem value="finance">Finance</SelectItem>
+                        <SelectItem value="hr">HR</SelectItem>
+                        <SelectItem value="it">IT</SelectItem>
+                        <SelectItem value="operations">Operations</SelectItem>
+                        <SelectItem value="marketing">Marketing</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1114,6 +1176,28 @@ const Tasks = () => {
                             <span>High</span>
                           </div>
                         </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Task Type Selector */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Type</Label>
+                    <Select
+                      value={selectedTask.task.type}
+                      onValueChange={(value: Task['type']) => updateTaskField('type', value)}
+                    >
+                      <SelectTrigger className="w-full animate-fade-in">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="procurement">Procurement</SelectItem>
+                        <SelectItem value="finance">Finance</SelectItem>
+                        <SelectItem value="hr">HR</SelectItem>
+                        <SelectItem value="it">IT</SelectItem>
+                        <SelectItem value="operations">Operations</SelectItem>
+                        <SelectItem value="marketing">Marketing</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
