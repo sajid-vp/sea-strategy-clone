@@ -16,12 +16,64 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { FolderKanban, List, BarChart3, TrendingUp, Users, Plus } from "lucide-react";
 import { initiatives, getAllProjects } from "@/data/projectsData";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 const Projects = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedYear, setSelectedYear] = useState("2025");
+  const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
+  const [newProject, setNewProject] = useState({
+    title: "",
+    code: "",
+    description: "",
+    owner: "",
+    department: "",
+    priority: "medium",
+    startDate: "",
+    endDate: "",
+    budget: "",
+    initiativeId: "",
+    status: "planned",
+    projectType: "Strategic",
+  });
   
   const allProjects = getAllProjects();
+
+  const handleAddProject = () => {
+    if (!newProject.title || !newProject.owner || !newProject.initiativeId) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
+    // In a real app, this would save to a database
+    toast.success("Project added successfully!");
+    setIsAddProjectOpen(false);
+    setNewProject({
+      title: "",
+      code: "",
+      description: "",
+      owner: "",
+      department: "",
+      priority: "medium",
+      startDate: "",
+      endDate: "",
+      budget: "",
+      initiativeId: "",
+      status: "planned",
+      projectType: "Strategic",
+    });
+  };
 
   const totalProjects = initiatives.reduce((acc, init) => acc + init.projects.length, 0);
   const onTrackProjects = initiatives.reduce((acc, init) => 
@@ -134,23 +186,212 @@ const Projects = () => {
               <TabsTrigger value="initiative">By Initiative</TabsTrigger>
             </TabsList>
             
-            <div className="flex items-center gap-1 border rounded-md p-1">
-              <Button
-                variant={viewMode === "grid" ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="h-8 w-8 p-0"
-              >
-                <FolderKanban className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-                className="h-8 w-8 p-0"
-              >
-                <List className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center gap-2">
+              <Dialog open={isAddProjectOpen} onOpenChange={setIsAddProjectOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add Project
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Add New Project</DialogTitle>
+                    <DialogDescription>
+                      Create a new project by filling in the details below
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4 py-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Project Title *</Label>
+                        <Input
+                          id="title"
+                          value={newProject.title}
+                          onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+                          placeholder="Enter project title"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="code">Project Code</Label>
+                        <Input
+                          id="code"
+                          value={newProject.code}
+                          onChange={(e) => setNewProject({ ...newProject, code: e.target.value })}
+                          placeholder="PRJ-2025-XXX"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea
+                        id="description"
+                        value={newProject.description}
+                        onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                        placeholder="Project description"
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="initiative">Initiative *</Label>
+                        <Select 
+                          value={newProject.initiativeId} 
+                          onValueChange={(value) => setNewProject({ ...newProject, initiativeId: value })}
+                        >
+                          <SelectTrigger id="initiative">
+                            <SelectValue placeholder="Select initiative" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {initiatives.map((init) => (
+                              <SelectItem key={init.id} value={init.id.toString()}>
+                                {init.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="owner">Project Owner *</Label>
+                        <Input
+                          id="owner"
+                          value={newProject.owner}
+                          onChange={(e) => setNewProject({ ...newProject, owner: e.target.value })}
+                          placeholder="Owner name"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="department">Department</Label>
+                        <Input
+                          id="department"
+                          value={newProject.department}
+                          onChange={(e) => setNewProject({ ...newProject, department: e.target.value })}
+                          placeholder="Department name"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="projectType">Project Type</Label>
+                        <Select 
+                          value={newProject.projectType} 
+                          onValueChange={(value) => setNewProject({ ...newProject, projectType: value })}
+                        >
+                          <SelectTrigger id="projectType">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Strategic">Strategic</SelectItem>
+                            <SelectItem value="Operational">Operational</SelectItem>
+                            <SelectItem value="IT">IT</SelectItem>
+                            <SelectItem value="Research">Research</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="status">Status</Label>
+                        <Select 
+                          value={newProject.status} 
+                          onValueChange={(value) => setNewProject({ ...newProject, status: value })}
+                        >
+                          <SelectTrigger id="status">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="planned">Planned</SelectItem>
+                            <SelectItem value="in-progress">In Progress</SelectItem>
+                            <SelectItem value="in-review">In Review</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="on-hold">On Hold</SelectItem>
+                            <SelectItem value="blocked">Blocked</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="priority">Priority</Label>
+                        <Select 
+                          value={newProject.priority} 
+                          onValueChange={(value) => setNewProject({ ...newProject, priority: value })}
+                        >
+                          <SelectTrigger id="priority">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="low">Low</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="budget">Budget</Label>
+                        <Input
+                          id="budget"
+                          value={newProject.budget}
+                          onChange={(e) => setNewProject({ ...newProject, budget: e.target.value })}
+                          placeholder="AED 0.00"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="startDate">Start Date</Label>
+                        <Input
+                          id="startDate"
+                          type="date"
+                          value={newProject.startDate}
+                          onChange={(e) => setNewProject({ ...newProject, startDate: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="endDate">End Date</Label>
+                        <Input
+                          id="endDate"
+                          type="date"
+                          value={newProject.endDate}
+                          onChange={(e) => setNewProject({ ...newProject, endDate: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setIsAddProjectOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddProject}>
+                      Create Project
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <div className="flex items-center gap-1 border rounded-md p-1">
+                <Button
+                  variant={viewMode === "grid" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="h-8 w-8 p-0"
+                >
+                  <FolderKanban className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="h-8 w-8 p-0"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
 
