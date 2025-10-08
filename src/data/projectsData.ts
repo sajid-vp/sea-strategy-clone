@@ -6,17 +6,41 @@ export const initiatives = [
       {
         id: 1,
         title: "ISO 27001 Implementation",
+        code: "PRJ-2025-001",
         status: "in-progress" as const,
         owner: "John Smith",
+        manager: "John Smith",
         team: ["Sarah Johnson", "Mike Chen"],
         progress: 75,
         startDate: "2025-01-15",
         endDate: "2025-06-30",
         budget: "AED 1,000.00",
+        actualBudget: "AED 750.00",
         department: "IT Security",
+        projectType: "Strategic",
+        priority: "high" as const,
         kpis: ["Security Compliance Rate", "Incident Response Time", "Policy Adherence"],
         stakeholders: ["CTO", "Legal Team", "Compliance Officer"],
         description: "Implement ISO 27001 information security management system across the organization to ensure data protection and compliance.",
+        objectives: [
+          { id: 1, title: "Achieve ISO 27001 certification", description: "Complete all requirements for ISO 27001 certification by Q2 2025", metrics: "100% compliance score" },
+          { id: 2, title: "Enhance security posture", description: "Reduce security incidents by 80%", metrics: "Incident count < 5 per month" }
+        ],
+        successCriteria: ["ISO 27001 certification achieved", "Zero critical security incidents", "All policies documented and approved"],
+        risks: [
+          { id: 1, description: "Resource availability constraints", likelihood: "medium", impact: "high", mitigation: "Hire external consultants as backup", status: "open" as const, owner: "John Smith" },
+          { id: 2, description: "Audit delays due to incomplete documentation", likelihood: "low", impact: "medium", mitigation: "Weekly documentation reviews", status: "monitoring" as const, owner: "Sarah Johnson" }
+        ],
+        issues: [
+          { id: 1, description: "Delay in policy approval from legal team", status: "open" as const, owner: "John Smith", resolution: "Escalated to CTO for priority review" }
+        ],
+        documents: [
+          { id: 1, name: "ISO 27001 Project Plan.pdf", type: "Project Plan", uploadedBy: "John Smith", uploadedDate: "2025-01-15" },
+          { id: 2, name: "Security Policies v1.2.docx", type: "Documentation", uploadedBy: "Sarah Johnson", uploadedDate: "2025-01-20" }
+        ],
+        dependencies: [
+          { id: 1, type: "Depends on", project: "Network Infrastructure Upgrade", status: "in-progress" as const }
+        ],
         milestones: [
           { id: 1, name: "Gap Analysis", dueDate: "2025-02-15", progress: 100, status: "done" as const },
           { id: 2, name: "Policy Documentation", dueDate: "2025-03-30", progress: 80, status: "in-progress" as const },
@@ -39,17 +63,30 @@ export const initiatives = [
       {
         id: 2,
         title: "Smart Campus Infrastructure",
+        code: "PRJ-2025-002",
         status: "in-progress" as const,
         owner: "Sarah Johnson",
+        manager: "Sarah Johnson",
         team: ["Emma Wilson", "Tom Martinez"],
         progress: 60,
         startDate: "2025-02-01",
         endDate: "2025-08-31",
         budget: "AED 2,500.00",
+        actualBudget: "AED 1,800.00",
         department: "IT Operations",
+        projectType: "IT",
+        priority: "medium" as const,
         kpis: ["System Uptime", "Energy Efficiency", "User Satisfaction"],
         stakeholders: ["Facilities Manager", "Campus Director", "Sustainability Team"],
         description: "Deploy smart campus infrastructure including IoT sensors, automated systems, and integrated management platform.",
+        objectives: [
+          { id: 1, title: "Deploy IoT infrastructure", description: "Install 500+ IoT sensors across campus by Q3 2025", metrics: "500 sensors installed" }
+        ],
+        successCriteria: ["95% system uptime", "20% energy reduction", "User satisfaction > 85%"],
+        risks: [],
+        issues: [],
+        documents: [],
+        dependencies: [],
         milestones: [
           { id: 6, name: "Requirements Analysis", dueDate: "2025-02-28", progress: 100, status: "done" as const },
           { id: 7, name: "Vendor Selection", dueDate: "2025-03-15", progress: 100, status: "done" as const },
