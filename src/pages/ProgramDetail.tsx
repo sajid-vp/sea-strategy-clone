@@ -6,9 +6,10 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Target, TrendingUp, DollarSign, Users, Calendar, FolderKanban, AlertTriangle, FileText, BarChart3, Edit, Flag } from "lucide-react";
+import { ArrowLeft, Target, TrendingUp, DollarSign, Users, Calendar, FolderKanban, AlertTriangle, FileText, BarChart3, Edit, Flag, Activity } from "lucide-react";
 import { getProgramById } from "@/data/programsData";
 import { initiatives } from "@/data/projectsData";
+import { getActivitiesByProgram } from "@/data/activitiesData";
 
 const ProgramDetail = () => {
   const { id } = useParams();
@@ -35,6 +36,7 @@ const ProgramDetail = () => {
 
   const initiative = initiatives.find(i => i.id === program.initiativeId);
   const programProjects = initiative?.projects.filter(p => (p as any).programId === program.id) || [];
+  const programActivities = getActivitiesByProgram(program.id);
   
   const getStatusVariant = (status: string) => {
     const map: Record<string, "todo" | "in-progress" | "done" | "blocked"> = {
@@ -131,10 +133,11 @@ const ProgramDetail = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-4 lg:grid-cols-7 w-full">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-8 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="objectives">Objectives</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
             <TabsTrigger value="budget">Budget</TabsTrigger>
             <TabsTrigger value="risks">Risks</TabsTrigger>
@@ -295,6 +298,68 @@ const ProgramDetail = () => {
                               <span className="font-semibold">{project.progress}%</span>
                             </div>
                             <Progress value={project.progress} className="h-2" />
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Activities Tab */}
+          <TabsContent value="activities" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-primary" />
+                      Program Activities
+                    </CardTitle>
+                    <CardDescription>{programActivities.length} activities under this program</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm">+ Add Activity</Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {programActivities.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No activities linked to this program yet</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {programActivities.map((activity) => (
+                      <Link key={activity.id} to={`/activities/${activity.id}`}>
+                        <div className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-semibold">{activity.title}</h4>
+                                <StatusBadge status={activity.status} />
+                              </div>
+                              <p className="text-sm text-muted-foreground">{activity.description}</p>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Type:</span>
+                              <Badge variant="outline" className="ml-2 text-xs">{activity.type}</Badge>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Frequency:</span>
+                              <span className="ml-2 font-medium capitalize">{activity.frequency}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Owner:</span>
+                              <span className="ml-2 font-medium">{activity.owner}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Duration:</span>
+                              <span className="ml-2 font-medium">{activity.duration} min</span>
+                            </div>
                           </div>
                         </div>
                       </Link>

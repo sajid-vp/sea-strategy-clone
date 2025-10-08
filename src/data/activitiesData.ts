@@ -11,6 +11,8 @@ export interface Activity {
   participants: string[];
   project?: string;
   projectId?: number;
+  program?: string;
+  programId?: number;
   startDate: string;
   nextOccurrence: string;
   duration: number; // in minutes
@@ -147,12 +149,81 @@ export const activities: Activity[] = [
     location: "Finance Department",
     notes: "Compare actual vs planned expenses across all projects",
   },
+  {
+    id: 9,
+    title: "Program Governance Meeting",
+    description: "Review program progress, decisions, and escalations",
+    type: "meeting",
+    frequency: "monthly",
+    status: "in-progress",
+    owner: "Sarah Johnson",
+    participants: ["Sarah Johnson", "John Smith", "Executive Sponsors"],
+    program: "Digital Infrastructure Modernization",
+    programId: 1,
+    startDate: "2025-01-10",
+    nextOccurrence: "2025-02-10",
+    duration: 90,
+    location: "Executive Boardroom",
+    notes: "Review program KPIs, budget, risks, and dependencies",
+  },
+  {
+    id: 10,
+    title: "Infrastructure Health Check",
+    description: "Regular operational review of infrastructure performance",
+    type: "operational",
+    frequency: "weekly",
+    status: "in-progress",
+    owner: "IT Operations",
+    participants: ["IT Operations Team", "Sarah Johnson"],
+    program: "Digital Infrastructure Modernization",
+    programId: 1,
+    startDate: "2025-01-02",
+    nextOccurrence: "2025-01-16",
+    duration: 45,
+    notes: "Review system metrics, capacity planning, and incident reports",
+  },
+  {
+    id: 11,
+    title: "Learning Platform Operations",
+    description: "Daily operational activities for the learning platform",
+    type: "operational",
+    frequency: "daily",
+    status: "in-progress",
+    owner: "Platform Team",
+    participants: ["Platform Team", "Support Staff"],
+    program: "Digital Learning Platform",
+    programId: 2,
+    startDate: "2025-02-01",
+    nextOccurrence: "2025-01-15",
+    duration: 60,
+    notes: "Monitor platform performance, user support, content updates",
+  },
+  {
+    id: 12,
+    title: "Faculty Training Sessions",
+    description: "Training faculty on new digital learning tools",
+    type: "support",
+    frequency: "weekly",
+    status: "in-progress",
+    owner: "Robert Martinez",
+    participants: ["Robert Martinez", "Training Team", "Faculty"],
+    program: "Digital Learning Platform",
+    programId: 2,
+    startDate: "2025-02-05",
+    nextOccurrence: "2025-01-18",
+    duration: 120,
+    location: "Training Room",
+    notes: "Hands-on training with Q&A session",
+  },
 ];
 
 export const getActivityById = (id: number) => activities.find(a => a.id === id);
 
 export const getActivitiesByProject = (projectId: number) => 
   activities.filter(a => a.projectId === projectId);
+
+export const getActivitiesByProgram = (programId: number) => 
+  activities.filter(a => a.programId === programId);
 
 export const getActivitiesByStatus = (status: Status) => 
   activities.filter(a => a.status === status);
