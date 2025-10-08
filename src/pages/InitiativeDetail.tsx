@@ -256,13 +256,22 @@ const InitiativeDetail = () => {
                 </Badge>
               </div>
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2 w-full lg:w-auto">
-                  <Plus className="h-4 w-4" />
-                  Add KPI
-                </Button>
-              </DialogTrigger>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                className="gap-2 w-full lg:w-auto"
+                onClick={() => setIsCommentsOpen(true)}
+              >
+                <MessageSquare className="h-4 w-4" />
+                Comments ({comments.length})
+              </Button>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2 w-full lg:w-auto">
+                    <Plus className="h-4 w-4" />
+                    Add KPI
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Create KPI</DialogTitle>
@@ -384,6 +393,7 @@ const InitiativeDetail = () => {
                 </form>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
 
           {/* Parent Goal */}
@@ -492,83 +502,66 @@ const InitiativeDetail = () => {
           </div>
         </Card>
 
-        {/* Comments */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-primary/10 p-2.5">
-                <MessageSquare className="h-5 w-5 text-primary" />
+        {/* Comments Dialog */}
+        <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>Initiative Comments</DialogTitle>
+              <DialogDescription>
+                Discussion and updates for {initiative.title}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* Comment Input */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
+                  className="flex-1"
+                />
+                <Button 
+                  size="sm" 
+                  onClick={handleAddComment}
+                  disabled={!newComment.trim()}
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
               </div>
-              <h2 className="text-lg font-semibold">Comments</h2>
-            </div>
-          </div>
 
-          <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="w-full gap-2">
-                <MessageSquare className="h-4 w-4" />
-                View All Comments ({comments.length})
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[80vh]">
-              <DialogHeader>
-                <DialogTitle>Initiative Comments</DialogTitle>
-                <DialogDescription>
-                  Discussion and updates for {initiative.title}
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="space-y-4">
-                {/* Comment Input */}
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Add a comment..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
-                    className="flex-1"
-                  />
-                  <Button 
-                    size="sm" 
-                    onClick={handleAddComment}
-                    disabled={!newComment.trim()}
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Comments List */}
-                <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
-                  {comments.length > 0 ? (
-                    comments.map(comment => (
-                      <div key={comment.id} className="p-4 bg-muted/50 rounded-lg space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              <User className="h-4 w-4 text-primary" />
-                            </div>
-                            <span className="font-medium">{comment.user}</span>
+              {/* Comments List */}
+              <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+                {comments.length > 0 ? (
+                  comments.map(comment => (
+                    <div key={comment.id} className="p-4 bg-muted/50 rounded-lg space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <User className="h-4 w-4 text-primary" />
                           </div>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(comment.timestamp).toLocaleString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
+                          <span className="font-medium">{comment.user}</span>
                         </div>
-                        <p className="text-sm text-foreground pl-10">{comment.text}</p>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(comment.timestamp).toLocaleString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-8">No comments yet. Be the first to comment!</p>
-                  )}
-                </div>
+                      <p className="text-sm text-foreground pl-10">{comment.text}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-8">No comments yet. Be the first to comment!</p>
+                )}
               </div>
-            </DialogContent>
-          </Dialog>
-        </Card>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

@@ -131,11 +131,21 @@ const ProjectDetail = () => {
           </Link>
         </div>
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            {project.title}
-          </h1>
-          <p className="text-muted-foreground mb-4">{project.description}</p>
+        <div className="mb-8 flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              {project.title}
+            </h1>
+            <p className="text-muted-foreground mb-4">{project.description}</p>
+          </div>
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={() => setIsCommentsOpen(true)}
+          >
+            <MessageSquare className="h-4 w-4" />
+            Comments ({comments.length})
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -493,86 +503,69 @@ const ProjectDetail = () => {
                 )}
               </CardContent>
             </Card>
-
-            {/* Comments */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4 text-primary" />
-                  Comments
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">Project discussion and updates</p>
-              </CardHeader>
-              <CardContent>
-                <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full gap-2">
-                      <MessageSquare className="h-4 w-4" />
-                      View Comments ({comments.length})
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[80vh]">
-                    <DialogHeader>
-                      <DialogTitle>Project Comments</DialogTitle>
-                      <DialogDescription>
-                        Discussion and updates for {project.title}
-                      </DialogDescription>
-                    </DialogHeader>
-                    
-                    <div className="space-y-4">
-                      {/* Comment Input */}
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Add a comment..."
-                          value={newComment}
-                          onChange={(e) => setNewComment(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
-                          className="flex-1"
-                        />
-                        <Button 
-                          size="sm" 
-                          onClick={handleAddComment}
-                          disabled={!newComment.trim()}
-                        >
-                          <Send className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      {/* Comments List */}
-                      <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
-                        {comments.length > 0 ? (
-                          comments.map(comment => (
-                            <div key={comment.id} className="p-3 border rounded-lg space-y-1">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                                    <User className="h-3 w-3 text-primary" />
-                                  </div>
-                                  <span className="text-sm font-medium">{comment.user}</span>
-                                </div>
-                                <span className="text-xs text-muted-foreground">
-                                  {new Date(comment.timestamp).toLocaleString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })}
-                                </span>
-                              </div>
-                              <p className="text-sm text-foreground pl-8">{comment.text}</p>
-                            </div>
-                          ))
-                        ) : (
-                          <p className="text-sm text-muted-foreground text-center py-8">No comments yet</p>
-                        )}
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
           </div>
         </div>
+
+        {/* Comments Dialog */}
+        <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>Project Comments</DialogTitle>
+              <DialogDescription>
+                Discussion and updates for {project.title}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* Comment Input */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
+                  className="flex-1"
+                />
+                <Button 
+                  size="sm" 
+                  onClick={handleAddComment}
+                  disabled={!newComment.trim()}
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Comments List */}
+              <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+                {comments.length > 0 ? (
+                  comments.map(comment => (
+                    <div key={comment.id} className="p-3 border rounded-lg space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                            <User className="h-3 w-3 text-primary" />
+                          </div>
+                          <span className="text-sm font-medium">{comment.user}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(comment.timestamp).toLocaleString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-foreground pl-8">{comment.text}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-8">No comments yet</p>
+                )}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
