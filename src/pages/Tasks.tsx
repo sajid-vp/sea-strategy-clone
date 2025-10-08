@@ -25,6 +25,7 @@ import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { CheckSquare, List, BarChart3, Clock, Users, Plus, LayoutGrid, AlertCircle, CheckCircle2, Circle, Clock3, User, Calendar as CalendarIcon, X, ChevronDown, Flag, Search, Filter, ArrowUpDown, Network, ListChecks, MessageSquare, Send } from "lucide-react";
+import { initiatives } from "@/data/projectsData";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -546,6 +547,36 @@ const Tasks = () => {
     });
   }, [tasksList, searchQuery, filterStatus, filterPriority, filterType, filterAssignee]);
 
+  // Group tasks by assignee
+  const tasksByOwner = useMemo(() => {
+    const grouped: Record<string, typeof filteredTasks> = {};
+    filteredTasks.forEach(item => {
+      const owner = item.task.assignee;
+      if (!grouped[owner]) {
+        grouped[owner] = [];
+      }
+      grouped[owner].push(item);
+    });
+    return grouped;
+  }, [filteredTasks]);
+
+  // Group tasks by initiative
+  const tasksByInitiative = useMemo(() => {
+    const grouped: Record<string, typeof filteredTasks> = {};
+    filteredTasks.forEach(item => {
+      // Find initiative for this project
+      const initiative = initiatives.find(init => 
+        init.projects.some(p => p.id === item.project.id)
+      );
+      const initiativeTitle = initiative?.title || "Other";
+      if (!grouped[initiativeTitle]) {
+        grouped[initiativeTitle] = [];
+      }
+      grouped[initiativeTitle].push(item);
+    });
+    return grouped;
+  }, [filteredTasks]);
+
   const getPriorityVariant = (priority: string): "destructive" | "secondary" | "outline" => {
     switch (priority) {
       case "high": return "destructive";
@@ -810,15 +841,22 @@ const Tasks = () => {
           </StatCard>
         </div>
 
-        {/* Tasks List */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Showing {filteredTasks.length} of {allTasks.length} tasks
-            </p>
-          </div>
+        {/* Tasks List with Tabs */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="owner">By Owner</TabsTrigger>
+            <TabsTrigger value="initiative">By Initiative</TabsTrigger>
+          </TabsList>
 
-          <div className="space-y-2">
+          <TabsContent value="overview" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredTasks.length} of {allTasks.length} tasks
+              </p>
+            </div>
+
+            <div className="space-y-2">
             {viewMode === "list" ? (
               <div className="border rounded-lg overflow-hidden">
                 <div className="bg-muted/30 border-b">
@@ -979,7 +1017,238 @@ const Tasks = () => {
               </div>
             )}
           </div>
-        </div>
+        </TabsContent>
+
+        <TabsContent value="owner" className="space-y-6">
+          {Object.entries(tasksByOwner).map(([owner, ownerTasks]) => (
+            <div key={owner} className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  {owner}
+                </h3>
+                <Badge variant="secondary">{ownerTasks.length} tasks</Badge>
+              </div>
+              
+              <div className="space-y-2">
+                {viewMode === "list" ? (
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="divide-y">
+                      {ownerTasks.map(({ task, project }) => (
+                        <div 
+                          key={task.id} 
+                          onClick={() => handleTaskClick(task, project)}
+                          className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
+                        >
+                          <div className="col-span-5 flex items-center gap-3">
+                            <button
+                              onClick={(e) => handleToggleComplete(task.id, project.id, e)}
+                              className="flex-shrink-0 hover:scale-110 transition-transform"
+                            >
+                              {getStatusIcon(task.status)}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                              <h3 className={cn(
+                                "font-medium text-foreground group-hover:text-primary transition-colors truncate",
+                                task.status === "done" && "line-through opacity-60"
+                              )}>
+                                {task.name}
+                              </h3>
+                              <p className="text-xs text-muted-foreground truncate">{project.title}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="col-span-2 flex items-center">
+                            <StatusBadge status={task.status} />
+                          </div>
+                          
+                          <div className="col-span-2 flex items-center">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                            </span>
+                          </div>
+                          
+                          <div className="col-span-3 flex items-center">
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric'
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {ownerTasks.map(({ task, project }) => (
+                      <div key={task.id} onClick={() => handleTaskClick(task, project)} className="block group">
+                        <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
+                          <div className="flex items-start gap-3 mb-3">
+                            <button
+                              onClick={(e) => handleToggleComplete(task.id, project.id, e)}
+                              className="flex-shrink-0 hover:scale-110 transition-transform mt-0.5"
+                            >
+                              {getStatusIcon(task.status)}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                              <h3 className={cn(
+                                "font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1",
+                                task.status === "done" && "line-through opacity-60"
+                              )}>
+                                {task.name}
+                              </h3>
+                              <p className="text-xs text-muted-foreground">{project.title}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <StatusBadge status={task.status} />
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                              </span>
+                            </div>
+                            
+                            <div className="pt-3 border-t space-y-2 text-sm">
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Clock className="h-4 w-4 flex-shrink-0" />
+                                <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric'
+                                })}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </TabsContent>
+
+        <TabsContent value="initiative" className="space-y-6">
+          {Object.entries(tasksByInitiative).map(([initiative, initiativeTasks]) => (
+            <div key={initiative} className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Network className="h-5 w-5 text-primary" />
+                  {initiative}
+                </h3>
+                <Badge variant="secondary">{initiativeTasks.length} tasks</Badge>
+              </div>
+              
+              <div className="space-y-2">
+                {viewMode === "list" ? (
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="divide-y">
+                      {initiativeTasks.map(({ task, project }) => (
+                        <div 
+                          key={task.id} 
+                          onClick={() => handleTaskClick(task, project)}
+                          className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
+                        >
+                          <div className="col-span-5 flex items-center gap-3">
+                            <button
+                              onClick={(e) => handleToggleComplete(task.id, project.id, e)}
+                              className="flex-shrink-0 hover:scale-110 transition-transform"
+                            >
+                              {getStatusIcon(task.status)}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                              <h3 className={cn(
+                                "font-medium text-foreground group-hover:text-primary transition-colors truncate",
+                                task.status === "done" && "line-through opacity-60"
+                              )}>
+                                {task.name}
+                              </h3>
+                              <p className="text-xs text-muted-foreground truncate">{project.title}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="col-span-2 flex items-center">
+                            <StatusBadge status={task.status} />
+                          </div>
+                          
+                          <div className="col-span-2 flex items-center">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                            </span>
+                          </div>
+                          
+                          <div className="col-span-3 flex items-center">
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric'
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {initiativeTasks.map(({ task, project }) => (
+                      <div key={task.id} onClick={() => handleTaskClick(task, project)} className="block group">
+                        <Card className="p-4 hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer h-full">
+                          <div className="flex items-start gap-3 mb-3">
+                            <button
+                              onClick={(e) => handleToggleComplete(task.id, project.id, e)}
+                              className="flex-shrink-0 hover:scale-110 transition-transform mt-0.5"
+                            >
+                              {getStatusIcon(task.status)}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                              <h3 className={cn(
+                                "font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1",
+                                task.status === "done" && "line-through opacity-60"
+                              )}>
+                                {task.name}
+                              </h3>
+                              <p className="text-xs text-muted-foreground">{project.title}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <StatusBadge status={task.status} />
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getPriorityBadgeColor(task.priority)}`}>
+                                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                              </span>
+                            </div>
+                            
+                            <div className="pt-3 border-t space-y-2 text-sm">
+                              <div className="flex items-center gap-2">
+                                <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                  <User className="h-3 w-3 text-primary" />
+                                </div>
+                                <span className="truncate">{task.assignee}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Clock className="h-4 w-4 flex-shrink-0" />
+                                <span>{new Date(task.dueDate).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric'
+                                })}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </TabsContent>
+      </Tabs>
 
         {/* Task Sheet - Modern Inline Editing */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
