@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { initiatives } from "@/data/projectsData";
 import { programs, getProgramsByInitiative } from "@/data/programsData";
 import { getActivitiesByProgram } from "@/data/activitiesData";
+import { getKPIsByInitiative, getKPIProgress, KPI } from "@/data/kpisData";
 
 // Data structure with objectives
 const goals = [
@@ -139,6 +140,18 @@ const InitiativeDetail = () => {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [isAddKPIDialogOpen, setIsAddKPIDialogOpen] = useState(false);
+  const [newKPIData, setNewKPIData] = useState({
+    name: "",
+    description: "",
+    targetValue: "",
+    currentValue: "",
+    unit: "",
+    owner: "",
+    frequency: "monthly" as const,
+    trackedByType: "project" as "project" | "program" | "activity",
+    trackedById: "",
+  });
   
   // Find the initiative from the data
   const initiative = initiatives.find(i => i.id.toString() === id);
@@ -170,6 +183,9 @@ const InitiativeDetail = () => {
   const initiativeActivities = initiativePrograms.flatMap(program => 
     getActivitiesByProgram(program.id)
   );
+
+  // Get KPIs for this initiative
+  const initiativeKPIs = getKPIsByInitiative(initiative.id);
 
   // Calculate progress based on projects
   const totalProjects = initiativeProjects.length;
@@ -225,6 +241,46 @@ const InitiativeDetail = () => {
       title: "Comment added",
       description: "Your comment has been posted"
     });
+  };
+
+  const handleAddKPI = () => {
+    if (!newKPIData.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a KPI name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "KPI created successfully",
+    });
+
+    setNewKPIData({
+      name: "",
+      description: "",
+      targetValue: "",
+      currentValue: "",
+      unit: "",
+      owner: "",
+      frequency: "monthly",
+      trackedByType: "project",
+      trackedById: "",
+    });
+    setIsAddKPIDialogOpen(false);
+  };
+
+  const getStatusColor = (status: KPI["status"]) => {
+    switch (status) {
+      case "on-track":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      case "at-risk":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+      case "off-track":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    }
   };
 
   return (
@@ -289,10 +345,11 @@ const InitiativeDetail = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="programs" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="programs">Programs</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="activities">Activities</TabsTrigger>
+            <TabsTrigger value="kpis">KPIs</TabsTrigger>
           </TabsList>
 
           {/* Programs Tab */}
@@ -431,6 +488,203 @@ const InitiativeDetail = () => {
                 <Activity className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
                 <p className="text-muted-foreground">No activities linked to this initiative yet.</p>
               </Card>
+            )}
+          </TabsContent>
+
+          {/* KPIs Tab */}
+          <TabsContent value="kpis" className="space-y-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Key Performance Indicators</h3>
+              <Dialog open={isAddKPIDialogOpen} onOpenChange={setIsAddKPIDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add KPI
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Add New KPI</DialogTitle>
+                    <DialogDescription>
+                      Create a new key performance indicator to track initiative progress
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="kpi-name">KPI Name *</Label>
+                      <Input
+                        id="kpi-name"
+                        placeholder="e.g., Security Compliance Rate"
+                        value={newKPIData.name}
+                        onChange={(e) => setNewKPIData({ ...newKPIData, name: e.target.value })}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="kpi-description">Description</Label>
+                      <Textarea
+                        id="kpi-description"
+                        placeholder="Describe what this KPI measures..."
+                        value={newKPIData.description}
+                        onChange={(e) => setNewKPIData({ ...newKPIData, description: e.target.value })}
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="target-value">Target Value *</Label>
+                        <Input
+                          id="target-value"
+                          type="number"
+                          placeholder="95"
+                          value={newKPIData.targetValue}
+                          onChange={(e) => setNewKPIData({ ...newKPIData, targetValue: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="current-value">Current Value</Label>
+                        <Input
+                          id="current-value"
+                          type="number"
+                          placeholder="78"
+                          value={newKPIData.currentValue}
+                          onChange={(e) => setNewKPIData({ ...newKPIData, currentValue: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="unit">Unit *</Label>
+                        <Input
+                          id="unit"
+                          placeholder="%"
+                          value={newKPIData.unit}
+                          onChange={(e) => setNewKPIData({ ...newKPIData, unit: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="owner">Owner *</Label>
+                        <Input
+                          id="owner"
+                          placeholder="John Smith"
+                          value={newKPIData.owner}
+                          onChange={(e) => setNewKPIData({ ...newKPIData, owner: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="frequency">Update Frequency *</Label>
+                        <Select
+                          value={newKPIData.frequency}
+                          onValueChange={(value: any) => setNewKPIData({ ...newKPIData, frequency: value })}
+                        >
+                          <SelectTrigger id="frequency">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="daily">Daily</SelectItem>
+                            <SelectItem value="weekly">Weekly</SelectItem>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="quarterly">Quarterly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Tracked By</Label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <Select
+                          value={newKPIData.trackedByType}
+                          onValueChange={(value: any) => setNewKPIData({ ...newKPIData, trackedByType: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="project">Project</SelectItem>
+                            <SelectItem value="program">Program</SelectItem>
+                            <SelectItem value="activity">Activity</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          placeholder={`${newKPIData.trackedByType} ID`}
+                          value={newKPIData.trackedById}
+                          onChange={(e) => setNewKPIData({ ...newKPIData, trackedById: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setIsAddKPIDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddKPI}>Add KPI</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            {initiativeKPIs.length === 0 ? (
+              <Card className="p-12 text-center">
+                <Target className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground">No KPIs defined for this initiative yet.</p>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {initiativeKPIs.map((kpi) => (
+                  <Card key={kpi.id} className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Target className="h-5 w-5 text-primary" />
+                          <h3 className="text-lg font-bold text-foreground">{kpi.name}</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{kpi.description}</p>
+                      </div>
+                      <Badge className={getStatusColor(kpi.status)}>
+                        {kpi.status.replace("-", " ").toUpperCase()}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Current Value</p>
+                        <p className="text-sm font-semibold">{kpi.currentValue} {kpi.unit}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Target Value</p>
+                        <p className="text-sm font-semibold">{kpi.targetValue} {kpi.unit}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Owner</p>
+                        <p className="text-sm font-semibold">{kpi.owner}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Frequency</p>
+                        <p className="text-sm font-semibold capitalize">{kpi.frequency}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 mb-4">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Progress to Target</span>
+                        <span className="font-semibold">{getKPIProgress(kpi)}%</span>
+                      </div>
+                      <Progress value={getKPIProgress(kpi)} className="h-2" />
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">Tracked By:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {kpi.trackedBy.map((tracker, index) => (
+                          <Badge key={index} variant="outline">
+                            {tracker.type}: {tracker.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground mt-4">
+                      Last Updated: {new Date(kpi.lastUpdated).toLocaleDateString()}
+                    </div>
+                  </Card>
+                ))}
+              </div>
             )}
           </TabsContent>
         </Tabs>
