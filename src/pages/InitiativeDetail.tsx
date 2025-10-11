@@ -401,7 +401,7 @@ const InitiativeDetail = () => {
           </TabsList>
 
           {/* Programs Tab */}
-          <TabsContent value="programs" className="space-y-8">
+          <TabsContent value="programs" className="space-y-6">
             {initiativePrograms.length > 0 ? (
               initiativePrograms.map((program) => (
                 <Link key={program.id} to={`/programs/${program.id}`} className="block">
@@ -448,7 +448,7 @@ const InitiativeDetail = () => {
           </TabsContent>
 
           {/* Projects Tab */}
-          <TabsContent value="projects" className="space-y-8">
+          <TabsContent value="projects" className="space-y-6">
             {initiativeProjects.length > 0 ? (
               initiativeProjects.map((project) => (
                 <Link key={project.id} to={`/projects/${project.id}`} className="block">
@@ -495,7 +495,7 @@ const InitiativeDetail = () => {
           </TabsContent>
 
           {/* Activities Tab */}
-          <TabsContent value="activities" className="space-y-8">
+          <TabsContent value="activities" className="space-y-6">
             {initiativeActivities.length > 0 ? (
               initiativeActivities.map((activity) => (
                 <Link key={activity.id} to={`/activities/${activity.id}`} className="block">
