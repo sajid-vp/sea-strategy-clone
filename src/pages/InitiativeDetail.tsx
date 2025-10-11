@@ -404,7 +404,7 @@ const InitiativeDetail = () => {
           <TabsContent value="programs" className="space-y-8">
             {initiativePrograms.length > 0 ? (
               initiativePrograms.map((program) => (
-                <Link key={program.id} to={`/programs/${program.id}`}>
+                <Link key={program.id} to={`/programs/${program.id}`} className="block">
                   <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
@@ -451,7 +451,7 @@ const InitiativeDetail = () => {
           <TabsContent value="projects" className="space-y-8">
             {initiativeProjects.length > 0 ? (
               initiativeProjects.map((project) => (
-                <Link key={project.id} to={`/projects/${project.id}`}>
+                <Link key={project.id} to={`/projects/${project.id}`} className="block">
                   <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
@@ -498,7 +498,7 @@ const InitiativeDetail = () => {
           <TabsContent value="activities" className="space-y-8">
             {initiativeActivities.length > 0 ? (
               initiativeActivities.map((activity) => (
-                <Link key={activity.id} to={`/activities/${activity.id}`}>
+                <Link key={activity.id} to={`/activities/${activity.id}`} className="block">
                   <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
