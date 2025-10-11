@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send, ListChecks, Clock, TrendingUp, DollarSign, AlertTriangle, FileText, Link2, BarChart3, Flag, Network, Download } from "lucide-react";
+import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send, ListChecks, Clock, TrendingUp, DollarSign, AlertTriangle, FileText, Link2, BarChart3, Flag, Network, Download, ChevronDown, ChevronRight, Package } from "lucide-react";
 import { AddRiskForm } from "@/components/forms/AddRiskForm";
 import { AddIssueForm } from "@/components/forms/AddIssueForm";
 import { AddDependencyForm } from "@/components/forms/AddDependencyForm";
+import { AddMilestoneForm } from "@/components/forms/AddMilestoneForm";
+import { AddDeliverableForm } from "@/components/forms/AddDeliverableForm";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -30,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { initiatives } from "@/data/projectsData";
 import { getActivitiesByProject } from "@/data/activitiesData";
 import { toast } from "sonner";
@@ -40,6 +43,10 @@ const ProjectDetail = () => {
   const [isAddRiskOpen, setIsAddRiskOpen] = useState(false);
   const [isAddIssueOpen, setIsAddIssueOpen] = useState(false);
   const [isAddDependencyOpen, setIsAddDependencyOpen] = useState(false);
+  const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
+  const [isAddDeliverableOpen, setIsAddDeliverableOpen] = useState(false);
+  const [selectedMilestone, setSelectedMilestone] = useState<{ id: number; name: string } | null>(null);
+  const [expandedMilestones, setExpandedMilestones] = useState<Record<number, boolean>>({});
   const [newTask, setNewTask] = useState({
     name: "",
     description: "",
@@ -491,39 +498,159 @@ const ProjectDetail = () => {
                       <Flag className="h-5 w-5 text-primary" />
                       Milestones & Deliverables
                     </CardTitle>
-                    <CardDescription>Key project milestones and their progress</CardDescription>
+                    <CardDescription>Key project milestones with trackable deliverables</CardDescription>
                   </div>
-                  <Button variant="outline" size="sm">+ Add Milestone</Button>
+                  <Dialog open={isAddMilestoneOpen} onOpenChange={setIsAddMilestoneOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        Add Milestone
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Add New Milestone</DialogTitle>
+                        <DialogDescription>
+                          Create a new milestone with target dates and progress tracking
+                        </DialogDescription>
+                      </DialogHeader>
+                      <AddMilestoneForm
+                        onSuccess={() => setIsAddMilestoneOpen(false)}
+                        onCancel={() => setIsAddMilestoneOpen(false)}
+                      />
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {project.milestones.map((milestone) => (
-                    <div key={milestone.id} className="border rounded-lg p-4 space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-semibold">{milestone.name}</h4>
-                            <StatusBadge status={milestone.status} />
+                  {project.milestones.map((milestone) => {
+                    const completedDeliverables = milestone.deliverables?.filter(d => d.status === "done").length || 0;
+                    const totalDeliverables = milestone.deliverables?.length || 0;
+                    const isExpanded = expandedMilestones[milestone.id] ?? true;
+                    
+                    return (
+                      <div key={milestone.id} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-semibold">{milestone.name}</h4>
+                              <StatusBadge status={milestone.status} />
+                            </div>
+                            <p className="text-sm text-muted-foreground flex items-center gap-1">
+                              <Calendar className="h-3.5 w-3.5" />
+                              Due: {new Date(milestone.dueDate).toLocaleDateString()}
+                            </p>
                           </div>
-                          <p className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3.5 w-3.5" />
-                            Due: {new Date(milestone.dueDate).toLocaleDateString()}
-                          </p>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Progress</span>
+                            <span className="font-semibold">{milestone.progress}%</span>
+                          </div>
+                          <Progress value={milestone.progress} className="h-2" />
+                        </div>
+
+                        <Separator />
+
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Collapsible
+                              open={isExpanded}
+                              onOpenChange={(open) => 
+                                setExpandedMilestones(prev => ({ ...prev, [milestone.id]: open }))
+                              }
+                              className="flex-1"
+                            >
+                              <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
+                                {isExpanded ? (
+                                  <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4" />
+                                )}
+                                <Package className="h-4 w-4" />
+                                Deliverables ({completedDeliverables}/{totalDeliverables} completed)
+                              </CollapsibleTrigger>
+                              
+                              <CollapsibleContent className="mt-3 space-y-2">
+                                {milestone.deliverables && milestone.deliverables.length > 0 ? (
+                                  milestone.deliverables.map((deliverable) => (
+                                    <div
+                                      key={deliverable.id}
+                                      className="flex items-start gap-3 p-3 rounded-md bg-muted/50 hover:bg-muted transition-colors"
+                                    >
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <span className="font-medium text-sm">{deliverable.name}</span>
+                                          <StatusBadge status={deliverable.status} className="text-xs px-2 py-0.5" />
+                                        </div>
+                                        {deliverable.description && (
+                                          <p className="text-xs text-muted-foreground">{deliverable.description}</p>
+                                        )}
+                                        {deliverable.completedDate && (
+                                          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                                            <CheckCircle2 className="h-3 w-3" />
+                                            Completed: {new Date(deliverable.completedDate).toLocaleDateString()}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p className="text-sm text-muted-foreground italic p-3 text-center bg-muted/30 rounded-md">
+                                    No deliverables yet
+                                  </p>
+                                )}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full gap-2"
+                            onClick={() => {
+                              setSelectedMilestone({ id: milestone.id, name: milestone.name });
+                              setIsAddDeliverableOpen(true);
+                            }}
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                            Add Deliverable
+                          </Button>
                         </div>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Progress</span>
-                          <span className="font-semibold">{milestone.progress}%</span>
-                        </div>
-                        <Progress value={milestone.progress} className="h-2" />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
+
+            {/* Add Deliverable Dialog */}
+            <Dialog open={isAddDeliverableOpen} onOpenChange={setIsAddDeliverableOpen}>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Add New Deliverable</DialogTitle>
+                  <DialogDescription>
+                    Add a trackable deliverable to this milestone
+                  </DialogDescription>
+                </DialogHeader>
+                {selectedMilestone && (
+                  <AddDeliverableForm
+                    milestoneId={selectedMilestone.id}
+                    milestoneName={selectedMilestone.name}
+                    onSuccess={() => {
+                      setIsAddDeliverableOpen(false);
+                      setSelectedMilestone(null);
+                    }}
+                    onCancel={() => {
+                      setIsAddDeliverableOpen(false);
+                      setSelectedMilestone(null);
+                    }}
+                  />
+                )}
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
 

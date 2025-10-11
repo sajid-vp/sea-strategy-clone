@@ -42,11 +42,59 @@ export const initiatives = [
           { id: 1, type: "Depends on", project: "Network Infrastructure Upgrade", status: "in-progress" as const }
         ],
         milestones: [
-          { id: 1, name: "Gap Analysis", dueDate: "2025-02-15", progress: 100, status: "done" as const },
-          { id: 2, name: "Policy Documentation", dueDate: "2025-03-30", progress: 80, status: "in-progress" as const },
-          { id: 3, name: "Security Controls Implementation", dueDate: "2025-05-15", progress: 60, status: "in-progress" as const },
-          { id: 4, name: "Internal Audit", dueDate: "2025-06-15", progress: 0, status: "todo" as const },
-          { id: 5, name: "Certification Audit", dueDate: "2025-06-30", progress: 0, status: "todo" as const },
+          { 
+            id: 1, 
+            name: "Gap Analysis", 
+            dueDate: "2025-02-15", 
+            progress: 100, 
+            status: "done" as const,
+            deliverables: [
+              { id: 1, name: "Gap Analysis Report", status: "done" as const, description: "Comprehensive report identifying security gaps", completedDate: "2025-02-10" },
+              { id: 2, name: "Risk Assessment Document", status: "done" as const, description: "Initial risk assessment findings", completedDate: "2025-02-14" }
+            ]
+          },
+          { 
+            id: 2, 
+            name: "Policy Documentation", 
+            dueDate: "2025-03-30", 
+            progress: 80, 
+            status: "in-progress" as const,
+            deliverables: [
+              { id: 3, name: "Security Policy Manual", status: "in-progress" as const, description: "Complete security policies documentation" },
+              { id: 4, name: "Employee Guidelines", status: "done" as const, description: "Security guidelines for staff", completedDate: "2025-03-15" }
+            ]
+          },
+          { 
+            id: 3, 
+            name: "Security Controls Implementation", 
+            dueDate: "2025-05-15", 
+            progress: 60, 
+            status: "in-progress" as const,
+            deliverables: [
+              { id: 5, name: "Access Control System", status: "in-progress" as const, description: "Implement role-based access controls" },
+              { id: 6, name: "Encryption Standards", status: "todo" as const, description: "Deploy encryption across systems" }
+            ]
+          },
+          { 
+            id: 4, 
+            name: "Internal Audit", 
+            dueDate: "2025-06-15", 
+            progress: 0, 
+            status: "todo" as const,
+            deliverables: [
+              { id: 7, name: "Audit Report", status: "todo" as const, description: "Internal audit findings and recommendations" }
+            ]
+          },
+          { 
+            id: 5, 
+            name: "Certification Audit", 
+            dueDate: "2025-06-30", 
+            progress: 0, 
+            status: "todo" as const,
+            deliverables: [
+              { id: 8, name: "ISO 27001 Certificate", status: "todo" as const, description: "Official certification document" }
+            ]
+          },
         ],
         tasks: [
           { id: 1, name: "Gap Analysis", status: "done" as const, priority: "high" as const, assignee: "John Smith", dependencies: [], subtasks: [] },
@@ -88,11 +136,11 @@ export const initiatives = [
         documents: [],
         dependencies: [],
         milestones: [
-          { id: 6, name: "Requirements Analysis", dueDate: "2025-02-28", progress: 100, status: "done" as const },
-          { id: 7, name: "Vendor Selection", dueDate: "2025-03-15", progress: 100, status: "done" as const },
-          { id: 8, name: "Hardware Installation", dueDate: "2025-06-15", progress: 50, status: "in-progress" as const },
-          { id: 9, name: "Software Integration", dueDate: "2025-07-31", progress: 30, status: "in-review" as const },
-          { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "todo" as const },
+          { id: 6, name: "Requirements Analysis", dueDate: "2025-02-28", progress: 100, status: "done" as const, deliverables: [] },
+          { id: 7, name: "Vendor Selection", dueDate: "2025-03-15", progress: 100, status: "done" as const, deliverables: [] },
+          { id: 8, name: "Hardware Installation", dueDate: "2025-06-15", progress: 50, status: "in-progress" as const, deliverables: [] },
+          { id: 9, name: "Software Integration", dueDate: "2025-07-31", progress: 30, status: "in-review" as const, deliverables: [] },
+          { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "todo" as const, deliverables: [] },
         ],
         tasks: [
           { id: 6, name: "Requirements Analysis", status: "done" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [], subtasks: [] },
@@ -126,11 +174,11 @@ export const initiatives = [
         stakeholders: ["Student Affairs", "IT Director", "Marketing Team"],
         description: "Develop a unified mobile application that integrates all campus services and information for students, staff, and parents.",
         milestones: [
-          { id: 11, name: "UI/UX Design", dueDate: "2025-02-28", progress: 100, status: "done" as const },
-          { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "blocked" as const },
-          { id: 13, name: "Frontend Development", dueDate: "2025-06-15", progress: 25, status: "in-review" as const },
-          { id: 14, name: "Integration Testing", dueDate: "2025-07-01", progress: 0, status: "todo" as const },
-          { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "todo" as const },
+          { id: 11, name: "UI/UX Design", dueDate: "2025-02-28", progress: 100, status: "done" as const, deliverables: [] },
+          { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "blocked" as const, deliverables: [] },
+          { id: 13, name: "Frontend Development", dueDate: "2025-06-15", progress: 25, status: "in-review" as const, deliverables: [] },
+          { id: 14, name: "Integration Testing", dueDate: "2025-07-01", progress: 0, status: "todo" as const, deliverables: [] },
+          { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "todo" as const, deliverables: [] },
         ],
         tasks: [
           { id: 11, name: "UI/UX Design", status: "done" as const, priority: "high" as const, assignee: "Lisa Anderson", dependencies: [], subtasks: [] },
@@ -159,10 +207,10 @@ export const initiatives = [
         stakeholders: ["Executive Team", "Data Analysts", "Department Heads"],
         description: "Implement AI-powered business intelligence dashboards to provide real-time insights and predictive analytics for decision-making.",
         milestones: [
-          { id: 16, name: "Data Source Integration", dueDate: "2025-04-15", progress: 70, status: "in-progress" as const },
-          { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "in-review" as const },
-          { id: 18, name: "AI Model Training", dueDate: "2025-08-15", progress: 20, status: "in-review" as const },
-          { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "todo" as const },
+          { id: 16, name: "Data Source Integration", dueDate: "2025-04-15", progress: 70, status: "in-progress" as const, deliverables: [] },
+          { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "in-review" as const, deliverables: [] },
+          { id: 18, name: "AI Model Training", dueDate: "2025-08-15", progress: 20, status: "in-review" as const, deliverables: [] },
+          { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "todo" as const, deliverables: [] },
         ],
         tasks: [
           { id: 16, name: "Data Source Integration", status: "in-progress" as const, priority: "high" as const, assignee: "Rachel Green", dependencies: [], subtasks: [] },
