@@ -21,7 +21,6 @@ export interface BlockerChainEnhanced extends BlockerChain {
     title: string;
     status: string;
   }>;
-  recommendedActions?: string[];
 }
 
 export interface CriticalPath {
@@ -177,25 +176,6 @@ export const findBlockerChainsEnhanced = (
       item => item.id === `project-${chain.projectId}` || item.id === `initiative-${chain.initiativeId}`
     ) || false;
     
-    // Generate recommended actions
-    const recommendedActions: string[] = [];
-    if (chain.impactLevel === "high") {
-      recommendedActions.push("Escalate to senior management immediately");
-      recommendedActions.push("Allocate additional resources to unblock");
-    }
-    if (chain.affectedCount > 3) {
-      recommendedActions.push("Review and prioritize dependent tasks");
-      recommendedActions.push("Consider parallel work streams if possible");
-    }
-    if (chain.blockingReason?.toLowerCase().includes("approval")) {
-      recommendedActions.push("Fast-track approval process");
-      recommendedActions.push("Set up daily check-ins with approvers");
-    }
-    if (chain.blockingReason?.toLowerCase().includes("budget")) {
-      recommendedActions.push("Explore alternative funding sources");
-      recommendedActions.push("Review scope for cost optimization");
-    }
-    
     // Estimate delay (simplified calculation)
     const estimatedDelay = chain.affectedCount * 3 + (isOnCriticalPath ? 5 : 0);
     
@@ -205,7 +185,6 @@ export const findBlockerChainsEnhanced = (
       estimatedDelay,
       isOnCriticalPath,
       dependencyChain,
-      recommendedActions: recommendedActions.length > 0 ? recommendedActions : undefined,
     };
   });
 };

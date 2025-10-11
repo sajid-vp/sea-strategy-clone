@@ -140,26 +140,6 @@ export const BlockerDetailView = ({ blocker, onClose }: BlockerDetailViewProps) 
           </>
         )}
 
-        {/* Recommended Actions */}
-        {blocker.recommendedActions && blocker.recommendedActions.length > 0 && (
-          <>
-            <Separator />
-            <div>
-              <h4 className="text-sm font-semibold mb-3">Recommended Actions</h4>
-              <ul className="space-y-2">
-                {blocker.recommendedActions.map((action, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">
-                      {index + 1}
-                    </div>
-                    <span className="text-muted-foreground">{action}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
-
         {/* Owner Info */}
         {blocker.owner && (
           <>
