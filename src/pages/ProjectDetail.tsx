@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send, ListChecks, Clock, TrendingUp, DollarSign, AlertTriangle, FileText, Link2, BarChart3, Flag, Network, Download } from "lucide-react";
 import { AddRiskForm } from "@/components/forms/AddRiskForm";
 import { AddIssueForm } from "@/components/forms/AddIssueForm";
+import { AddDependencyForm } from "@/components/forms/AddDependencyForm";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ const ProjectDetail = () => {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [isAddRiskOpen, setIsAddRiskOpen] = useState(false);
   const [isAddIssueOpen, setIsAddIssueOpen] = useState(false);
+  const [isAddDependencyOpen, setIsAddDependencyOpen] = useState(false);
   const [newTask, setNewTask] = useState({
     name: "",
     description: "",
@@ -985,7 +987,23 @@ const ProjectDetail = () => {
                     </CardTitle>
                     <CardDescription>Related projects and cross-functional dependencies</CardDescription>
                   </div>
-                  <Button size="sm" variant="outline">+ Add Link</Button>
+                  <Dialog open={isAddDependencyOpen} onOpenChange={setIsAddDependencyOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="outline">+ Add Link</Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Add Dependency / Link</DialogTitle>
+                        <DialogDescription>
+                          Link this project to other initiatives, projects, or tasks
+                        </DialogDescription>
+                      </DialogHeader>
+                      <AddDependencyForm 
+                        onSuccess={() => setIsAddDependencyOpen(false)}
+                        onCancel={() => setIsAddDependencyOpen(false)}
+                      />
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardHeader>
               <CardContent>
