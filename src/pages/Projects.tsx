@@ -14,8 +14,9 @@ import { Progress } from "@/components/ui/progress";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { FolderKanban, List, BarChart3, TrendingUp, Users, Plus } from "lucide-react";
+import { FolderKanban, List, BarChart3, TrendingUp, Users, Plus, Check, ChevronsUpDown, X } from "lucide-react";
 import { initiatives, getAllProjects } from "@/data/projectsData";
+import { programs } from "@/data/programsData";
 import {
   Dialog,
   DialogContent,
@@ -28,11 +29,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 const Projects = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedYear, setSelectedYear] = useState("2025");
   const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
+  const [openInitiativePopover, setOpenInitiativePopover] = useState(false);
+  const [openProgramPopover, setOpenProgramPopover] = useState(false);
   const [newProject, setNewProject] = useState({
     title: "",
     code: "",
@@ -43,7 +50,8 @@ const Projects = () => {
     startDate: "",
     endDate: "",
     budget: "",
-    initiativeId: "",
+    initiativeIds: [] as string[],
+    programIds: [] as string[],
     status: "planned",
     projectType: "Strategic",
   });
@@ -51,7 +59,7 @@ const Projects = () => {
   const allProjects = getAllProjects();
 
   const handleAddProject = () => {
-    if (!newProject.title || !newProject.owner || !newProject.initiativeId) {
+    if (!newProject.title || !newProject.owner || newProject.initiativeIds.length === 0) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -69,10 +77,29 @@ const Projects = () => {
       startDate: "",
       endDate: "",
       budget: "",
-      initiativeId: "",
+      initiativeIds: [],
+      programIds: [],
       status: "planned",
       projectType: "Strategic",
     });
+  };
+
+  const handleInitiativeChange = (initiativeId: string) => {
+    setNewProject(prev => ({
+      ...prev,
+      initiativeIds: prev.initiativeIds.includes(initiativeId)
+        ? prev.initiativeIds.filter(id => id !== initiativeId)
+        : [...prev.initiativeIds, initiativeId]
+    }));
+  };
+
+  const handleProgramChange = (programId: string) => {
+    setNewProject(prev => ({
+      ...prev,
+      programIds: prev.programIds.includes(programId)
+        ? prev.programIds.filter(id => id !== programId)
+        : [...prev.programIds, programId]
+    }));
   };
 
   const totalProjects = initiatives.reduce((acc, init) => acc + init.projects.length, 0);
@@ -235,34 +262,158 @@ const Projects = () => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="initiative">Initiative *</Label>
-                        <Select 
-                          value={newProject.initiativeId} 
-                          onValueChange={(value) => setNewProject({ ...newProject, initiativeId: value })}
-                        >
-                          <SelectTrigger id="initiative">
-                            <SelectValue placeholder="Select initiative" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {initiatives.map((init) => (
-                              <SelectItem key={init.id} value={init.id.toString()}>
-                                {init.title}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="owner">Project Owner *</Label>
-                        <Input
-                          id="owner"
-                          value={newProject.owner}
-                          onChange={(e) => setNewProject({ ...newProject, owner: e.target.value })}
-                          placeholder="Owner name"
-                        />
-                      </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="owner">Project Owner *</Label>
+                      <Input
+                        id="owner"
+                        value={newProject.owner}
+                        onChange={(e) => setNewProject({ ...newProject, owner: e.target.value })}
+                        placeholder="Owner name"
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Initiatives * (Select one or more)</Label>
+                      <Popover open={openInitiativePopover} onOpenChange={setOpenInitiativePopover}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openInitiativePopover}
+                            className="w-full justify-between h-auto min-h-10"
+                          >
+                            <span className="text-muted-foreground">
+                              {newProject.initiativeIds.length === 0 
+                                ? "Search and select initiatives..." 
+                                : `${newProject.initiativeIds.length} initiative${newProject.initiativeIds.length > 1 ? 's' : ''} selected`
+                              }
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Search initiatives..." />
+                            <CommandList>
+                              <CommandEmpty>No initiatives found.</CommandEmpty>
+                              <CommandGroup>
+                                {initiatives.map((initiative) => (
+                                  <CommandItem
+                                    key={initiative.id}
+                                    value={initiative.title}
+                                    onSelect={() => handleInitiativeChange(initiative.id.toString())}
+                                    className="cursor-pointer"
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        newProject.initiativeIds.includes(initiative.id.toString())
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    <div className="flex-1">
+                                      <div className="font-medium text-sm">{initiative.title}</div>
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      
+                      {newProject.initiativeIds.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {newProject.initiativeIds.map((id) => {
+                            const initiative = initiatives.find(i => i.id.toString() === id);
+                            return initiative ? (
+                              <Badge key={id} variant="secondary" className="gap-1">
+                                {initiative.title}
+                                <X 
+                                  className="h-3 w-3 cursor-pointer" 
+                                  onClick={() => handleInitiativeChange(id)}
+                                />
+                              </Badge>
+                            ) : null;
+                          })}
+                        </div>
+                      )}
+                      {newProject.initiativeIds.length === 0 && (
+                        <p className="text-xs text-muted-foreground">
+                          Please select at least one initiative
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Programs (Optional)</Label>
+                      <Popover open={openProgramPopover} onOpenChange={setOpenProgramPopover}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openProgramPopover}
+                            className="w-full justify-between h-auto min-h-10"
+                          >
+                            <span className="text-muted-foreground">
+                              {newProject.programIds.length === 0 
+                                ? "Search and select programs..." 
+                                : `${newProject.programIds.length} program${newProject.programIds.length > 1 ? 's' : ''} selected`
+                              }
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Search programs..." />
+                            <CommandList>
+                              <CommandEmpty>No programs found.</CommandEmpty>
+                              <CommandGroup>
+                                {programs.map((program) => (
+                                  <CommandItem
+                                    key={program.id}
+                                    value={program.title}
+                                    onSelect={() => handleProgramChange(program.id.toString())}
+                                    className="cursor-pointer"
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        newProject.programIds.includes(program.id.toString())
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    <div className="flex-1">
+                                      <div className="font-medium text-sm">{program.title}</div>
+                                      <div className="text-xs text-muted-foreground">{program.code}</div>
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      
+                      {newProject.programIds.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {newProject.programIds.map((id) => {
+                            const program = programs.find(p => p.id.toString() === id);
+                            return program ? (
+                              <Badge key={id} variant="secondary" className="gap-1">
+                                {program.title}
+                                <X 
+                                  className="h-3 w-3 cursor-pointer" 
+                                  onClick={() => handleProgramChange(id)}
+                                />
+                              </Badge>
+                            ) : null;
+                          })}
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

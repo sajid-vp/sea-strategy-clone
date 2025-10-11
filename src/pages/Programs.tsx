@@ -22,22 +22,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, FolderKanban, Target, TrendingUp, DollarSign, Users } from "lucide-react";
+import { Plus, FolderKanban, Target, TrendingUp, DollarSign, Users, Check, ChevronsUpDown, X } from "lucide-react";
 import { programs } from "@/data/programsData";
 import { initiatives } from "@/data/projectsData";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 const Programs = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [initiativeFilter, setInitiativeFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddProgramOpen, setIsAddProgramOpen] = useState(false);
+  const [openInitiativePopover, setOpenInitiativePopover] = useState(false);
   const [newProgram, setNewProgram] = useState({
     title: "",
     code: "",
     description: "",
-    initiativeId: "",
+    initiativeIds: [] as string[],
     owner: "",
     manager: "",
     startDate: "",
@@ -66,7 +71,7 @@ const Programs = () => {
       title: "",
       code: "",
       description: "",
-      initiativeId: "",
+      initiativeIds: [],
       owner: "",
       manager: "",
       startDate: "",
@@ -74,6 +79,15 @@ const Programs = () => {
       budget: "",
       status: "planned",
     });
+  };
+
+  const handleInitiativeChange = (initiativeId: string) => {
+    setNewProgram(prev => ({
+      ...prev,
+      initiativeIds: prev.initiativeIds.includes(initiativeId)
+        ? prev.initiativeIds.filter(id => id !== initiativeId)
+        : [...prev.initiativeIds, initiativeId]
+    }));
   };
 
   const getStatusVariant = (status: string) => {
@@ -143,22 +157,77 @@ const Programs = () => {
                     className="min-h-[100px]"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="initiative">Initiative *</Label>
-                    <Select value={newProgram.initiativeId} onValueChange={(value) => setNewProgram({ ...newProgram, initiativeId: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select initiative" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {initiatives.map((initiative) => (
-                          <SelectItem key={initiative.id} value={String(initiative.id)}>
+                
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Initiatives (Optional)</Label>
+                  <Popover open={openInitiativePopover} onOpenChange={setOpenInitiativePopover}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openInitiativePopover}
+                        className="w-full justify-between h-auto min-h-10"
+                      >
+                        <span className="text-muted-foreground">
+                          {newProgram.initiativeIds.length === 0 
+                            ? "Search and select initiatives..." 
+                            : `${newProgram.initiativeIds.length} initiative${newProgram.initiativeIds.length > 1 ? 's' : ''} selected`
+                          }
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Search initiatives..." />
+                        <CommandList>
+                          <CommandEmpty>No initiatives found.</CommandEmpty>
+                          <CommandGroup>
+                            {initiatives.map((initiative) => (
+                              <CommandItem
+                                key={initiative.id}
+                                value={initiative.title}
+                                onSelect={() => handleInitiativeChange(initiative.id.toString())}
+                                className="cursor-pointer"
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    newProgram.initiativeIds.includes(initiative.id.toString())
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                <div className="flex-1">
+                                  <div className="font-medium text-sm">{initiative.title}</div>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  
+                  {newProgram.initiativeIds.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {newProgram.initiativeIds.map((id) => {
+                        const initiative = initiatives.find(i => i.id.toString() === id);
+                        return initiative ? (
+                          <Badge key={id} variant="secondary" className="gap-1">
                             {initiative.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                            <X 
+                              className="h-3 w-3 cursor-pointer" 
+                              onClick={() => handleInitiativeChange(id)}
+                            />
+                          </Badge>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="status">Status</Label>
                     <Select value={newProgram.status} onValueChange={(value) => setNewProgram({ ...newProgram, status: value })}>
