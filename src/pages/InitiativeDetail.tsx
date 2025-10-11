@@ -871,9 +871,19 @@ const InitiativeDetail = () => {
                     <span className="font-semibold">{updatingKPI.targetValue} {updatingKPI.unit}</span>
                   </div>
                   <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Update Frequency:</span>
+                    <span className="font-semibold capitalize">{updatingKPI.frequency}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Last Updated:</span>
+                    <span className="font-medium">{new Date(updatingKPI.lastUpdated).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tracked By:</span>
                     <span className="font-medium text-xs">
-                      {updatingKPI.trackedBy.map(t => t.type).join(", ")}
+                      {updatingKPI.trackedBy.length > 0 
+                        ? updatingKPI.trackedBy.map(t => t.type.charAt(0).toUpperCase() + t.type.slice(1)).join(", ")
+                        : "Manual"}
                     </span>
                   </div>
                 </div>
@@ -894,9 +904,18 @@ const InitiativeDetail = () => {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Enter the latest value based on {updatingKPI.trackedBy.length > 0 
-                      ? updatingKPI.trackedBy.map(t => t.name).join(", ") 
-                      : "manual tracking"}
+                    {updatingKPI.trackedBy.length > 0 
+                      ? `Based on ${updatingKPI.trackedBy.map(t => t.name).join(", ")}`
+                      : "Manual entry"}
+                    {" · "}Updated {updatingKPI.frequency}
+                  </p>
+                </div>
+
+                <div className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md">
+                  <p className="text-xs text-blue-900 dark:text-blue-100">
+                    <strong>Frequency: {updatingKPI.frequency.charAt(0).toUpperCase() + updatingKPI.frequency.slice(1)}</strong>
+                    <br />
+                    This KPI should be updated on a {updatingKPI.frequency} basis.
                   </p>
                 </div>
               </div>
