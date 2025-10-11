@@ -103,7 +103,7 @@ const Activities = () => {
       <main className="container mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Activities</h1>
+            <h1 className="text-2xl font-bold text-foreground">Activities</h1>
           </div>
           <Dialog open={isAddActivityOpen} onOpenChange={setIsAddActivityOpen}>
             <DialogTrigger asChild>
