@@ -1,10 +1,11 @@
-import { Search, X, Check } from "lucide-react";
+import { Search, X, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState } from "react";
 import {
   Command,
   CommandEmpty,
@@ -61,6 +62,8 @@ export const FilterPanel = ({
   availableProjects,
   availableGoals,
 }: FilterPanelProps) => {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   const toggleOwner = (owner: string) => {
     setSelectedOwners(
       selectedOwners.includes(owner)
@@ -107,21 +110,32 @@ export const FilterPanel = ({
     searchQuery !== "" || selectedOwners.length > 0 || selectedInitiatives.length > 0 || 
     selectedProjects.length > 0 || selectedGoals.length > 0;
 
+  const hasAdvancedFilters = selectedOwners.length > 0 || selectedInitiatives.length > 0 || 
+    selectedProjects.length > 0 || selectedGoals.length > 0;
+
   return (
     <Card className="p-4 mb-6">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium">Filters</h3>
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearAllFilters}>
-              Clear All
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {hasAdvancedFilters && (
+              <Badge variant="secondary" className="text-xs">
+                {selectedOwners.length + selectedInitiatives.length + selectedProjects.length + selectedGoals.length} advanced
+              </Badge>
+            )}
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearAllFilters}>
+                Clear All
+              </Button>
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Main Filters Row */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Search */}
-          <div className="relative">
+          <div className="relative md:col-span-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search items..."
@@ -158,9 +172,26 @@ export const FilterPanel = ({
               <SelectItem value="done">Done</SelectItem>
             </SelectContent>
           </Select>
+        </div>
 
-          {/* Goals Multi-Select */}
-          <Popover>
+        {/* Advanced Filters Toggle */}
+        <div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="w-full justify-between"
+          >
+            <span className="text-sm">Advanced Filters</span>
+            {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+        </div>
+
+        {/* Advanced Filters Section */}
+        {showAdvanced && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t">
+            {/* Goals Multi-Select */}
+            <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -207,13 +238,10 @@ export const FilterPanel = ({
                 </CommandList>
               </Command>
             </PopoverContent>
-          </Popover>
-        </div>
+            </Popover>
 
-        {/* Second Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Initiatives Multi-Select */}
-          <Popover>
+            {/* Initiatives Multi-Select */}
+            <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -360,8 +388,9 @@ export const FilterPanel = ({
                 </CommandList>
               </Command>
             </PopoverContent>
-          </Popover>
-        </div>
+            </Popover>
+          </div>
+        )}
 
         {/* Active Filter Badges */}
         {hasActiveFilters && (
