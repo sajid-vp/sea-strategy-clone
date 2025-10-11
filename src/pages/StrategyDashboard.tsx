@@ -288,27 +288,6 @@ const StrategyDashboard = () => {
           <h1 className="text-2xl font-bold text-foreground">Strategy Director Dashboard</h1>
         </div>
 
-        <FilterPanel
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          selectedStatus={selectedStatus}
-          setSelectedStatus={setSelectedStatus}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedOwners={selectedOwners}
-          setSelectedOwners={setSelectedOwners}
-          selectedInitiatives={selectedHierarchyInitiatives}
-          setSelectedInitiatives={setSelectedHierarchyInitiatives}
-          selectedProjects={selectedHierarchyProjects}
-          setSelectedProjects={setSelectedHierarchyProjects}
-          selectedGoals={selectedGoals}
-          setSelectedGoals={setSelectedGoals}
-          availableOwners={availableOwners}
-          availableInitiatives={mockInitiatives.map(i => ({ id: i.id, title: i.title }))}
-          availableProjects={mockProjects.map(p => ({ id: p.id, title: p.title }))}
-          availableGoals={mockGoals.map(g => ({ id: g.id, title: g.title }))}
-        />
-
         <Tabs defaultValue="hierarchy" className="space-y-6">
           <TabsList>
             <TabsTrigger value="hierarchy">Hierarchy View</TabsTrigger>
@@ -316,6 +295,27 @@ const StrategyDashboard = () => {
           </TabsList>
 
           <TabsContent value="hierarchy" className="space-y-6">
+            <FilterPanel
+              selectedYear={selectedYear}
+              setSelectedYear={setSelectedYear}
+              selectedStatus={selectedStatus}
+              setSelectedStatus={setSelectedStatus}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              selectedOwners={selectedOwners}
+              setSelectedOwners={setSelectedOwners}
+              selectedInitiatives={selectedHierarchyInitiatives}
+              setSelectedInitiatives={setSelectedHierarchyInitiatives}
+              selectedProjects={selectedHierarchyProjects}
+              setSelectedProjects={setSelectedHierarchyProjects}
+              selectedGoals={selectedGoals}
+              setSelectedGoals={setSelectedGoals}
+              availableOwners={availableOwners}
+              availableInitiatives={mockInitiatives.map(i => ({ id: i.id, title: i.title }))}
+              availableProjects={mockProjects.map(p => ({ id: p.id, title: p.title }))}
+              availableGoals={mockGoals.map(g => ({ id: g.id, title: g.title }))}
+            />
+            
             <FlowCanvas
               initialNodes={nodes}
               initialEdges={edges}
