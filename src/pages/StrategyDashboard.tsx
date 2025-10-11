@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { FlowCanvas } from "@/components/strategy/FlowCanvas";
-import { StatsPanel } from "@/components/strategy/StatsPanel";
 import { FilterPanel } from "@/components/strategy/FilterPanel";
 import { BlockerPanel } from "@/components/strategy/BlockerPanel";
 import { DetailSheet } from "@/components/strategy/DetailSheet";
@@ -192,14 +191,12 @@ const StrategyDashboard = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Strategy Director Dashboard</h1>
           <p className="text-muted-foreground">
             Visual flow mapping of strategic initiatives, projects, and blockers
           </p>
         </div>
-
-        <StatsPanel stats={stats} />
 
         <FilterPanel
           selectedYear={selectedYear}
