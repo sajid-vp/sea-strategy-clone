@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, Users, Clock, MapPin, FolderKanban, FileText, Edit } from "lucide-react";
+import { ArrowLeft, Calendar, Users, Clock, MapPin, FolderKanban, Edit } from "lucide-react";
 import { getActivityById } from "@/data/activitiesData";
 
 const ActivityDetail = () => {
@@ -137,11 +137,10 @@ const ActivityDetail = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="details" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="participants">Participants</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
-            <TabsTrigger value="notes">Notes</TabsTrigger>
           </TabsList>
 
           {/* Details Tab */}
@@ -251,24 +250,6 @@ const ActivityDetail = () => {
             </Card>
           </TabsContent>
 
-          {/* Notes Tab */}
-          <TabsContent value="notes" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Activity Notes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {activity.notes ? (
-                  <p className="text-foreground whitespace-pre-wrap">{activity.notes}</p>
-                ) : (
-                  <p className="text-muted-foreground">No notes added yet</p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
       </main>
     </div>

@@ -39,7 +39,6 @@ const Activities = () => {
     frequency: "weekly",
     owner: "",
     participants: "",
-    project: "",
     startDate: "",
     duration: "",
     location: "",
@@ -68,7 +67,6 @@ const Activities = () => {
       frequency: "weekly",
       owner: "",
       participants: "",
-      project: "",
       startDate: "",
       duration: "",
       location: "",
@@ -218,25 +216,14 @@ const Activities = () => {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="project">Project (Optional)</Label>
-                    <Input
-                      id="project"
-                      value={newActivity.project}
-                      onChange={(e) => setNewActivity({ ...newActivity, project: e.target.value })}
-                      placeholder="Link to project"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="location">Location</Label>
-                    <Input
-                      id="location"
-                      value={newActivity.location}
-                      onChange={(e) => setNewActivity({ ...newActivity, location: e.target.value })}
-                      placeholder="Conference room or virtual"
-                    />
-                  </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Input
+                    id="location"
+                    value={newActivity.location}
+                    onChange={(e) => setNewActivity({ ...newActivity, location: e.target.value })}
+                    placeholder="Conference room or virtual"
+                  />
                 </div>
               </div>
               <div className="flex justify-end gap-2">
