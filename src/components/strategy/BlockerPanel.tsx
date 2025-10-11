@@ -1,4 +1,4 @@
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -75,5 +75,3 @@ export const BlockerPanel = ({ blockerChains }: BlockerPanelProps) => {
     </Card>
   );
 };
-
-import { CheckCircle2 } from "lucide-react";
