@@ -3,11 +3,13 @@ import { Header } from "@/components/Header";
 import { FlowCanvas } from "@/components/strategy/FlowCanvas";
 import { FilterPanel } from "@/components/strategy/FilterPanel";
 import { BlockerPanel } from "@/components/strategy/BlockerPanel";
+import { BlockerFilters } from "@/components/strategy/BlockerFilters";
+import { BlockerAnalysisReport } from "@/components/strategy/BlockerAnalysisReport";
 import { DetailSheet } from "@/components/strategy/DetailSheet";
 import { useStrategyFlow } from "@/hooks/useStrategyFlow";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import { AlertTriangle, Network } from "lucide-react";
+import { findBlockerChainsEnhanced } from "@/utils/blockerAnalysis";
+import { toast } from "@/hooks/use-toast";
 
 // Mock data - in real app, these would come from your data sources
 const mockGoals = [
@@ -168,6 +170,13 @@ const mockTasks = [
 const StrategyDashboard = () => {
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  
+  // Blocker analysis filters
+  const [blockerSearchQuery, setBlockerSearchQuery] = useState("");
+  const [selectedImpactLevels, setSelectedImpactLevels] = useState<string[]>([]);
+  const [selectedInitiatives, setSelectedInitiatives] = useState<string[]>([]);
+  const [groupBy, setGroupBy] = useState("None");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
   const {
     nodes,
@@ -183,9 +192,45 @@ const StrategyDashboard = () => {
     stats,
   } = useStrategyFlow(mockGoals, mockObjectives, mockInitiatives, mockProjects, mockTasks);
 
+  // Enhanced blocker chains with additional data
+  const enhancedBlockerChains = findBlockerChainsEnhanced(
+    mockTasks,
+    mockProjects,
+    mockInitiatives,
+    criticalPath
+  );
+
+  // Filter enhanced blockers
+  const filteredBlockers = enhancedBlockerChains.filter(blocker => {
+    // Search filter
+    if (blockerSearchQuery && !blocker.taskTitle.toLowerCase().includes(blockerSearchQuery.toLowerCase())) {
+      return false;
+    }
+    
+    // Impact level filter
+    if (selectedImpactLevels.length > 0 && !selectedImpactLevels.includes(blocker.impactLevel)) {
+      return false;
+    }
+    
+    // Initiative filter
+    if (selectedInitiatives.length > 0 && !selectedInitiatives.includes(String(blocker.initiativeId))) {
+      return false;
+    }
+    
+    return true;
+  });
+
   const handleNodeClick = (node: any) => {
     setSelectedNode(node);
     setIsDetailOpen(true);
+  };
+
+  const handleExport = () => {
+    toast({
+      title: "Export in progress",
+      description: "Your blocker analysis report will download shortly.",
+    });
+    // In a real app, this would generate a PDF/CSV
   };
 
   return (
@@ -221,68 +266,53 @@ const StrategyDashboard = () => {
           </TabsContent>
 
           <TabsContent value="blockers" className="space-y-6">
-            {/* Summary Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-destructive/10">
-                    <AlertTriangle className="h-5 w-5 text-destructive" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-foreground">{blockerChains.length}</div>
-                    <div className="text-sm text-muted-foreground">Critical Blockers</div>
-                  </div>
-                </div>
-              </Card>
-              
-              <Card className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-warning/10">
-                    <AlertTriangle className="h-5 w-5 text-warning" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-foreground">
-                      {blockerChains.filter(b => b.impactLevel === "high").length}
-                    </div>
-                    <div className="text-sm text-muted-foreground">High Impact</div>
-                  </div>
-                </div>
-              </Card>
-              
-              <Card className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Network className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-foreground">
-                      {blockerChains.reduce((sum, b) => sum + b.affectedCount, 0)}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Items Affected</div>
-                  </div>
-                </div>
-              </Card>
-            </div>
+            {/* Filters */}
+            <BlockerFilters
+              searchQuery={blockerSearchQuery}
+              setSearchQuery={setBlockerSearchQuery}
+              selectedImpactLevels={selectedImpactLevels}
+              setSelectedImpactLevels={setSelectedImpactLevels}
+              selectedInitiatives={selectedInitiatives}
+              setSelectedInitiatives={setSelectedInitiatives}
+              groupBy={groupBy}
+              setGroupBy={setGroupBy}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              initiatives={mockInitiatives}
+              onExport={handleExport}
+            />
 
-            {/* Main Content */}
+            {/* Main Content - 2 Column Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-3">
+              {/* Left: Report Table */}
+              <div className="lg:col-span-2">
+                <BlockerAnalysisReport
+                  blockers={filteredBlockers}
+                  groupBy={groupBy}
+                />
+              </div>
+
+              {/* Right: Visual Map + Summary */}
+              <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-2">
                     Visual Dependency Map
                   </h3>
-                  <FlowCanvas
-                    initialNodes={nodes.filter(n => n.data.status === "blocked" || n.type === "goalNode")}
-                    initialEdges={edges}
-                    onNodeClick={handleNodeClick}
-                  />
+                  <div className="h-[400px]">
+                    <FlowCanvas
+                      initialNodes={nodes.filter(n => n.data.status === "blocked" || n.type === "goalNode")}
+                      initialEdges={edges}
+                      onNodeClick={handleNodeClick}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-muted-foreground">
-                  Blocker Details
-                </h3>
-                <BlockerPanel blockerChains={blockerChains} />
+                
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                    Active Blockers
+                  </h3>
+                  <BlockerPanel blockerChains={blockerChains} />
+                </div>
               </div>
             </div>
           </TabsContent>

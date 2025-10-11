@@ -12,6 +12,18 @@ export interface BlockerChain {
   blockingReason?: string;
 }
 
+export interface BlockerChainEnhanced extends BlockerChain {
+  owner?: string;
+  estimatedDelay?: number;
+  isOnCriticalPath?: boolean;
+  dependencyChain?: Array<{
+    id: number;
+    title: string;
+    status: string;
+  }>;
+  recommendedActions?: string[];
+}
+
 export interface CriticalPath {
   items: Array<{
     id: string;
@@ -60,6 +72,71 @@ export const findBlockerChains = (
     const impactOrder = { high: 3, medium: 2, low: 1 };
     const impactDiff = impactOrder[b.impactLevel] - impactOrder[a.impactLevel];
     return impactDiff !== 0 ? impactDiff : b.affectedCount - a.affectedCount;
+  });
+};
+
+export const findBlockerChainsEnhanced = (
+  tasks: any[],
+  projects: any[],
+  initiatives: any[],
+  criticalPath: CriticalPath | null
+): BlockerChainEnhanced[] => {
+  const chains = findBlockerChains(tasks, projects, initiatives);
+  
+  return chains.map(chain => {
+    const task = tasks.find(t => t.id === chain.taskId);
+    const project = projects.find(p => p.id === chain.projectId);
+    
+    // Build dependency chain
+    const dependencyChain: Array<{ id: number; title: string; status: string }> = [];
+    if (task?.dependencies) {
+      task.dependencies.forEach((depId: number) => {
+        const depTask = tasks.find(t => t.id === depId);
+        if (depTask) {
+          dependencyChain.push({
+            id: depTask.id,
+            title: depTask.title,
+            status: depTask.status,
+          });
+        }
+      });
+    }
+    
+    // Check if on critical path
+    const isOnCriticalPath = criticalPath?.items.some(
+      item => item.id === `project-${chain.projectId}` || item.id === `initiative-${chain.initiativeId}`
+    ) || false;
+    
+    // Generate recommended actions
+    const recommendedActions: string[] = [];
+    if (chain.impactLevel === "high") {
+      recommendedActions.push("Escalate to senior management immediately");
+      recommendedActions.push("Allocate additional resources to unblock");
+    }
+    if (chain.affectedCount > 3) {
+      recommendedActions.push("Review and prioritize dependent tasks");
+      recommendedActions.push("Consider parallel work streams if possible");
+    }
+    if (chain.blockingReason?.toLowerCase().includes("approval")) {
+      recommendedActions.push("Fast-track approval process");
+      recommendedActions.push("Set up daily check-ins with approvers");
+    }
+    if (chain.blockingReason?.toLowerCase().includes("budget")) {
+      recommendedActions.push("Explore alternative funding sources");
+      recommendedActions.push("Review scope for cost optimization");
+    }
+    
+    // Estimate delay (simplified calculation)
+    const estimatedDelay = chain.affectedCount * 3 + (isOnCriticalPath ? 5 : 0);
+    
+    return {
+      ...chain,
+      owner: task?.assignee || project?.owner,
+      estimatedDelay,
+      isOnCriticalPath,
+      dependencyChain,
+      recommendedActions: recommendedActions.length > 0 ? recommendedActions : undefined,
+    };
   });
 };
 
