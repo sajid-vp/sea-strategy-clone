@@ -129,7 +129,8 @@ const Initiatives = () => {
   const [formData, setFormData] = useState({
     title: "",
     objectives: [] as string[],
-    year: "2025",
+    startYear: "2025",
+    endYear: "2025",
     owner: "",
     description: "",
   });
@@ -160,6 +161,16 @@ const Initiatives = () => {
       return;
     }
 
+    // Validate date range
+    if (parseInt(formData.startYear) > parseInt(formData.endYear)) {
+      toast({
+        title: "Validation Error",
+        description: "Start year must be before or equal to end year",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Here you would normally save to a database
     toast({
       title: "Success",
@@ -170,7 +181,8 @@ const Initiatives = () => {
     setFormData({
       title: "",
       objectives: [],
-      year: "2025",
+      startYear: "2025",
+      endYear: "2025",
       owner: "",
       description: "",
     });
@@ -294,23 +306,47 @@ const Initiatives = () => {
                   
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-4">
-                      {/* Year - moved to top */}
-                      <div className="space-y-2">
-                        <Label htmlFor="year">Year *</Label>
-                        <Select 
-                          value={formData.year} 
-                          onValueChange={(value) => handleInputChange("year", value)}
-                        >
-                          <SelectTrigger id="year">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="2025">2025</SelectItem>
-                            <SelectItem value="2026">2026</SelectItem>
-                            <SelectItem value="2027">2027</SelectItem>
-                            <SelectItem value="2028">2028</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      {/* Date Range */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="startYear">Start Year *</Label>
+                          <Select 
+                            value={formData.startYear} 
+                            onValueChange={(value) => handleInputChange("startYear", value)}
+                          >
+                            <SelectTrigger id="startYear">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="2025">2025</SelectItem>
+                              <SelectItem value="2026">2026</SelectItem>
+                              <SelectItem value="2027">2027</SelectItem>
+                              <SelectItem value="2028">2028</SelectItem>
+                              <SelectItem value="2029">2029</SelectItem>
+                              <SelectItem value="2030">2030</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="endYear">End Year *</Label>
+                          <Select 
+                            value={formData.endYear} 
+                            onValueChange={(value) => handleInputChange("endYear", value)}
+                          >
+                            <SelectTrigger id="endYear">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="2025">2025</SelectItem>
+                              <SelectItem value="2026">2026</SelectItem>
+                              <SelectItem value="2027">2027</SelectItem>
+                              <SelectItem value="2028">2028</SelectItem>
+                              <SelectItem value="2029">2029</SelectItem>
+                              <SelectItem value="2030">2030</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
