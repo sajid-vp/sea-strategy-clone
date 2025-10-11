@@ -44,7 +44,7 @@ export const FlowCanvas = ({ initialNodes, initialEdges, onNodeClick }: FlowCanv
   );
 
   return (
-    <div className="h-[calc(100vh-300px)] w-full border rounded-lg bg-card">
+    <div className="h-[calc(100vh-250px)] w-full border rounded-lg bg-card">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -53,8 +53,15 @@ export const FlowCanvas = ({ initialNodes, initialEdges, onNodeClick }: FlowCanv
         onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
         fitView
+        fitViewOptions={{
+          padding: 0.3,
+          includeHiddenNodes: false,
+          minZoom: 0.5,
+          maxZoom: 1,
+        }}
         minZoom={0.2}
         maxZoom={1.5}
+        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
       >
         <Background />
         <Controls />
