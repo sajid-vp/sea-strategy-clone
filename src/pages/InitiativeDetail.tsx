@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, User, Users, Calendar, Target, Plus, MessageSquare, Send, FolderKanban, Activity } from "lucide-react";
+import { ArrowLeft, User, Users, Calendar, Target, Plus, MessageSquare, Send, FolderKanban, Activity, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -141,6 +141,8 @@ const InitiativeDetail = () => {
   const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [isAddKPIDialogOpen, setIsAddKPIDialogOpen] = useState(false);
+  const [isEditKPIDialogOpen, setIsEditKPIDialogOpen] = useState(false);
+  const [editingKPI, setEditingKPI] = useState<KPI | null>(null);
   const [newKPIData, setNewKPIData] = useState({
     name: "",
     description: "",
@@ -270,6 +272,23 @@ const InitiativeDetail = () => {
       trackedById: "",
     });
     setIsAddKPIDialogOpen(false);
+  };
+
+  const handleEditKPI = (kpi: KPI) => {
+    setEditingKPI(kpi);
+    setIsEditKPIDialogOpen(true);
+  };
+
+  const handleUpdateKPI = () => {
+    if (!editingKPI) return;
+
+    toast({
+      title: "Success",
+      description: "KPI updated successfully",
+    });
+
+    setEditingKPI(null);
+    setIsEditKPIDialogOpen(false);
   };
 
   const getStatusColor = (status: KPI["status"]) => {
@@ -637,9 +656,18 @@ const InitiativeDetail = () => {
                         </div>
                         <p className="text-sm text-muted-foreground">{kpi.description}</p>
                       </div>
-                      <Badge className={getStatusColor(kpi.status)}>
-                        {kpi.status.replace("-", " ").toUpperCase()}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditKPI(kpi)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Badge className={getStatusColor(kpi.status)}>
+                          {kpi.status.replace("-", " ").toUpperCase()}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       <div>
@@ -688,6 +716,115 @@ const InitiativeDetail = () => {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Edit KPI Dialog */}
+        <Dialog open={isEditKPIDialogOpen} onOpenChange={setIsEditKPIDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit KPI</DialogTitle>
+              <DialogDescription>
+                Update the key performance indicator details
+              </DialogDescription>
+            </DialogHeader>
+            {editingKPI && (
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-kpi-name">KPI Name *</Label>
+                  <Input
+                    id="edit-kpi-name"
+                    value={editingKPI.name}
+                    onChange={(e) => setEditingKPI({ ...editingKPI, name: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-kpi-description">Description</Label>
+                  <Textarea
+                    id="edit-kpi-description"
+                    value={editingKPI.description}
+                    onChange={(e) => setEditingKPI({ ...editingKPI, description: e.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-target-value">Target Value *</Label>
+                    <Input
+                      id="edit-target-value"
+                      type="number"
+                      value={editingKPI.targetValue}
+                      onChange={(e) => setEditingKPI({ ...editingKPI, targetValue: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-current-value">Current Value</Label>
+                    <Input
+                      id="edit-current-value"
+                      type="number"
+                      value={editingKPI.currentValue}
+                      onChange={(e) => setEditingKPI({ ...editingKPI, currentValue: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-unit">Unit *</Label>
+                    <Input
+                      id="edit-unit"
+                      value={editingKPI.unit}
+                      onChange={(e) => setEditingKPI({ ...editingKPI, unit: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-owner">Owner *</Label>
+                    <Input
+                      id="edit-owner"
+                      value={editingKPI.owner}
+                      onChange={(e) => setEditingKPI({ ...editingKPI, owner: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-frequency">Update Frequency *</Label>
+                    <Select
+                      value={editingKPI.frequency}
+                      onValueChange={(value: any) => setEditingKPI({ ...editingKPI, frequency: value })}
+                    >
+                      <SelectTrigger id="edit-frequency">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="quarterly">Quarterly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-status">Status</Label>
+                  <Select
+                    value={editingKPI.status}
+                    onValueChange={(value: any) => setEditingKPI({ ...editingKPI, status: value })}
+                  >
+                    <SelectTrigger id="edit-status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="on-track">On Track</SelectItem>
+                      <SelectItem value="at-risk">At Risk</SelectItem>
+                      <SelectItem value="off-track">Off Track</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsEditKPIDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateKPI}>Update KPI</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Comments Dialog */}
         <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
