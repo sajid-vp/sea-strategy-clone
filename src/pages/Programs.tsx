@@ -97,10 +97,7 @@ const Programs = () => {
       <main className="container mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Programs</h1>
-            <p className="text-muted-foreground">
-              Strategic programs coordinating multiple projects and initiatives
-            </p>
+            <h1 className="text-3xl font-bold text-foreground">Programs</h1>
           </div>
           <Dialog open={isAddProgramOpen} onOpenChange={setIsAddProgramOpen}>
             <DialogTrigger asChild>
