@@ -317,25 +317,12 @@ const StrategyDashboard = () => {
               onExport={handleExport}
             />
 
-            {/* Main Content - 2 Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left: Report Table */}
-              <div className="lg:col-span-2">
-                <BlockerAnalysisReport
-                  blockers={filteredBlockers}
-                  groupBy={groupBy}
-                />
-              </div>
-
-              {/* Right: Active Blockers */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2">
-                    Active Blockers
-                  </h3>
-                  <BlockerPanel blockerChains={blockerChains} />
-                </div>
-              </div>
+            {/* Main Content */}
+            <div>
+              <BlockerAnalysisReport
+                blockers={filteredBlockers}
+                groupBy={groupBy}
+              />
             </div>
           </TabsContent>
         </Tabs>
