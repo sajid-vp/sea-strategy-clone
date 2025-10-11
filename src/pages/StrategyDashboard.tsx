@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { FlowCanvas } from "@/components/strategy/FlowCanvas";
 import { FilterPanel } from "@/components/strategy/FilterPanel";
-import { Network, AlertTriangle } from "lucide-react";
 import { BlockerPanel } from "@/components/strategy/BlockerPanel";
 import { DetailSheet } from "@/components/strategy/DetailSheet";
 import { useStrategyFlow } from "@/hooks/useStrategyFlow";
@@ -191,16 +190,11 @@ const StrategyDashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Network className="h-6 w-6 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground">Strategy Director</h1>
-          </div>
-          <p className="text-muted-foreground ml-14">
-            Navigate strategic goals, initiatives, and identify critical blockers across your portfolio
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Strategy Director Dashboard</h1>
+          <p className="text-muted-foreground">
+            Visual flow mapping of strategic initiatives, projects, and blockers
           </p>
         </div>
 
@@ -214,15 +208,9 @@ const StrategyDashboard = () => {
         />
 
         <Tabs defaultValue="hierarchy" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="hierarchy" className="flex items-center gap-2">
-              <Network className="h-4 w-4" />
-              <span>Hierarchy View</span>
-            </TabsTrigger>
-            <TabsTrigger value="blockers" className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              <span>Blocker Analysis</span>
-            </TabsTrigger>
+          <TabsList>
+            <TabsTrigger value="hierarchy">Hierarchy View</TabsTrigger>
+            <TabsTrigger value="blockers">Blocker Analysis</TabsTrigger>
           </TabsList>
 
           <TabsContent value="hierarchy" className="space-y-6">
