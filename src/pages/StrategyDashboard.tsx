@@ -5,6 +5,7 @@ import { FilterPanel } from "@/components/strategy/FilterPanel";
 import { BlockerPanel } from "@/components/strategy/BlockerPanel";
 import { BlockerFilters } from "@/components/strategy/BlockerFilters";
 import { BlockerAnalysisReport } from "@/components/strategy/BlockerAnalysisReport";
+import { BlockerDetailView } from "@/components/strategy/BlockerDetailView";
 import { DetailSheet } from "@/components/strategy/DetailSheet";
 import { useStrategyFlow } from "@/hooks/useStrategyFlow";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -179,6 +180,8 @@ const mockTasks = [
 const StrategyDashboard = () => {
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedBlockerForDetail, setSelectedBlockerForDetail] = useState<any>(null);
+  const [isBlockerDetailOpen, setIsBlockerDetailOpen] = useState(false);
   
   // Blocker analysis filters
   const [blockerSearchQuery, setBlockerSearchQuery] = useState("");
@@ -230,6 +233,29 @@ const StrategyDashboard = () => {
   });
 
   const handleNodeClick = (node: any) => {
+    // Check if this is a blocked or overdue task/project
+    const isBlocked = node.data.status === "blocked";
+    const isOverdue = node.data.dueDate && new Date(node.data.dueDate) < new Date();
+    
+    if ((isBlocked || isOverdue) && (node.type === "taskNode" || node.type === "projectNode")) {
+      // Find the corresponding blocker from enhanced blocker chains
+      const blocker = enhancedBlockerChains.find(b => {
+        if (node.type === "taskNode") {
+          return b.taskId === node.data.id;
+        } else if (node.type === "projectNode") {
+          return b.projectId === node.data.id;
+        }
+        return false;
+      });
+      
+      if (blocker) {
+        setSelectedBlockerForDetail(blocker);
+        setIsBlockerDetailOpen(true);
+        return;
+      }
+    }
+    
+    // Default behavior for other nodes
     setSelectedNode(node);
     setIsDetailOpen(true);
   };
@@ -320,6 +346,32 @@ const StrategyDashboard = () => {
         onClose={() => setIsDetailOpen(false)}
         node={selectedNode}
       />
+
+      {/* Blocker Detail Sheet */}
+      {selectedBlockerForDetail && (
+        <div className={`fixed inset-y-0 right-0 z-50 w-full sm:w-[600px] bg-background border-l shadow-lg transform transition-transform duration-300 ${
+          isBlockerDetailOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}>
+          <BlockerDetailView
+            blocker={selectedBlockerForDetail}
+            onClose={() => {
+              setIsBlockerDetailOpen(false);
+              setSelectedBlockerForDetail(null);
+            }}
+          />
+        </div>
+      )}
+      
+      {/* Overlay */}
+      {isBlockerDetailOpen && (
+        <div 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+          onClick={() => {
+            setIsBlockerDetailOpen(false);
+            setSelectedBlockerForDetail(null);
+          }}
+        />
+      )}
     </div>
   );
 };
