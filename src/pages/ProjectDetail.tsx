@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send, Target, ListChecks, Clock, TrendingUp, DollarSign, AlertTriangle, FileText, Link2, BarChart3, Flag, Network, Download } from "lucide-react";
+import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send, ListChecks, Clock, TrendingUp, DollarSign, AlertTriangle, FileText, Link2, BarChart3, Flag, Network, Download } from "lucide-react";
+import { AddRiskForm } from "@/components/forms/AddRiskForm";
+import { AddIssueForm } from "@/components/forms/AddIssueForm";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -34,6 +36,8 @@ import { toast } from "sonner";
 const ProjectDetail = () => {
   const { id } = useParams();
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const [isAddRiskOpen, setIsAddRiskOpen] = useState(false);
+  const [isAddIssueOpen, setIsAddIssueOpen] = useState(false);
   const [newTask, setNewTask] = useState({
     name: "",
     description: "",
@@ -201,9 +205,8 @@ const ProjectDetail = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-4 lg:grid-cols-11 w-full">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-10 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="objectives">Objectives</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
             <TabsTrigger value="milestones">Milestones</TabsTrigger>
             <TabsTrigger value="activities">Activities</TabsTrigger>
@@ -342,76 +345,7 @@ const ProjectDetail = () => {
             </div>
           </TabsContent>
 
-          {/* 2️⃣ Objectives & Goals Tab */}
-          <TabsContent value="objectives" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-primary" />
-                      Project Objectives
-                    </CardTitle>
-                    <CardDescription>SMART objectives and expected outcomes</CardDescription>
-                  </div>
-                  <Button size="sm" variant="outline">+ Add Objective</Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {(project as any).objectives?.map((obj: any) => (
-                  <div key={obj.id} className="border rounded-lg p-4 space-y-2">
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-semibold">{obj.title}</h4>
-                      <Badge variant="secondary">Active</Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{obj.description}</p>
-                    <div className="pt-2">
-                      <p className="text-xs text-muted-foreground">Success Metric</p>
-                      <p className="text-sm font-medium">{obj.metrics}</p>
-                    </div>
-                  </div>
-                )) || <p className="text-sm text-muted-foreground text-center py-8">No objectives defined yet</p>}
-              </CardContent>
-            </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Success Criteria</CardTitle>
-                  <CardDescription>What defines project success</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {(project as any).successCriteria?.map((criteria: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
-                        <span className="text-sm">{criteria}</span>
-                      </li>
-                    )) || <p className="text-sm text-muted-foreground">No criteria defined</p>}
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Strategic Alignment</CardTitle>
-                  <CardDescription>Links to organizational goals</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 border rounded-lg">
-                      <p className="text-sm font-medium mb-1">Initiative</p>
-                      <Link to={`/initiatives/${parentInitiative.id}`}>
-                        <p className="text-sm text-primary hover:underline">{parentInitiative.title}</p>
-                      </Link>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* 3️⃣ Tasks & Activities Tab */}
+          {/* 2️⃣ Tasks & Activities Tab */}
           <TabsContent value="tasks" className="space-y-6">
             <Card>
               <CardHeader>
@@ -805,17 +739,6 @@ const ProjectDetail = () => {
               </Card>
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Budget Breakdown</CardTitle>
-                <CardDescription>Expenses by category</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  Budget breakdown not available
-                </p>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           {/* 8️⃣ Risks & Issues Tab */}
@@ -830,7 +753,23 @@ const ProjectDetail = () => {
                     </CardTitle>
                     <CardDescription>Potential risks and mitigation strategies</CardDescription>
                   </div>
-                  <Button size="sm" variant="outline">+ Add Risk</Button>
+                  <Dialog open={isAddRiskOpen} onOpenChange={setIsAddRiskOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="outline">+ Add Risk</Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Add New Risk</DialogTitle>
+                        <DialogDescription>
+                          Identify and document potential risks for this project
+                        </DialogDescription>
+                      </DialogHeader>
+                      <AddRiskForm 
+                        onSuccess={() => setIsAddRiskOpen(false)}
+                        onCancel={() => setIsAddRiskOpen(false)}
+                      />
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardHeader>
               <CardContent>
@@ -885,7 +824,23 @@ const ProjectDetail = () => {
                     </CardTitle>
                     <CardDescription>Current challenges and resolutions</CardDescription>
                   </div>
-                  <Button size="sm" variant="outline">+ Add Issue</Button>
+                  <Dialog open={isAddIssueOpen} onOpenChange={setIsAddIssueOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="outline">+ Add Issue</Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Add New Issue</DialogTitle>
+                        <DialogDescription>
+                          Document issues and challenges affecting this project
+                        </DialogDescription>
+                      </DialogHeader>
+                      <AddIssueForm 
+                        onSuccess={() => setIsAddIssueOpen(false)}
+                        onCancel={() => setIsAddIssueOpen(false)}
+                      />
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardHeader>
               <CardContent>
