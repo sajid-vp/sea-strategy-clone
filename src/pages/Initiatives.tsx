@@ -108,9 +108,17 @@ const Initiatives = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedYear, setSelectedYear] = useState("2025");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [openGoalPopover, setOpenGoalPopover] = useState(false);
+  const [openObjectivePopover, setOpenObjectivePopover] = useState(false);
   const { toast } = useToast();
   const totalInitiatives = goals.reduce((acc, goal) => acc + goal.initiatives.length, 0);
+
+  // Extract all objectives from goals for the form
+  const allObjectives = goals.flatMap(g => 
+    (g as any).objectives?.map((obj: any) => ({
+      ...obj,
+      goalTitle: g.title
+    })) || []
+  );
 
   // Extract unique owners from existing data
   const uniqueOwners = Array.from(
@@ -120,7 +128,7 @@ const Initiatives = () => {
   // Form state
   const [formData, setFormData] = useState({
     title: "",
-    goals: [] as string[],
+    objectives: [] as string[],
     year: "2025",
     owner: "",
     description: "",
@@ -130,12 +138,12 @@ const Initiatives = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleGoalsChange = (goalId: string) => {
+  const handleObjectivesChange = (objectiveId: string) => {
     setFormData(prev => ({
       ...prev,
-      goals: prev.goals.includes(goalId)
-        ? prev.goals.filter(id => id !== goalId)
-        : [...prev.goals, goalId]
+      objectives: prev.objectives.includes(objectiveId)
+        ? prev.objectives.filter(id => id !== objectiveId)
+        : [...prev.objectives, objectiveId]
     }));
   };
 
@@ -143,7 +151,7 @@ const Initiatives = () => {
     e.preventDefault();
     
     // Basic validation
-    if (!formData.title.trim() || formData.goals.length === 0 || !formData.owner.trim()) {
+    if (!formData.title.trim() || formData.objectives.length === 0 || !formData.owner.trim()) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -161,7 +169,7 @@ const Initiatives = () => {
     // Reset form and close dialog
     setFormData({
       title: "",
-      goals: [],
+      objectives: [],
       year: "2025",
       owner: "",
       description: "",
@@ -265,7 +273,7 @@ const Initiatives = () => {
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="owner">By Owner</TabsTrigger>
-              <TabsTrigger value="goal">By Goal</TabsTrigger>
+              <TabsTrigger value="objective">By Objective</TabsTrigger>
             </TabsList>
             
             <div className="flex items-center gap-2">
@@ -336,21 +344,21 @@ const Initiatives = () => {
                         </Select>
                       </div>
 
-                      {/* Goals - searchable multi-select */}
+                      {/* Objectives - searchable multi-select */}
                       <div className="space-y-3">
-                        <Label className="text-sm font-medium">Goals * (Select one or more)</Label>
-                        <Popover open={openGoalPopover} onOpenChange={setOpenGoalPopover}>
+                        <Label className="text-sm font-medium">Objectives * (Select one or more)</Label>
+                        <Popover open={openObjectivePopover} onOpenChange={setOpenObjectivePopover}>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
                               role="combobox"
-                              aria-expanded={openGoalPopover}
+                              aria-expanded={openObjectivePopover}
                               className="w-full justify-between h-auto min-h-10"
                             >
                               <span className="text-muted-foreground">
-                                {formData.goals.length === 0 
-                                  ? "Search and select goals..." 
-                                  : `${formData.goals.length} goal${formData.goals.length > 1 ? 's' : ''} selected`
+                                {formData.objectives.length === 0 
+                                  ? "Search and select objectives..." 
+                                  : `${formData.objectives.length} objective${formData.objectives.length > 1 ? 's' : ''} selected`
                                 }
                               </span>
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -358,29 +366,29 @@ const Initiatives = () => {
                           </PopoverTrigger>
                           <PopoverContent className="w-full p-0" align="start">
                             <Command>
-                              <CommandInput placeholder="Search goals..." />
+                              <CommandInput placeholder="Search objectives..." />
                               <CommandList>
-                                <CommandEmpty>No goals found.</CommandEmpty>
+                                <CommandEmpty>No objectives found.</CommandEmpty>
                                 <CommandGroup>
-                                  {goals.map((goal) => (
+                                  {allObjectives.map((objective: any) => (
                                     <CommandItem
-                                      key={goal.id}
-                                      value={goal.title}
-                                      onSelect={() => handleGoalsChange(goal.id.toString())}
+                                      key={objective.id}
+                                      value={objective.title}
+                                      onSelect={() => handleObjectivesChange(objective.id.toString())}
                                       className="cursor-pointer"
                                     >
                                       <Check
                                         className={cn(
                                           "mr-2 h-4 w-4",
-                                          formData.goals.includes(goal.id.toString())
+                                          formData.objectives.includes(objective.id.toString())
                                             ? "opacity-100"
                                             : "opacity-0"
                                         )}
                                       />
                                       <div className="flex-1">
-                                        <div className="font-medium text-sm">{goal.title}</div>
+                                        <div className="font-medium text-sm">{objective.title}</div>
                                         <div className="text-xs text-muted-foreground line-clamp-1">
-                                          {goal.description}
+                                          {objective.description} • {objective.goalTitle}
                                         </div>
                                       </div>
                                     </CommandItem>
@@ -391,21 +399,21 @@ const Initiatives = () => {
                           </PopoverContent>
                         </Popover>
                         
-                        {/* Selected goals as badges */}
-                        {formData.goals.length > 0 && (
+                        {/* Selected objectives as badges */}
+                        {formData.objectives.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-2">
-                            {formData.goals.map((goalId) => {
-                              const goal = goals.find(g => g.id.toString() === goalId);
-                              return goal ? (
+                            {formData.objectives.map((objectiveId) => {
+                              const objective = allObjectives.find((o: any) => o.id.toString() === objectiveId);
+                              return objective ? (
                                 <Badge 
-                                  key={goalId} 
+                                  key={objectiveId} 
                                   variant="secondary"
                                   className="gap-1 pr-1"
                                 >
-                                  {goal.title}
+                                  {objective.title}
                                   <button
                                     type="button"
-                                    onClick={() => handleGoalsChange(goalId)}
+                                    onClick={() => handleObjectivesChange(objectiveId)}
                                     className="ml-1 hover:bg-muted rounded-sm p-0.5"
                                   >
                                     <X className="h-3 w-3" />
@@ -416,9 +424,9 @@ const Initiatives = () => {
                           </div>
                         )}
                         
-                        {formData.goals.length === 0 && (
+                        {formData.objectives.length === 0 && (
                           <p className="text-xs text-muted-foreground">
-                            Please select at least one goal for this initiative
+                            Please select at least one objective for this initiative
                           </p>
                         )}
                       </div>
@@ -523,7 +531,7 @@ const Initiatives = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="goal" className="mt-0">
+          <TabsContent value="objective" className="mt-0">
             <div className="space-y-8">
               {goals.map((goal) => (
                 <div key={goal.id}>
