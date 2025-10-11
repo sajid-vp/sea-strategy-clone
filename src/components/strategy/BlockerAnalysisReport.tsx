@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertTriangle, ChevronDown, ChevronRight, Target, TrendingUp } from "lucide-react";
+import { AlertTriangle, ChevronDown, ChevronRight, Target } from "lucide-react";
 import { BlockerChainEnhanced } from "@/utils/blockerAnalysis";
 import { BlockerDetailView } from "./BlockerDetailView";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -67,13 +67,6 @@ export const BlockerAnalysisReport = ({ blockers, groupBy }: BlockerAnalysisRepo
 
   const groups = groupedBlockers();
 
-  // Calculate quick wins and critical blockers
-  const quickWins = blockers.filter(b => 
-    b.impactLevel === "high" && b.affectedCount <= 2
-  );
-  const criticalPathBlockers = blockers.filter(b => b.isOnCriticalPath);
-  const cascadingRisks = blockers.filter(b => b.affectedCount > 3);
-
   if (selectedBlocker) {
     return (
       <BlockerDetailView
@@ -85,54 +78,6 @@ export const BlockerAnalysisReport = ({ blockers, groupBy }: BlockerAnalysisRepo
 
   return (
     <div className="space-y-6">
-      {/* Action Items Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-br from-card to-card/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-success" />
-              Quick Wins
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{quickWins.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              High impact, low complexity
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-card to-card/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-destructive" />
-              Critical Path
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{criticalPathBlockers.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Blockers on critical path
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-card to-card/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Target className="h-4 w-4 text-warning" />
-              Cascading Risks
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{cascadingRisks.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Affecting 4+ items
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Blocker Table by Group */}
       <Card>
         <CardHeader>
