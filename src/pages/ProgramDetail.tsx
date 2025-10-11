@@ -248,116 +248,96 @@ const ProgramDetail = () => {
           </TabsContent>
 
           {/* Projects Tab */}
-          <TabsContent value="projects" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <FolderKanban className="h-5 w-5 text-primary" />
-                      Program Projects
-                    </CardTitle>
-                    <CardDescription>{programProjects.length} projects under this program</CardDescription>
-                  </div>
-                  <Button variant="outline" size="sm">+ Add Project</Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {programProjects.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <FolderKanban className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No projects linked to this program yet</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {programProjects.map((project) => (
-                      <Link key={project.id} to={`/projects/${project.id}`}>
-                        <div className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className="font-semibold">{project.title}</h4>
-                                <StatusBadge status={project.status} />
-                              </div>
-                              <p className="text-sm text-muted-foreground">{project.description}</p>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Progress</span>
-                              <span className="font-semibold">{project.progress}%</span>
-                            </div>
-                            <Progress value={project.progress} className="h-2" />
-                          </div>
+          <TabsContent value="projects" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">Program Projects</h3>
+                <p className="text-sm text-muted-foreground">{programProjects.length} projects under this program</p>
+              </div>
+              <Button variant="outline" size="sm">+ Add Project</Button>
+            </div>
+
+            {programProjects.length === 0 ? (
+              <Card className="p-12 text-center">
+                <FolderKanban className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground">No projects linked to this program yet</p>
+              </Card>
+            ) : (
+              programProjects.map((project) => (
+                <Link key={project.id} to={`/projects/${project.id}`}>
+                  <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold">{project.title}</h4>
+                          <StatusBadge status={project.status} />
                         </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                        <p className="text-sm text-muted-foreground">{project.description}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Progress</span>
+                        <span className="font-semibold">{project.progress}%</span>
+                      </div>
+                      <Progress value={project.progress} className="h-2" />
+                    </div>
+                  </Card>
+                </Link>
+              ))
+            )}
           </TabsContent>
 
           {/* Activities Tab */}
-          <TabsContent value="activities" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Activity className="h-5 w-5 text-primary" />
-                      Program Activities
-                    </CardTitle>
-                    <CardDescription>{programActivities.length} activities under this program</CardDescription>
-                  </div>
-                  <Button variant="outline" size="sm">+ Add Activity</Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {programActivities.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No activities linked to this program yet</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {programActivities.map((activity) => (
-                      <Link key={activity.id} to={`/activities/${activity.id}`}>
-                        <div className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className="font-semibold">{activity.title}</h4>
-                                <StatusBadge status={activity.status} />
-                              </div>
-                              <p className="text-sm text-muted-foreground">{activity.description}</p>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Type:</span>
-                              <Badge variant="outline" className="ml-2 text-xs">{activity.type}</Badge>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Frequency:</span>
-                              <span className="ml-2 font-medium capitalize">{activity.frequency}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Owner:</span>
-                              <span className="ml-2 font-medium">{activity.owner}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Duration:</span>
-                              <span className="ml-2 font-medium">{activity.duration} min</span>
-                            </div>
-                          </div>
+          <TabsContent value="activities" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">Program Activities</h3>
+                <p className="text-sm text-muted-foreground">{programActivities.length} activities under this program</p>
+              </div>
+              <Button variant="outline" size="sm">+ Add Activity</Button>
+            </div>
+
+            {programActivities.length === 0 ? (
+              <Card className="p-12 text-center">
+                <Activity className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground">No activities linked to this program yet</p>
+              </Card>
+            ) : (
+              programActivities.map((activity) => (
+                <Link key={activity.id} to={`/activities/${activity.id}`}>
+                  <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold">{activity.title}</h4>
+                          <StatusBadge status={activity.status} />
                         </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                        <p className="text-sm text-muted-foreground">{activity.description}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Type:</span>
+                        <Badge variant="outline" className="ml-2 text-xs">{activity.type}</Badge>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Frequency:</span>
+                        <span className="ml-2 font-medium capitalize">{activity.frequency}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Owner:</span>
+                        <span className="ml-2 font-medium">{activity.owner}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Duration:</span>
+                        <span className="ml-2 font-medium">{activity.duration} min</span>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              ))
+            )}
           </TabsContent>
 
           {/* Team Tab */}
