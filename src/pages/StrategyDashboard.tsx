@@ -301,25 +301,8 @@ const StrategyDashboard = () => {
                 />
               </div>
 
-              {/* Right: Visual Map + Summary */}
+              {/* Right: Active Blockers */}
               <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2">
-                    Visual Dependency Map
-                  </h3>
-                  <div className="h-[400px]">
-                    <FlowCanvas
-                      initialNodes={nodes.filter(n => 
-                        n.data.status === "blocked" || 
-                        n.type === "goalNode" ||
-                        (n.data.dueDate && new Date(n.data.dueDate) < new Date())
-                      )}
-                      initialEdges={edges}
-                      onNodeClick={handleNodeClick}
-                    />
-                  </div>
-                </div>
-                
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-2">
                     Active Blockers
