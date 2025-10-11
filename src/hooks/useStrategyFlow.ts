@@ -12,6 +12,10 @@ export const useStrategyFlow = (
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedOwners, setSelectedOwners] = useState<string[]>([]);
+  const [selectedInitiatives, setSelectedInitiatives] = useState<string[]>([]);
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   
   // Filter data by year
   const filteredInitiatives = useMemo(() => {
@@ -29,16 +33,61 @@ export const useStrategyFlow = (
     return objectives.filter(o => o.year === parseInt(selectedYear));
   }, [objectives, selectedYear]);
   
+  // Filter by selected dimensions
+  const dimensionFilteredData = useMemo(() => {
+    let filteredGoals = goals;
+    let filteredObjs = filteredObjectives;
+    let filteredInits = filteredInitiatives;
+    let filteredProjs = projects;
+    let filteredTasks = tasks;
+
+    // Filter by goals
+    if (selectedGoals.length > 0) {
+      const goalIds = selectedGoals.map(id => parseInt(id));
+      filteredGoals = goals.filter(g => goalIds.includes(g.id));
+      filteredObjs = filteredObjs.filter(o => goalIds.includes(o.goalId));
+    }
+
+    // Filter by initiatives
+    if (selectedInitiatives.length > 0) {
+      const initIds = selectedInitiatives.map(id => parseInt(id));
+      filteredInits = filteredInits.filter(i => initIds.includes(i.id));
+      filteredProjs = filteredProjs.filter(p => initIds.includes(p.initiativeId));
+    }
+
+    // Filter by projects
+    if (selectedProjects.length > 0) {
+      const projIds = selectedProjects.map(id => parseInt(id));
+      filteredProjs = filteredProjs.filter(p => projIds.includes(p.id));
+      filteredTasks = filteredTasks.filter(t => projIds.includes(t.projectId));
+    }
+
+    // Filter by owners
+    if (selectedOwners.length > 0) {
+      filteredInits = filteredInits.filter(i => i.owner && selectedOwners.includes(i.owner));
+      filteredProjs = filteredProjs.filter(p => p.owner && selectedOwners.includes(p.owner));
+      filteredTasks = filteredTasks.filter(t => t.assignee && selectedOwners.includes(t.assignee));
+    }
+
+    return {
+      goals: filteredGoals,
+      objectives: filteredObjs,
+      initiatives: filteredInits,
+      projects: filteredProjs,
+      tasks: filteredTasks,
+    };
+  }, [goals, filteredObjectives, filteredInitiatives, projects, tasks, selectedGoals, selectedInitiatives, selectedProjects, selectedOwners]);
+  
   // Create flow layout
   const { nodes, edges } = useMemo(() => {
     return createHierarchicalLayout(
-      goals,
-      filteredObjectives,
-      filteredInitiatives,
-      projects,
-      tasks
+      dimensionFilteredData.goals,
+      dimensionFilteredData.objectives,
+      dimensionFilteredData.initiatives,
+      dimensionFilteredData.projects,
+      dimensionFilteredData.tasks
     );
-  }, [goals, filteredObjectives, filteredInitiatives, projects, tasks]);
+  }, [dimensionFilteredData]);
   
   // Filter by status
   const filteredNodes = useMemo(() => {
@@ -57,17 +106,27 @@ export const useStrategyFlow = (
   
   // Blocker analysis
   const blockerChains = useMemo(() => {
-    return findBlockerChains(tasks, projects, filteredInitiatives);
-  }, [tasks, projects, filteredInitiatives]);
+    return findBlockerChains(dimensionFilteredData.tasks, dimensionFilteredData.projects, dimensionFilteredData.initiatives);
+  }, [dimensionFilteredData]);
   
   // Critical path
   const criticalPath = useMemo(() => {
-    return calculateCriticalPath(goals, filteredObjectives, filteredInitiatives, projects, tasks);
-  }, [goals, filteredObjectives, filteredInitiatives, projects, tasks]);
+    return calculateCriticalPath(
+      dimensionFilteredData.goals,
+      dimensionFilteredData.objectives,
+      dimensionFilteredData.initiatives,
+      dimensionFilteredData.projects,
+      dimensionFilteredData.tasks
+    );
+  }, [dimensionFilteredData]);
   
   // Statistics
   const stats = useMemo(() => {
-    const allStatuses = [...filteredInitiatives, ...projects, ...tasks].map(item => item.status);
+    const allStatuses = [
+      ...dimensionFilteredData.initiatives,
+      ...dimensionFilteredData.projects,
+      ...dimensionFilteredData.tasks
+    ].map(item => item.status);
     return {
       totalBlocked: allStatuses.filter(s => s === "blocked").length,
       totalAtRisk: allStatuses.filter(s => s === "in-review").length,
@@ -76,7 +135,7 @@ export const useStrategyFlow = (
       totalItems: allStatuses.length,
       onTrackPercentage: Math.round((allStatuses.filter(s => s === "in-progress" || s === "done").length / allStatuses.length) * 100),
     };
-  }, [filteredInitiatives, projects, tasks]);
+  }, [dimensionFilteredData]);
   
   return {
     nodes: searchedNodes,
@@ -87,6 +146,14 @@ export const useStrategyFlow = (
     setSelectedStatus,
     searchQuery,
     setSearchQuery,
+    selectedOwners,
+    setSelectedOwners,
+    selectedInitiatives,
+    setSelectedInitiatives,
+    selectedProjects,
+    setSelectedProjects,
+    selectedGoals,
+    setSelectedGoals,
     blockerChains,
     criticalPath,
     stats,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { FlowCanvas } from "@/components/strategy/FlowCanvas";
 import { FilterPanel } from "@/components/strategy/FilterPanel";
@@ -197,10 +197,27 @@ const StrategyDashboard = () => {
     setSelectedStatus,
     searchQuery,
     setSearchQuery,
+    selectedOwners,
+    setSelectedOwners,
+    selectedInitiatives: selectedHierarchyInitiatives,
+    setSelectedInitiatives: setSelectedHierarchyInitiatives,
+    selectedProjects: selectedHierarchyProjects,
+    setSelectedProjects: setSelectedHierarchyProjects,
+    selectedGoals,
+    setSelectedGoals,
     blockerChains,
     criticalPath,
     stats,
   } = useStrategyFlow(mockGoals, mockObjectives, mockInitiatives, mockProjects, mockTasks);
+
+  // Get unique owners for filter
+  const availableOwners = useMemo(() => {
+    const owners = new Set<string>();
+    mockInitiatives.forEach(i => i.owner && owners.add(i.owner));
+    mockProjects.forEach(p => p.owner && owners.add(p.owner));
+    mockTasks.forEach(t => t.assignee && owners.add(t.assignee));
+    return Array.from(owners).sort();
+  }, []);
 
   // Enhanced blocker chains with additional data
   const enhancedBlockerChains = findBlockerChainsEnhanced(
@@ -277,6 +294,18 @@ const StrategyDashboard = () => {
           setSelectedStatus={setSelectedStatus}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          selectedOwners={selectedOwners}
+          setSelectedOwners={setSelectedOwners}
+          selectedInitiatives={selectedHierarchyInitiatives}
+          setSelectedInitiatives={setSelectedHierarchyInitiatives}
+          selectedProjects={selectedHierarchyProjects}
+          setSelectedProjects={setSelectedHierarchyProjects}
+          selectedGoals={selectedGoals}
+          setSelectedGoals={setSelectedGoals}
+          availableOwners={availableOwners}
+          availableInitiatives={mockInitiatives.map(i => ({ id: i.id, title: i.title }))}
+          availableProjects={mockProjects.map(p => ({ id: p.id, title: p.title }))}
+          availableGoals={mockGoals.map(g => ({ id: g.id, title: g.title }))}
         />
 
         <Tabs defaultValue="hierarchy" className="space-y-6">
