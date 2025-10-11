@@ -17,6 +17,7 @@ import TaskDetail from "./pages/TaskDetail";
 import GoalDetail from "./pages/GoalDetail";
 import Activities from "./pages/Activities";
 import ActivityDetail from "./pages/ActivityDetail";
+import StrategyDashboard from "./pages/StrategyDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/tasks/:id" element={<TaskDetail />} />
           <Route path="/activities" element={<Activities />} />
           <Route path="/activities/:id" element={<ActivityDetail />} />
+          <Route path="/strategy" element={<StrategyDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
