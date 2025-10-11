@@ -1,4 +1,5 @@
 import { Node, Edge } from "reactflow";
+import { isOverdue } from "./overdueUtils";
 
 export interface FlowData {
   nodes: Node[];
@@ -97,6 +98,8 @@ export const createHierarchicalLayout = (
     const initProjects = projects.filter(p => p.initiativeId === initiative.id);
     
     initProjects.forEach((project, index) => {
+      const projectOverdue = isOverdue(project.dueDate);
+      
       nodes.push({
         id: `project-${project.id}`,
         type: "projectNode",
@@ -113,8 +116,11 @@ export const createHierarchicalLayout = (
         source: `initiative-${initiative.id}`,
         target: `project-${project.id}`,
         type: "smoothstep",
-        animated: false,
-        style: { stroke: project.status === "blocked" ? "hsl(var(--destructive))" : undefined },
+        animated: project.status === "blocked" || projectOverdue,
+        style: { 
+          stroke: projectOverdue || project.status === "blocked" ? "hsl(var(--destructive))" : undefined,
+          strokeWidth: projectOverdue ? 3 : undefined,
+        },
       });
     });
     
@@ -127,6 +133,8 @@ export const createHierarchicalLayout = (
     const projTasks = tasks.filter(t => t.projectId === project.id).slice(0, 3); // Limit to 3 tasks per project
     
     projTasks.forEach((task, index) => {
+      const taskOverdue = isOverdue(task.dueDate);
+      
       nodes.push({
         id: `task-${task.id}`,
         type: "taskNode",
@@ -143,10 +151,10 @@ export const createHierarchicalLayout = (
         source: `project-${project.id}`,
         target: `task-${task.id}`,
         type: "smoothstep",
-        animated: task.status === "blocked",
+        animated: task.status === "blocked" || taskOverdue,
         style: { 
-          stroke: task.status === "blocked" ? "hsl(var(--destructive))" : undefined,
-          strokeWidth: task.status === "blocked" ? 3 : 1,
+          stroke: taskOverdue || task.status === "blocked" ? "hsl(var(--destructive))" : undefined,
+          strokeWidth: taskOverdue || task.status === "blocked" ? 3 : 1,
         },
       });
     });

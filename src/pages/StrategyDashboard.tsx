@@ -95,6 +95,7 @@ const mockProjects = [
     status: "in-progress",
     progress: 65,
     owner: "Michael Chen",
+    dueDate: "2025-11-15",
   },
   {
     id: 2,
@@ -103,6 +104,7 @@ const mockProjects = [
     status: "in-progress",
     progress: 40,
     owner: "David Kim",
+    dueDate: "2025-12-01",
   },
   {
     id: 3,
@@ -111,6 +113,7 @@ const mockProjects = [
     status: "blocked",
     progress: 20,
     owner: "Robert Martinez",
+    dueDate: "2025-10-01", // Overdue
   },
 ];
 
@@ -122,6 +125,7 @@ const mockTasks = [
     status: "done",
     assignee: "Alice Wong",
     dependencies: [],
+    dueDate: "2025-09-15",
   },
   {
     id: 2,
@@ -130,6 +134,7 @@ const mockTasks = [
     status: "in-progress",
     assignee: "Bob Smith",
     dependencies: [1],
+    dueDate: "2025-10-20",
   },
   {
     id: 3,
@@ -139,6 +144,7 @@ const mockTasks = [
     assignee: "Charlie Brown",
     dependencies: [2],
     blockingReason: "Waiting for security approval",
+    dueDate: "2025-10-05", // Overdue
   },
   {
     id: 4,
@@ -147,6 +153,7 @@ const mockTasks = [
     status: "in-progress",
     assignee: "Diana Prince",
     dependencies: [],
+    dueDate: "2025-11-30",
   },
   {
     id: 5,
@@ -155,6 +162,7 @@ const mockTasks = [
     status: "done",
     assignee: "Eva Green",
     dependencies: [],
+    dueDate: "2025-09-01",
   },
   {
     id: 6,
@@ -164,6 +172,7 @@ const mockTasks = [
     assignee: "Frank Miller",
     dependencies: [5],
     blockingReason: "Budget approval pending",
+    dueDate: "2025-09-30", // Overdue
   },
 ];
 
@@ -300,7 +309,11 @@ const StrategyDashboard = () => {
                   </h3>
                   <div className="h-[400px]">
                     <FlowCanvas
-                      initialNodes={nodes.filter(n => n.data.status === "blocked" || n.type === "goalNode")}
+                      initialNodes={nodes.filter(n => 
+                        n.data.status === "blocked" || 
+                        n.type === "goalNode" ||
+                        (n.data.dueDate && new Date(n.data.dueDate) < new Date())
+                      )}
                       initialEdges={edges}
                       onNodeClick={handleNodeClick}
                     />

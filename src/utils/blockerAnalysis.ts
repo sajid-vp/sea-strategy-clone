@@ -83,7 +83,77 @@ export const findBlockerChainsEnhanced = (
 ): BlockerChainEnhanced[] => {
   const chains = findBlockerChains(tasks, projects, initiatives);
   
-  return chains.map(chain => {
+  // Add overdue items as blockers/risks
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const overdueItems: BlockerChain[] = [];
+  
+  // Find overdue tasks that aren't already blocked
+  tasks.forEach(task => {
+    if (task.status !== "blocked" && task.status !== "done" && task.dueDate) {
+      const dueDate = new Date(task.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      
+      if (dueDate < today) {
+        const project = projects.find(p => p.id === task.projectId);
+        const initiative = project ? initiatives.find(i => i.id === project.initiativeId) : null;
+        
+        const affectedTasks = tasks.filter(t => 
+          t.dependencies && t.dependencies.includes(task.id)
+        );
+        
+        const daysOverdue = Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        overdueItems.push({
+          taskId: task.id,
+          taskTitle: task.title,
+          projectId: project?.id,
+          projectTitle: project?.title,
+          initiativeId: initiative?.id,
+          initiativeTitle: initiative?.title,
+          impactLevel: daysOverdue > 7 ? "high" : daysOverdue > 3 ? "medium" : "low",
+          affectedCount: affectedTasks.length,
+          blockingReason: `Task is ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue`,
+        });
+      }
+    }
+  });
+  
+  // Find overdue projects
+  projects.forEach(project => {
+    if (project.status !== "blocked" && project.status !== "done" && project.dueDate) {
+      const dueDate = new Date(project.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      
+      if (dueDate < today) {
+        const initiative = initiatives.find(i => i.id === project.initiativeId);
+        const projectTasks = tasks.filter(t => t.projectId === project.id);
+        const daysOverdue = Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // Only add if not already in chains
+        const exists = chains.some(c => c.projectId === project.id);
+        if (!exists) {
+          overdueItems.push({
+            taskId: project.id * 1000, // Use large ID to avoid conflicts
+            taskTitle: project.title,
+            projectId: project.id,
+            projectTitle: project.title,
+            initiativeId: initiative?.id,
+            initiativeTitle: initiative?.title,
+            impactLevel: daysOverdue > 7 ? "high" : daysOverdue > 3 ? "medium" : "low",
+            affectedCount: projectTasks.length,
+            blockingReason: `Project is ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue`,
+          });
+        }
+      }
+    }
+  });
+  
+  // Combine blocked and overdue items
+  const allChains = [...chains, ...overdueItems];
+  
+  return allChains.map(chain => {
     const task = tasks.find(t => t.id === chain.taskId);
     const project = projects.find(p => p.id === chain.projectId);
     
