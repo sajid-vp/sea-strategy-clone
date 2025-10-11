@@ -48,7 +48,7 @@ const Programs = () => {
     startDate: "",
     endDate: "",
     budget: "",
-    status: "planned",
+      status: "todo",
   });
 
   const filteredPrograms = programs.filter((program) => {
@@ -77,7 +77,7 @@ const Programs = () => {
       startDate: "",
       endDate: "",
       budget: "",
-      status: "planned",
+      status: "todo",
     });
   };
 
@@ -88,16 +88,6 @@ const Programs = () => {
         ? prev.initiativeIds.filter(id => id !== initiativeId)
         : [...prev.initiativeIds, initiativeId]
     }));
-  };
-
-  const getStatusVariant = (status: string) => {
-    const map: Record<string, "todo" | "in-progress" | "done" | "blocked"> = {
-      "planned": "todo",
-      "active": "in-progress",
-      "on-hold": "blocked",
-      "closed": "done"
-    };
-    return map[status] || "todo";
   };
 
   return (
@@ -235,10 +225,11 @@ const Programs = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="planned">Planned</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="on-hold">On Hold</SelectItem>
-                        <SelectItem value="closed">Closed</SelectItem>
+                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="in-review">In Review</SelectItem>
+                        <SelectItem value="blocked">Blocked</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -316,10 +307,11 @@ const Programs = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="planned">Planned</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="on-hold">On Hold</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
+              <SelectItem value="todo">To Do</SelectItem>
+              <SelectItem value="in-progress">In Progress</SelectItem>
+              <SelectItem value="in-review">In Review</SelectItem>
+              <SelectItem value="blocked">Blocked</SelectItem>
+              <SelectItem value="done">Done</SelectItem>
             </SelectContent>
           </Select>
           <Select value={initiativeFilter} onValueChange={setInitiativeFilter}>
@@ -352,7 +344,7 @@ const Programs = () => {
                         <FolderKanban className="h-5 w-5 text-primary" />
                         <h3 className="text-xl font-semibold text-foreground">{program.title}</h3>
                         <span className="text-sm font-mono text-muted-foreground">{program.code}</span>
-                        <StatusBadge status={getStatusVariant(program.status)} />
+                        <StatusBadge status={program.status} />
                       </div>
                       <p className="text-sm text-muted-foreground mb-4">{program.description}</p>
                       

@@ -37,16 +37,6 @@ const ProgramDetail = () => {
   const initiative = initiatives.find(i => i.id === program.initiativeId);
   const programProjects = initiative?.projects.filter(p => (p as any).programId === program.id) || [];
   const programActivities = getActivitiesByProgram(program.id);
-  
-  const getStatusVariant = (status: string) => {
-    const map: Record<string, "todo" | "in-progress" | "done" | "blocked"> = {
-      "planned": "todo",
-      "active": "in-progress",
-      "on-hold": "blocked",
-      "closed": "done"
-    };
-    return map[status] || "todo";
-  };
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -79,7 +69,7 @@ const ProgramDetail = () => {
                 <FolderKanban className="h-8 w-8 text-primary" />
                 <h1 className="text-3xl font-bold text-foreground">{program.title}</h1>
                 <Badge variant="outline" className="text-xs">{program.code}</Badge>
-                <StatusBadge status={getStatusVariant(program.status)} />
+                <StatusBadge status={program.status} />
               </div>
               <p className="text-muted-foreground mb-4">{program.description}</p>
             </div>
@@ -160,7 +150,7 @@ const ProgramDetail = () => {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">Status</p>
-                      <StatusBadge status={getStatusVariant(program.status)} />
+                      <StatusBadge status={program.status} />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">Start Date</p>

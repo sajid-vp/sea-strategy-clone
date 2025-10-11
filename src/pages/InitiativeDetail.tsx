@@ -415,7 +415,7 @@ const InitiativeDetail = () => {
                         </div>
                         <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
                       </div>
-                      <StatusBadge status={program.status === "planned" ? "todo" : program.status === "active" ? "in-progress" : program.status === "on-hold" ? "blocked" : "done"} />
+                      <StatusBadge status={program.status} />
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
                       <div>

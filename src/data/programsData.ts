@@ -1,4 +1,4 @@
-type Status = "planned" | "active" | "on-hold" | "closed";
+type Status = "todo" | "in-progress" | "in-review" | "blocked" | "done";
 
 export interface Program {
   id: number;
@@ -46,7 +46,7 @@ export const programs: Program[] = [
     title: "Digital Infrastructure Modernization",
     code: "PRG-001",
     description: "Comprehensive program to modernize IT infrastructure and enhance security across the organization",
-    status: "active",
+    status: "in-progress",
     initiativeId: 1,
     owner: "John Smith",
     manager: "Sarah Johnson",
@@ -97,7 +97,7 @@ export const programs: Program[] = [
     title: "Digital Learning Platform",
     code: "PRG-002",
     description: "Program to develop and implement a comprehensive digital learning ecosystem",
-    status: "active",
+    status: "in-progress",
     initiativeId: 2,
     owner: "Dr. Lisa Wang",
     manager: "Robert Martinez",
@@ -148,7 +148,7 @@ export const programs: Program[] = [
     title: "Student Success Initiative",
     code: "PRG-003",
     description: "Multi-faceted program to improve student retention, engagement, and success outcomes",
-    status: "planned",
+    status: "todo",
     initiativeId: 2,
     owner: "Dr. Michael Stevens",
     manager: "Amanda Wilson",
