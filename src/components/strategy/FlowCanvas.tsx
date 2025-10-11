@@ -54,14 +54,14 @@ export const FlowCanvas = ({ initialNodes, initialEdges, onNodeClick }: FlowCanv
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{
-          padding: 0.3,
+          padding: 0.4,
           includeHiddenNodes: false,
           minZoom: 0.5,
-          maxZoom: 1,
+          maxZoom: 1.2,
+          duration: 800,
         }}
         minZoom={0.2}
         maxZoom={1.5}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
       >
         <Background />
         <Controls />

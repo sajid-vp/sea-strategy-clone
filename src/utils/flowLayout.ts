@@ -15,8 +15,8 @@ export const createHierarchicalLayout = (
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   
-  const LEVEL_SPACING = 300;
-  const NODE_SPACING = 150;
+  const LEVEL_SPACING = 350;
+  const NODE_SPACING = 180;
   
   // Level 1: Goals
   goals.forEach((goal, index) => {
