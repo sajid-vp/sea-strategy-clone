@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, User, Users, Calendar, Target, Plus, MessageSquare, Send, FolderKanban, Activity, Pencil } from "lucide-react";
+import { ArrowLeft, User, Users, Calendar, Target, Plus, MessageSquare, Send, FolderKanban, Activity, Pencil, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -142,7 +142,10 @@ const InitiativeDetail = () => {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [isAddKPIDialogOpen, setIsAddKPIDialogOpen] = useState(false);
   const [isEditKPIDialogOpen, setIsEditKPIDialogOpen] = useState(false);
+  const [isUpdateProgressDialogOpen, setIsUpdateProgressDialogOpen] = useState(false);
   const [editingKPI, setEditingKPI] = useState<KPI | null>(null);
+  const [updatingKPI, setUpdatingKPI] = useState<KPI | null>(null);
+  const [progressUpdateValue, setProgressUpdateValue] = useState("");
   const [newKPIData, setNewKPIData] = useState({
     name: "",
     description: "",
@@ -284,11 +287,37 @@ const InitiativeDetail = () => {
 
     toast({
       title: "Success",
-      description: "KPI updated successfully",
+      description: "KPI details updated successfully",
     });
 
     setEditingKPI(null);
     setIsEditKPIDialogOpen(false);
+  };
+
+  const handleOpenProgressUpdate = (kpi: KPI) => {
+    setUpdatingKPI(kpi);
+    setProgressUpdateValue(kpi.currentValue);
+    setIsUpdateProgressDialogOpen(true);
+  };
+
+  const handleUpdateProgress = () => {
+    if (!updatingKPI || !progressUpdateValue.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid progress value",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Progress Updated",
+      description: `${updatingKPI.name} updated to ${progressUpdateValue}${updatingKPI.unit}`,
+    });
+
+    setUpdatingKPI(null);
+    setProgressUpdateValue("");
+    setIsUpdateProgressDialogOpen(false);
   };
 
   const getStatusColor = (status: KPI["status"]) => {
@@ -658,6 +687,15 @@ const InitiativeDetail = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleOpenProgressUpdate(kpi)}
+                          className="gap-1"
+                        >
+                          <TrendingUp className="h-4 w-4" />
+                          Update
+                        </Button>
+                        <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEditKPI(kpi)}
@@ -717,13 +755,13 @@ const InitiativeDetail = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Edit KPI Dialog */}
+        {/* Edit KPI Dialog - For editing KPI structure/details */}
         <Dialog open={isEditKPIDialogOpen} onOpenChange={setIsEditKPIDialogOpen}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Edit KPI</DialogTitle>
+              <DialogTitle>Edit KPI Details</DialogTitle>
               <DialogDescription>
-                Update the key performance indicator details
+                Update KPI structure, target values, owner, and tracking settings
               </DialogDescription>
             </DialogHeader>
             {editingKPI && (
@@ -744,7 +782,7 @@ const InitiativeDetail = () => {
                     onChange={(e) => setEditingKPI({ ...editingKPI, description: e.target.value })}
                   />
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="edit-target-value">Target Value *</Label>
                     <Input
@@ -752,15 +790,6 @@ const InitiativeDetail = () => {
                       type="number"
                       value={editingKPI.targetValue}
                       onChange={(e) => setEditingKPI({ ...editingKPI, targetValue: e.target.value })}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="edit-current-value">Current Value</Label>
-                    <Input
-                      id="edit-current-value"
-                      type="number"
-                      value={editingKPI.currentValue}
-                      onChange={(e) => setEditingKPI({ ...editingKPI, currentValue: e.target.value })}
                     />
                   </div>
                   <div className="grid gap-2">
@@ -800,20 +829,15 @@ const InitiativeDetail = () => {
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="edit-status">Status</Label>
-                  <Select
-                    value={editingKPI.status}
-                    onValueChange={(value: any) => setEditingKPI({ ...editingKPI, status: value })}
-                  >
-                    <SelectTrigger id="edit-status">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="on-track">On Track</SelectItem>
-                      <SelectItem value="at-risk">At Risk</SelectItem>
-                      <SelectItem value="off-track">Off Track</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label>Tracked By</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {editingKPI.trackedBy.map((tracker, idx) => (
+                      <span key={idx}>
+                        {tracker.type.charAt(0).toUpperCase() + tracker.type.slice(1)}: {tracker.name}
+                        {idx < editingKPI.trackedBy.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
+                  </p>
                 </div>
               </div>
             )}
@@ -821,7 +845,70 @@ const InitiativeDetail = () => {
               <Button variant="outline" onClick={() => setIsEditKPIDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleUpdateKPI}>Update KPI</Button>
+              <Button onClick={handleUpdateKPI}>Save Changes</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Update Progress Dialog - For updating current value */}
+        <Dialog open={isUpdateProgressDialogOpen} onOpenChange={setIsUpdateProgressDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Update KPI Progress</DialogTitle>
+              <DialogDescription>
+                Update the current value for {updatingKPI?.name}
+              </DialogDescription>
+            </DialogHeader>
+            {updatingKPI && (
+              <div className="grid gap-4 py-4">
+                <div className="p-4 bg-muted rounded-lg space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Current Value:</span>
+                    <span className="font-semibold">{updatingKPI.currentValue} {updatingKPI.unit}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Target Value:</span>
+                    <span className="font-semibold">{updatingKPI.targetValue} {updatingKPI.unit}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Tracked By:</span>
+                    <span className="font-medium text-xs">
+                      {updatingKPI.trackedBy.map(t => t.type).join(", ")}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="progress-value">New Current Value *</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="progress-value"
+                      type="number"
+                      placeholder={updatingKPI.currentValue}
+                      value={progressUpdateValue}
+                      onChange={(e) => setProgressUpdateValue(e.target.value)}
+                      className="flex-1"
+                    />
+                    <div className="flex items-center px-3 border rounded-md bg-muted text-sm">
+                      {updatingKPI.unit}
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Enter the latest value based on {updatingKPI.trackedBy.length > 0 
+                      ? updatingKPI.trackedBy.map(t => t.name).join(", ") 
+                      : "manual tracking"}
+                  </p>
+                </div>
+              </div>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsUpdateProgressDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateProgress}>
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Update Progress
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
