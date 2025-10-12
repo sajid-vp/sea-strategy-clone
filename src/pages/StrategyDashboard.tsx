@@ -283,18 +283,18 @@ const StrategyDashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 py-4">
-        <div className="mb-3">
+      <main className="container mx-auto px-6 py-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground">Strategy Director Dashboard</h1>
         </div>
 
-        <Tabs defaultValue="hierarchy" className="space-y-3">
+        <Tabs defaultValue="hierarchy" className="space-y-6">
           <TabsList>
             <TabsTrigger value="hierarchy">Hierarchy View</TabsTrigger>
             <TabsTrigger value="blockers">Blocker Analysis</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="hierarchy" className="space-y-3">
+          <TabsContent value="hierarchy" className="space-y-6">
             <FilterPanel
               selectedYear={selectedYear}
               setSelectedYear={setSelectedYear}
