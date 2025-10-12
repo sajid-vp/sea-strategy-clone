@@ -1,25 +1,15 @@
-import { Search, X, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState } from "react";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 
 interface FilterPanelProps {
   selectedYear: string;
@@ -62,8 +52,6 @@ export const FilterPanel = ({
   availableProjects,
   availableGoals,
 }: FilterPanelProps) => {
-  const [showAdvanced, setShowAdvanced] = useState(false);
-
   const toggleOwner = (owner: string) => {
     setSelectedOwners(
       selectedOwners.includes(owner)
@@ -106,361 +94,245 @@ export const FilterPanel = ({
     setSelectedGoals([]);
   };
 
-  const hasActiveFilters = selectedYear !== "all" || selectedStatus !== "all" || 
-    searchQuery !== "" || selectedOwners.length > 0 || selectedInitiatives.length > 0 || 
-    selectedProjects.length > 0 || selectedGoals.length > 0;
-
-  const hasAdvancedFilters = selectedOwners.length > 0 || selectedInitiatives.length > 0 || 
-    selectedProjects.length > 0 || selectedGoals.length > 0;
+  const activeFilters = selectedOwners.length + selectedInitiatives.length + 
+    selectedProjects.length + selectedGoals.length +
+    (selectedYear !== "all" ? 1 : 0) + (selectedStatus !== "all" ? 1 : 0);
 
   return (
-    <Card className="p-4 mb-6">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">Filters</h3>
-          <div className="flex items-center gap-2">
-            {hasAdvancedFilters && (
-              <Badge variant="secondary" className="text-xs">
-                {selectedOwners.length + selectedInitiatives.length + selectedProjects.length + selectedGoals.length} advanced
-              </Badge>
-            )}
-            {hasActiveFilters && (
-              <Button variant="ghost" size="sm" onClick={clearAllFilters}>
-                Clear All
-              </Button>
-            )}
-          </div>
+    <div className="space-y-4 mb-6">
+      <div className="flex flex-wrap gap-3 items-center">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[200px] max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search items..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
         </div>
 
-        {/* Main Filters Row */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="relative md:col-span-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search items..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          
-          {/* Year */}
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger>
-              <SelectValue placeholder="Year" />
-            </SelectTrigger>
-            <SelectContent className="bg-background z-50">
-              <SelectItem value="all">All Years</SelectItem>
-              <SelectItem value="2025">2025</SelectItem>
-              <SelectItem value="2026">2026</SelectItem>
-              <SelectItem value="2027">2027</SelectItem>
-              <SelectItem value="2028">2028</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          {/* Status */}
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-            <SelectTrigger>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent className="bg-background z-50">
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="blocked">Blocked</SelectItem>
-              <SelectItem value="in-review">At Risk</SelectItem>
-              <SelectItem value="in-progress">On Track</SelectItem>
-              <SelectItem value="done">Done</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Year Filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Year
+              {selectedYear !== "all" && (
+                <Badge variant="secondary" className="ml-2">1</Badge>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuLabel>Year</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              checked={selectedYear === "all"}
+              onCheckedChange={() => setSelectedYear("all")}
+            >
+              All Years
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={selectedYear === "2025"}
+              onCheckedChange={() => setSelectedYear("2025")}
+            >
+              2025
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={selectedYear === "2026"}
+              onCheckedChange={() => setSelectedYear("2026")}
+            >
+              2026
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={selectedYear === "2027"}
+              onCheckedChange={() => setSelectedYear("2027")}
+            >
+              2027
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={selectedYear === "2028"}
+              onCheckedChange={() => setSelectedYear("2028")}
+            >
+              2028
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-        {/* Advanced Filters Toggle */}
-        <div>
+        {/* Status Filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Status
+              {selectedStatus !== "all" && (
+                <Badge variant="secondary" className="ml-2">1</Badge>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuLabel>Status</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              checked={selectedStatus === "all"}
+              onCheckedChange={() => setSelectedStatus("all")}
+            >
+              All Status
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={selectedStatus === "blocked"}
+              onCheckedChange={() => setSelectedStatus("blocked")}
+            >
+              Blocked
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={selectedStatus === "in-review"}
+              onCheckedChange={() => setSelectedStatus("in-review")}
+            >
+              At Risk
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={selectedStatus === "in-progress"}
+              onCheckedChange={() => setSelectedStatus("in-progress")}
+            >
+              On Track
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={selectedStatus === "done"}
+              onCheckedChange={() => setSelectedStatus("done")}
+            >
+              Done
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Goals Filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Goals
+              {selectedGoals.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {selectedGoals.length}
+                </Badge>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-64">
+            <DropdownMenuLabel>Goals</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {availableGoals.map((goal) => (
+              <DropdownMenuCheckboxItem
+                key={goal.id}
+                checked={selectedGoals.includes(String(goal.id))}
+                onCheckedChange={() => toggleGoal(String(goal.id))}
+              >
+                {goal.title}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Initiatives Filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Initiatives
+              {selectedInitiatives.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {selectedInitiatives.length}
+                </Badge>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-64">
+            <DropdownMenuLabel>Initiatives</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {availableInitiatives.map((initiative) => (
+              <DropdownMenuCheckboxItem
+                key={initiative.id}
+                checked={selectedInitiatives.includes(String(initiative.id))}
+                onCheckedChange={() => toggleInitiative(String(initiative.id))}
+              >
+                {initiative.title}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Projects Filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Projects
+              {selectedProjects.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {selectedProjects.length}
+                </Badge>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-64">
+            <DropdownMenuLabel>Projects</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {availableProjects.map((project) => (
+              <DropdownMenuCheckboxItem
+                key={project.id}
+                checked={selectedProjects.includes(String(project.id))}
+                onCheckedChange={() => toggleProject(String(project.id))}
+              >
+                {project.title}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Owners Filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Owners
+              {selectedOwners.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {selectedOwners.length}
+                </Badge>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-64">
+            <DropdownMenuLabel>Owners</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {availableOwners.map((owner) => (
+              <DropdownMenuCheckboxItem
+                key={owner}
+                checked={selectedOwners.includes(owner)}
+                onCheckedChange={() => toggleOwner(owner)}
+              >
+                {owner}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Active Filters */}
+      {activeFilters > 0 && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>{activeFilters} filter{activeFilters > 1 ? 's' : ''} active</span>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="w-full justify-between"
+            onClick={clearAllFilters}
+            className="h-auto py-0 px-2"
           >
-            <span className="text-sm">Advanced Filters</span>
-            {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            Clear all
           </Button>
         </div>
-
-        {/* Advanced Filters Section */}
-        {showAdvanced && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t">
-            {/* Goals Multi-Select */}
-            <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                className={cn(
-                  "justify-between font-normal",
-                  selectedGoals.length === 0 && "text-muted-foreground"
-                )}
-              >
-                {selectedGoals.length === 0
-                  ? "Select goals..."
-                  : `${selectedGoals.length} goal${selectedGoals.length > 1 ? 's' : ''} selected`}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[300px] p-0 bg-background z-50" align="start">
-              <Command>
-                <CommandInput placeholder="Search goals..." />
-                <CommandList>
-                  <CommandEmpty>No goals found.</CommandEmpty>
-                  <CommandGroup>
-                    <ScrollArea className="h-[200px]">
-                      {availableGoals.map((goal) => (
-                        <CommandItem
-                          key={goal.id}
-                          onSelect={() => toggleGoal(String(goal.id))}
-                        >
-                          <div className="flex items-center gap-2 w-full">
-                            <div className={cn(
-                              "h-4 w-4 border rounded-sm flex items-center justify-center",
-                              selectedGoals.includes(String(goal.id))
-                                ? "bg-primary border-primary"
-                                : "border-input"
-                            )}>
-                              {selectedGoals.includes(String(goal.id)) && (
-                                <Check className="h-3 w-3 text-primary-foreground" />
-                              )}
-                            </div>
-                            <span className="flex-1">{goal.title}</span>
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </ScrollArea>
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-            </Popover>
-
-            {/* Initiatives Multi-Select */}
-            <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                className={cn(
-                  "justify-between font-normal",
-                  selectedInitiatives.length === 0 && "text-muted-foreground"
-                )}
-              >
-                {selectedInitiatives.length === 0
-                  ? "Select initiatives..."
-                  : `${selectedInitiatives.length} initiative${selectedInitiatives.length > 1 ? 's' : ''} selected`}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[300px] p-0 bg-background z-50" align="start">
-              <Command>
-                <CommandInput placeholder="Search initiatives..." />
-                <CommandList>
-                  <CommandEmpty>No initiatives found.</CommandEmpty>
-                  <CommandGroup>
-                    <ScrollArea className="h-[200px]">
-                      {availableInitiatives.map((initiative) => (
-                        <CommandItem
-                          key={initiative.id}
-                          onSelect={() => toggleInitiative(String(initiative.id))}
-                        >
-                          <div className="flex items-center gap-2 w-full">
-                            <div className={cn(
-                              "h-4 w-4 border rounded-sm flex items-center justify-center",
-                              selectedInitiatives.includes(String(initiative.id))
-                                ? "bg-primary border-primary"
-                                : "border-input"
-                            )}>
-                              {selectedInitiatives.includes(String(initiative.id)) && (
-                                <Check className="h-3 w-3 text-primary-foreground" />
-                              )}
-                            </div>
-                            <span className="flex-1">{initiative.title}</span>
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </ScrollArea>
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-
-          {/* Projects Multi-Select */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                className={cn(
-                  "justify-between font-normal",
-                  selectedProjects.length === 0 && "text-muted-foreground"
-                )}
-              >
-                {selectedProjects.length === 0
-                  ? "Select projects..."
-                  : `${selectedProjects.length} project${selectedProjects.length > 1 ? 's' : ''} selected`}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[300px] p-0 bg-background z-50" align="start">
-              <Command>
-                <CommandInput placeholder="Search projects..." />
-                <CommandList>
-                  <CommandEmpty>No projects found.</CommandEmpty>
-                  <CommandGroup>
-                    <ScrollArea className="h-[200px]">
-                      {availableProjects.map((project) => (
-                        <CommandItem
-                          key={project.id}
-                          onSelect={() => toggleProject(String(project.id))}
-                        >
-                          <div className="flex items-center gap-2 w-full">
-                            <div className={cn(
-                              "h-4 w-4 border rounded-sm flex items-center justify-center",
-                              selectedProjects.includes(String(project.id))
-                                ? "bg-primary border-primary"
-                                : "border-input"
-                            )}>
-                              {selectedProjects.includes(String(project.id)) && (
-                                <Check className="h-3 w-3 text-primary-foreground" />
-                              )}
-                            </div>
-                            <span className="flex-1">{project.title}</span>
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </ScrollArea>
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-
-          {/* Owners Multi-Select */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                className={cn(
-                  "justify-between font-normal",
-                  selectedOwners.length === 0 && "text-muted-foreground"
-                )}
-              >
-                {selectedOwners.length === 0
-                  ? "Select owners..."
-                  : `${selectedOwners.length} owner${selectedOwners.length > 1 ? 's' : ''} selected`}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[300px] p-0 bg-background z-50" align="start">
-              <Command>
-                <CommandInput placeholder="Search owners..." />
-                <CommandList>
-                  <CommandEmpty>No owners found.</CommandEmpty>
-                  <CommandGroup>
-                    <ScrollArea className="h-[200px]">
-                      {availableOwners.map((owner) => (
-                        <CommandItem
-                          key={owner}
-                          onSelect={() => toggleOwner(owner)}
-                        >
-                          <div className="flex items-center gap-2 w-full">
-                            <div className={cn(
-                              "h-4 w-4 border rounded-sm flex items-center justify-center",
-                              selectedOwners.includes(owner)
-                                ? "bg-primary border-primary"
-                                : "border-input"
-                            )}>
-                              {selectedOwners.includes(owner) && (
-                                <Check className="h-3 w-3 text-primary-foreground" />
-                              )}
-                            </div>
-                            <span className="flex-1">{owner}</span>
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </ScrollArea>
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-            </Popover>
-          </div>
-        )}
-
-        {/* Active Filter Badges */}
-        {hasActiveFilters && (
-          <div className="flex flex-wrap gap-2 pt-2 border-t">
-            {selectedYear !== "all" && (
-              <Badge variant="secondary" className="gap-1">
-                Year: {selectedYear}
-                <X 
-                  className="h-3 w-3 cursor-pointer hover:text-destructive" 
-                  onClick={() => setSelectedYear("all")}
-                />
-              </Badge>
-            )}
-            {selectedStatus !== "all" && (
-              <Badge variant="secondary" className="gap-1">
-                Status: {selectedStatus}
-                <X 
-                  className="h-3 w-3 cursor-pointer hover:text-destructive" 
-                  onClick={() => setSelectedStatus("all")}
-                />
-              </Badge>
-            )}
-            {selectedOwners.map(owner => (
-              <Badge key={owner} variant="secondary" className="gap-1">
-                {owner}
-                <X 
-                  className="h-3 w-3 cursor-pointer hover:text-destructive" 
-                  onClick={() => setSelectedOwners(selectedOwners.filter(o => o !== owner))}
-                />
-              </Badge>
-            ))}
-            {selectedGoals.map(goalId => {
-              const goal = availableGoals.find(g => String(g.id) === goalId);
-              return goal ? (
-                <Badge key={goalId} variant="secondary" className="gap-1">
-                  {goal.title}
-                  <X 
-                    className="h-3 w-3 cursor-pointer hover:text-destructive" 
-                    onClick={() => setSelectedGoals(selectedGoals.filter(g => g !== goalId))}
-                  />
-                </Badge>
-              ) : null;
-            })}
-            {selectedInitiatives.map(initId => {
-              const initiative = availableInitiatives.find(i => String(i.id) === initId);
-              return initiative ? (
-                <Badge key={initId} variant="secondary" className="gap-1">
-                  {initiative.title}
-                  <X 
-                    className="h-3 w-3 cursor-pointer hover:text-destructive" 
-                    onClick={() => setSelectedInitiatives(selectedInitiatives.filter(i => i !== initId))}
-                  />
-                </Badge>
-              ) : null;
-            })}
-            {selectedProjects.map(projId => {
-              const project = availableProjects.find(p => String(p.id) === projId);
-              return project ? (
-                <Badge key={projId} variant="secondary" className="gap-1">
-                  {project.title}
-                  <X 
-                    className="h-3 w-3 cursor-pointer hover:text-destructive" 
-                    onClick={() => setSelectedProjects(selectedProjects.filter(p => p !== projId))}
-                  />
-                </Badge>
-              ) : null;
-            })}
-          </div>
-        )}
-      </div>
-    </Card>
+      )}
+    </div>
   );
 };
