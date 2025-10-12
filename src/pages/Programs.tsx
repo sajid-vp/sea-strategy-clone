@@ -4,9 +4,11 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
+import { StatCard } from "@/components/StatCard";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -22,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, FolderKanban, Target, TrendingUp, DollarSign, Users, Check, ChevronsUpDown, X } from "lucide-react";
+import { Plus, FolderKanban, Target, TrendingUp, DollarSign, Users, Check, ChevronsUpDown, X, List, BarChart3 } from "lucide-react";
 import { programs } from "@/data/programsData";
 import { initiatives } from "@/data/projectsData";
 import { Progress } from "@/components/ui/progress";
@@ -33,9 +35,8 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 
 const Programs = () => {
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [initiativeFilter, setInitiativeFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [selectedYear, setSelectedYear] = useState("2025");
   const [isAddProgramOpen, setIsAddProgramOpen] = useState(false);
   const [openInitiativePopover, setOpenInitiativePopover] = useState(false);
   const [newProgram, setNewProgram] = useState({
@@ -48,17 +49,21 @@ const Programs = () => {
     startDate: "",
     endDate: "",
     budget: "",
-      status: "todo",
+    status: "todo",
   });
 
-  const filteredPrograms = programs.filter((program) => {
-    const matchesStatus = statusFilter === "all" || program.status === statusFilter;
-    const matchesInitiative = initiativeFilter === "all" || program.initiativeId === Number(initiativeFilter);
-    const matchesSearch = program.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         program.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         program.code.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesInitiative && matchesSearch;
-  });
+  // Calculate stats
+  const totalPrograms = programs.length;
+  const activePrograms = programs.filter(p => p.status === "in-progress").length;
+  const completedPrograms = programs.filter(p => p.status === "done").length;
+  const blockedPrograms = programs.filter(p => p.status === "blocked").length;
+  const avgProgress = Math.round(
+    programs.reduce((sum, p) => sum + p.progress, 0) / totalPrograms
+  );
+  const totalBudget = programs.reduce((sum, p) => {
+    const budget = parseFloat(p.budget.replace(/[$,]/g, ''));
+    return sum + (isNaN(budget) ? 0 : budget);
+  }, 0);
 
   const handleAddProgram = () => {
     if (!newProgram.title || !newProgram.code || !newProgram.owner || !newProgram.startDate) {
@@ -95,10 +100,96 @@ const Programs = () => {
       <Header />
 
       <main className="container mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Programs</h1>
+        {/* Year Filter */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-foreground">Programs</h1>
+          <div className="w-40">
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2025">2025</SelectItem>
+                <SelectItem value="2026">2026</SelectItem>
+                <SelectItem value="2027">2027</SelectItem>
+                <SelectItem value="2028">2028</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            title="Total Programs"
+            value={totalPrograms}
+            subtitle={selectedYear}
+            className="border-l-4 border-l-secondary-foreground"
+            icon={<FolderKanban className="h-5 w-5 text-primary" />}
+          />
+
+          <StatCard
+            title="Program Status"
+            value=""
+            className="border-l-4 border-l-secondary-foreground"
+            icon={<BarChart3 className="h-5 w-5 text-primary" />}
+          >
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-success" />
+                  <span className="text-muted-foreground">Active:</span>
+                </div>
+                <span className="font-semibold">{activePrograms}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
+                  <span className="text-muted-foreground">Completed:</span>
+                </div>
+                <span className="font-semibold">{completedPrograms}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-destructive" />
+                  <span className="text-muted-foreground">Blocked:</span>
+                </div>
+                <span className="font-semibold">{blockedPrograms}</span>
+              </div>
+            </div>
+          </StatCard>
+
+          <StatCard
+            title="Overall Progress"
+            value={`${avgProgress}%`}
+            className="border-l-4 border-l-secondary-foreground"
+            icon={<TrendingUp className="h-5 w-5 text-primary" />}
+          >
+            <div className="mt-2">
+              <div className="text-xs text-muted-foreground mb-1">Average</div>
+              <Progress value={avgProgress} className="h-2" />
+            </div>
+          </StatCard>
+
+          <StatCard
+            title="Total Budget"
+            value={`$${(totalBudget / 1000000).toFixed(1)}M`}
+            subtitle="Allocated"
+            className="border-l-4 border-l-secondary-foreground"
+            icon={<DollarSign className="h-5 w-5 text-primary" />}
+          />
+        </div>
+
+        {/* Programs */}
+        <Tabs defaultValue="overview" className="w-full">
+          <div className="flex items-center justify-between mb-6">
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="owner">By Owner</TabsTrigger>
+              <TabsTrigger value="initiative">By Initiative</TabsTrigger>
+            </TabsList>
+            
+            <div className="flex items-center gap-2">
           <Dialog open={isAddProgramOpen} onOpenChange={setIsAddProgramOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
@@ -289,121 +380,232 @@ const Programs = () => {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
 
-        {/* Filters */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Input
-            placeholder="Search programs..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="todo">To Do</SelectItem>
-              <SelectItem value="in-progress">In Progress</SelectItem>
-              <SelectItem value="in-review">In Review</SelectItem>
-              <SelectItem value="blocked">Blocked</SelectItem>
-              <SelectItem value="done">Done</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={initiativeFilter} onValueChange={setInitiativeFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by initiative" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Initiatives</SelectItem>
-              {initiatives.map((initiative) => (
-                <SelectItem key={initiative.id} value={String(initiative.id)}>
-                  {initiative.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Programs Grid */}
-        <div className="grid gap-4">
-          {filteredPrograms.map((program) => {
-            const initiative = initiatives.find(i => i.id === program.initiativeId);
-            const projectCount = initiative?.projects.filter(p => (p as any).programId === program.id).length || 0;
-            
-            return (
-              <Link key={program.id} to={`/programs/${program.id}`}>
-                <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <FolderKanban className="h-5 w-5 text-primary" />
-                        <h3 className="text-xl font-semibold text-foreground">{program.title}</h3>
-                        <span className="text-sm font-mono text-muted-foreground">{program.code}</span>
-                        <StatusBadge status={program.status} />
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-4">{program.description}</p>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-                        <div>
-                          <div className="text-xs text-muted-foreground mb-1">Initiative</div>
-                          <div className="text-sm font-medium flex items-center gap-1">
-                            <Target className="h-3.5 w-3.5" />
-                            {initiative?.title || "N/A"}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-muted-foreground mb-1">Projects</div>
-                          <div className="text-sm font-medium flex items-center gap-1">
-                            <FolderKanban className="h-3.5 w-3.5" />
-                            {projectCount} projects
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-muted-foreground mb-1">Owner</div>
-                          <div className="text-sm font-medium flex items-center gap-1">
-                            <Users className="h-3.5 w-3.5" />
-                            {program.owner}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-muted-foreground mb-1">Budget</div>
-                          <div className="text-sm font-medium flex items-center gap-1">
-                            <DollarSign className="h-3.5 w-3.5" />
-                            {program.budget}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-muted-foreground mb-1">Progress</div>
-                          <div className="text-sm font-medium flex items-center gap-1">
-                            <TrendingUp className="h-3.5 w-3.5" />
-                            {program.progress}%
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Progress</span>
-                          <span className="font-semibold">{program.progress}%</span>
-                        </div>
-                        <Progress value={program.progress} className="h-2" />
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-
-        {filteredPrograms.length === 0 && (
-          <div className="text-center py-12">
-            <FolderKanban className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <p className="text-muted-foreground">No programs found matching your filters</p>
+              <div className="flex items-center gap-1 border rounded-md p-1">
+                <Button
+                  variant={viewMode === "grid" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="h-8 w-8 p-0"
+                >
+                  <FolderKanban className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="h-8 w-8 p-0"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
-        )}
+
+          <TabsContent value="overview">
+            <div className={viewMode === "grid" 
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              : "space-y-3"
+            }>
+              {programs.map((program) => {
+                const initiative = initiatives.find(i => i.id === program.initiativeId);
+                const projectCount = initiative?.projects.filter(p => (p as any).programId === program.id).length || 0;
+                
+                return (
+                  <Link key={program.id} to={`/programs/${program.id}`}>
+                    <Card className="p-6 hover:shadow-lg transition-all cursor-pointer h-full">
+                      <div className="flex flex-col h-full">
+                        <div className="flex items-start gap-3 mb-4">
+                          <FolderKanban className="h-5 w-5 text-primary mt-1" />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-foreground mb-1 truncate">{program.title}</h3>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xs font-mono text-muted-foreground">{program.code}</span>
+                              <StatusBadge status={program.status} />
+                            </div>
+                            <p className="text-sm text-muted-foreground line-clamp-2">{program.description}</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3 mt-auto">
+                          <div>
+                            <div className="flex items-center justify-between text-sm mb-1">
+                              <span className="text-muted-foreground">Progress</span>
+                              <span className="font-semibold">{program.progress}%</span>
+                            </div>
+                            <Progress value={program.progress} className="h-2" />
+                          </div>
+
+                          <div className="pt-3 border-t space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Owner:</span>
+                              <span className="font-medium truncate ml-2">{program.owner}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Budget:</span>
+                              <span className="font-medium">{program.budget}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Projects:</span>
+                              <span className="font-medium">{projectCount}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="owner" className="space-y-4">
+            {Array.from(
+              new Set(programs.map(p => p.owner))
+            ).map((owner) => {
+              const ownerPrograms = programs.filter(p => p.owner === owner);
+
+              return (
+                <div key={owner}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      {owner}
+                    </h3>
+                    <span className="text-sm text-muted-foreground">
+                      {ownerPrograms.length} program{ownerPrograms.length > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <div className={viewMode === "grid" 
+                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    : "space-y-3"
+                  }>
+                    {ownerPrograms.map((program) => {
+                      const initiative = initiatives.find(i => i.id === program.initiativeId);
+                      const projectCount = initiative?.projects.filter(p => (p as any).programId === program.id).length || 0;
+
+                      return (
+                        <Link key={program.id} to={`/programs/${program.id}`}>
+                          <Card className="p-6 hover:shadow-lg transition-all cursor-pointer h-full">
+                            <div className="flex flex-col h-full">
+                              <div className="flex items-start gap-3 mb-4">
+                                <FolderKanban className="h-5 w-5 text-primary mt-1" />
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-semibold text-foreground mb-1 truncate">{program.title}</h3>
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-xs font-mono text-muted-foreground">{program.code}</span>
+                                    <StatusBadge status={program.status} />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="space-y-3 mt-auto">
+                                <div>
+                                  <div className="flex items-center justify-between text-sm mb-1">
+                                    <span className="text-muted-foreground">Progress</span>
+                                    <span className="font-semibold">{program.progress}%</span>
+                                  </div>
+                                  <Progress value={program.progress} className="h-2" />
+                                </div>
+
+                                <div className="pt-3 border-t space-y-2">
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">Budget:</span>
+                                    <span className="font-medium">{program.budget}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">Projects:</span>
+                                    <span className="font-medium">{projectCount}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </TabsContent>
+
+          <TabsContent value="initiative" className="space-y-4">
+            {initiatives.map((initiative) => {
+              const initiativePrograms = programs.filter(
+                (p) => p.initiativeId === initiative.id
+              );
+
+              if (initiativePrograms.length === 0) return null;
+
+              return (
+                <div key={initiative.id}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                      <Target className="h-5 w-5 text-primary" />
+                      {initiative.title}
+                    </h3>
+                    <span className="text-sm text-muted-foreground">
+                      {initiativePrograms.length} program{initiativePrograms.length > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <div className={viewMode === "grid" 
+                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    : "space-y-3"
+                  }>
+                    {initiativePrograms.map((program) => {
+                      const projectCount = initiative.projects.filter(p => (p as any).programId === program.id).length || 0;
+
+                      return (
+                        <Link key={program.id} to={`/programs/${program.id}`}>
+                          <Card className="p-6 hover:shadow-lg transition-all cursor-pointer h-full">
+                            <div className="flex flex-col h-full">
+                              <div className="flex items-start gap-3 mb-4">
+                                <FolderKanban className="h-5 w-5 text-primary mt-1" />
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-semibold text-foreground mb-1 truncate">{program.title}</h3>
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-xs font-mono text-muted-foreground">{program.code}</span>
+                                    <StatusBadge status={program.status} />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="space-y-3 mt-auto">
+                                <div>
+                                  <div className="flex items-center justify-between text-sm mb-1">
+                                    <span className="text-muted-foreground">Progress</span>
+                                    <span className="font-semibold">{program.progress}%</span>
+                                  </div>
+                                  <Progress value={program.progress} className="h-2" />
+                                </div>
+
+                                <div className="pt-3 border-t space-y-2">
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">Owner:</span>
+                                    <span className="font-medium truncate ml-2">{program.owner}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">Budget:</span>
+                                    <span className="font-medium">{program.budget}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">Projects:</span>
+                                    <span className="font-medium">{projectCount}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
