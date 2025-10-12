@@ -41,32 +41,83 @@ export const useStrategyFlow = (
     let filteredProjs = projects;
     let filteredTasks = tasks;
 
-    // Filter by goals
-    if (selectedGoals.length > 0) {
-      const goalIds = selectedGoals.map(id => parseInt(id));
-      filteredGoals = goals.filter(g => goalIds.includes(g.id));
-      filteredObjs = filteredObjs.filter(o => goalIds.includes(o.goalId));
-    }
-
-    // Filter by initiatives
-    if (selectedInitiatives.length > 0) {
-      const initIds = selectedInitiatives.map(id => parseInt(id));
-      filteredInits = filteredInits.filter(i => initIds.includes(i.id));
-      filteredProjs = filteredProjs.filter(p => initIds.includes(p.initiativeId));
-    }
-
-    // Filter by projects
+    // Filter by projects (show complete pathway)
     if (selectedProjects.length > 0) {
       const projIds = selectedProjects.map(id => parseInt(id));
       filteredProjs = filteredProjs.filter(p => projIds.includes(p.id));
+      
+      // Include parent initiatives for selected projects
+      const relatedInitIds = new Set(filteredProjs.map(p => p.initiativeId));
+      filteredInits = filteredInits.filter(i => relatedInitIds.has(i.id));
+      
+      // Include parent objectives for related initiatives
+      const relatedObjIds = new Set(filteredInits.map(i => i.objectiveId));
+      filteredObjs = filteredObjs.filter(o => relatedObjIds.has(o.id));
+      
+      // Include parent goals for related objectives
+      const relatedGoalIds = new Set(filteredObjs.map(o => o.goalId));
+      filteredGoals = filteredGoals.filter(g => relatedGoalIds.has(g.id));
+      
+      // Include tasks for selected projects
       filteredTasks = filteredTasks.filter(t => projIds.includes(t.projectId));
     }
+    // Filter by initiatives (show complete pathway)
+    else if (selectedInitiatives.length > 0) {
+      const initIds = selectedInitiatives.map(id => parseInt(id));
+      filteredInits = filteredInits.filter(i => initIds.includes(i.id));
+      
+      // Include parent objectives for selected initiatives
+      const relatedObjIds = new Set(filteredInits.map(i => i.objectiveId));
+      filteredObjs = filteredObjs.filter(o => relatedObjIds.has(o.id));
+      
+      // Include parent goals for related objectives
+      const relatedGoalIds = new Set(filteredObjs.map(o => o.goalId));
+      filteredGoals = filteredGoals.filter(g => relatedGoalIds.has(g.id));
+      
+      // Include child projects and tasks
+      filteredProjs = filteredProjs.filter(p => initIds.includes(p.initiativeId));
+      const projIds = new Set(filteredProjs.map(p => p.id));
+      filteredTasks = filteredTasks.filter(t => projIds.has(t.projectId));
+    }
+    // Filter by goals (show complete pathway)
+    else if (selectedGoals.length > 0) {
+      const goalIds = selectedGoals.map(id => parseInt(id));
+      filteredGoals = goals.filter(g => goalIds.includes(g.id));
+      
+      // Include child objectives
+      filteredObjs = filteredObjs.filter(o => goalIds.includes(o.goalId));
+      
+      // Include child initiatives
+      const objIds = new Set(filteredObjs.map(o => o.id));
+      filteredInits = filteredInits.filter(i => objIds.has(i.objectiveId));
+      
+      // Include child projects
+      const initIds = new Set(filteredInits.map(i => i.id));
+      filteredProjs = filteredProjs.filter(p => initIds.has(p.initiativeId));
+      
+      // Include child tasks
+      const projIds = new Set(filteredProjs.map(p => p.id));
+      filteredTasks = filteredTasks.filter(t => projIds.has(t.projectId));
+    }
 
-    // Filter by owners
+    // Apply owner filter (if any other filters are active, filter within them)
     if (selectedOwners.length > 0) {
       filteredInits = filteredInits.filter(i => i.owner && selectedOwners.includes(i.owner));
       filteredProjs = filteredProjs.filter(p => p.owner && selectedOwners.includes(p.owner));
       filteredTasks = filteredTasks.filter(t => t.assignee && selectedOwners.includes(t.assignee));
+      
+      // If we filtered by owners, ensure we keep the parent chain for remaining items
+      if (selectedGoals.length === 0 && selectedInitiatives.length === 0 && selectedProjects.length === 0) {
+        const initIds = new Set(filteredInits.map(i => i.id));
+        const objIds = new Set(filteredInits.map(i => i.objectiveId));
+        filteredObjs = filteredObjs.filter(o => objIds.has(o.id));
+        
+        const goalIds = new Set(filteredObjs.map(o => o.goalId));
+        filteredGoals = filteredGoals.filter(g => goalIds.has(g.id));
+        
+        const projIds = new Set(filteredProjs.map(p => p.id));
+        filteredProjs = filteredProjs.filter(p => initIds.has(p.initiativeId) || projIds.has(p.id));
+      }
     }
 
     return {
