@@ -104,6 +104,12 @@ export const useStrategyFlow = (
     );
   }, [filteredNodes, searchQuery]);
   
+  // Filter edges to only show connections between visible nodes
+  const filteredEdges = useMemo(() => {
+    const nodeIds = new Set(searchedNodes.map(node => node.id));
+    return edges.filter(edge => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+  }, [edges, searchedNodes]);
+  
   // Blocker analysis
   const blockerChains = useMemo(() => {
     return findBlockerChains(dimensionFilteredData.tasks, dimensionFilteredData.projects, dimensionFilteredData.initiatives);
@@ -139,7 +145,7 @@ export const useStrategyFlow = (
   
   return {
     nodes: searchedNodes,
-    edges,
+    edges: filteredEdges,
     selectedYear,
     setSelectedYear,
     selectedStatus,
