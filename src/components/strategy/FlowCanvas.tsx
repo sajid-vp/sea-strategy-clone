@@ -53,7 +53,7 @@ export const FlowCanvas = ({ initialNodes, initialEdges, onNodeClick }: FlowCanv
   );
 
   return (
-    <div className="h-[calc(100vh-160px)] w-full border rounded-lg bg-card">
+    <div className="h-[calc(100vh-280px)] w-full border rounded-lg bg-card">
       <ReactFlow
         nodes={nodes}
         edges={edges}
