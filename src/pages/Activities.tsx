@@ -425,7 +425,7 @@ const Activities = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 gap-4" : "space-y-4"}>
+            <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-6"}>
               {activities.map(renderActivityCard)}
             </div>
           </TabsContent>
@@ -443,7 +443,7 @@ const Activities = () => {
                     {ownerActivities.length} {ownerActivities.length === 1 ? "activity" : "activities"}
                   </span>
                 </div>
-                <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 gap-4" : "space-y-4"}>
+                <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-6"}>
                   {ownerActivities.map(renderActivityCard)}
                 </div>
               </div>
@@ -463,7 +463,7 @@ const Activities = () => {
                     {typeActivities.length} {typeActivities.length === 1 ? "activity" : "activities"}
                   </span>
                 </div>
-                <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 gap-4" : "space-y-4"}>
+                <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-6"}>
                   {typeActivities.map(renderActivityCard)}
                 </div>
               </div>
