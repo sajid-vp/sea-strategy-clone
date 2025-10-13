@@ -52,6 +52,11 @@ const milestoneSchema = z.object({
     .min(0, { message: "Progress must be at least 0" })
     .max(100, { message: "Progress cannot exceed 100" })
     .default(0),
+  budget: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/, { message: "Budget must be a valid number" })
+    .optional()
+    .or(z.literal("")),
 });
 
 type MilestoneFormValues = z.infer<typeof milestoneSchema>;
@@ -69,6 +74,7 @@ export function AddMilestoneForm({ onSuccess, onCancel }: AddMilestoneFormProps)
       description: "",
       status: "todo",
       progress: 0,
+      budget: "",
     },
   });
 
@@ -173,6 +179,24 @@ export function AddMilestoneForm({ onSuccess, onCancel }: AddMilestoneFormProps)
                   placeholder="0"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="budget"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Budget (Optional)</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Enter budget amount (e.g., 50000)"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />

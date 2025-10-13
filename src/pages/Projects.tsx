@@ -17,6 +17,7 @@ import { Header } from "@/components/Header";
 import { FolderKanban, List, BarChart3, TrendingUp, Users, Plus, Check, ChevronsUpDown, X } from "lucide-react";
 import { initiatives, getAllProjects } from "@/data/projectsData";
 import { programs } from "@/data/programsData";
+import { mapToAggregatedStatus } from "@/types/status";
 import {
   Dialog,
   DialogContent,
@@ -56,7 +57,24 @@ const Projects = () => {
     projectType: "Strategic",
   });
   
-  const allProjects = getAllProjects();
+  const getAllProjectsList = getAllProjects();
+  
+  const totalProjects = initiatives.reduce((acc, init) => acc + init.projects.length, 0);
+  const onTrackProjects = initiatives.reduce((acc, init) => 
+    acc + init.projects.filter(p => mapToAggregatedStatus(p.status, p.progress) === "on-track").length, 0
+  );
+  const atRiskProjects = initiatives.reduce((acc, init) => 
+    acc + init.projects.filter(p => mapToAggregatedStatus(p.status, p.progress) === "at-risk").length, 0
+  );
+  const offTrackProjects = initiatives.reduce((acc, init) => 
+    acc + init.projects.filter(p => mapToAggregatedStatus(p.status, p.progress) === "off-track").length, 0
+  );
+  
+  const avgProgress = totalProjects > 0 ? Math.round(
+    initiatives.reduce((acc, init) => 
+      acc + init.projects.reduce((sum, p) => sum + p.progress, 0), 0
+    ) / totalProjects
+  ) : 0;
 
   const handleAddProject = () => {
     if (!newProject.title || !newProject.owner || newProject.initiativeIds.length === 0) {
@@ -79,7 +97,7 @@ const Projects = () => {
       budget: "",
       initiativeIds: [],
       programIds: [],
-      status: "planned",
+      status: "todo",
       projectType: "Strategic",
     });
   };
@@ -102,22 +120,7 @@ const Projects = () => {
     }));
   };
 
-  const totalProjects = initiatives.reduce((acc, init) => acc + init.projects.length, 0);
-  const onTrackProjects = initiatives.reduce((acc, init) => 
-    acc + init.projects.filter(p => p.status === "in-progress").length, 0
-  );
-  const atRiskProjects = initiatives.reduce((acc, init) => 
-    acc + init.projects.filter(p => p.status === "in-review").length, 0
-  );
-  const offTrackProjects = initiatives.reduce((acc, init) => 
-    acc + init.projects.filter(p => p.status === "blocked").length, 0
-  );
-  
-  const avgProgress = Math.round(
-    initiatives.reduce((acc, init) => 
-      acc + init.projects.reduce((sum, p) => sum + p.progress, 0), 0
-    ) / totalProjects
-  );
+  const allProjects = getAllProjectsList;
 
   return (
     <div className="min-h-screen bg-background">
@@ -456,12 +459,11 @@ const Projects = () => {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="planned">Planned</SelectItem>
+                            <SelectItem value="todo">To Do</SelectItem>
                             <SelectItem value="in-progress">In Progress</SelectItem>
                             <SelectItem value="in-review">In Review</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                            <SelectItem value="on-hold">On Hold</SelectItem>
                             <SelectItem value="blocked">Blocked</SelectItem>
+                            <SelectItem value="done">Done</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

@@ -15,6 +15,7 @@ import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { LayoutGrid, List, Target, Flag, TrendingUp, BarChart3, Users, User, Plus, Check, ChevronsUpDown, X } from "lucide-react";
+import { mapToAggregatedStatus } from "@/types/status";
 import {
   Dialog,
   DialogContent,
@@ -110,7 +111,15 @@ const Initiatives = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openObjectivePopover, setOpenObjectivePopover] = useState(false);
   const { toast } = useToast();
-  const totalInitiatives = goals.reduce((acc, goal) => acc + goal.initiatives.length, 0);
+  const allInitiatives = goals.flatMap(g => g.initiatives);
+  const totalInitiatives = allInitiatives.length;
+  
+  // Calculate real stats using aggregated status
+  const onTrackCount = allInitiatives.filter(i => mapToAggregatedStatus(i.status) === "on-track").length;
+  const atRiskCount = allInitiatives.filter(i => mapToAggregatedStatus(i.status) === "at-risk").length;
+  const offTrackCount = allInitiatives.filter(i => mapToAggregatedStatus(i.status) === "off-track").length;
+  const doneCount = allInitiatives.filter(i => mapToAggregatedStatus(i.status) === "done").length;
+  const avgProgress = totalInitiatives > 0 ? Math.round(((onTrackCount + doneCount) / totalInitiatives) * 100) : 0;
 
   // Extract all objectives from goals for the form
   const allObjectives = goals.flatMap(g => 
@@ -223,17 +232,12 @@ const Initiatives = () => {
           />
           
           <StatCard
-            title="Key Initiatives"
-            value="0"
+            title="Done"
+            value={doneCount}
             subtitle="2025"
-            className="border-l-4 border-l-secondary-foreground"
+            className="border-l-4 border-l-primary"
             icon={<Flag className="h-5 w-5 text-primary" />}
-          >
-            <div className="mt-2">
-              <div className="text-xs text-muted-foreground mb-1">Progress</div>
-              <Progress value={0} className="h-2 bg-destructive" />
-            </div>
-          </StatCard>
+          />
 
           <StatCard
             title="Initiative Status"
@@ -247,34 +251,34 @@ const Initiatives = () => {
                   <div className="h-2 w-2 rounded-full bg-success" />
                   <span className="text-muted-foreground">On Track:</span>
                 </div>
-                <span className="font-semibold">2</span>
+                <span className="font-semibold">{onTrackCount}</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-warning" />
                   <span className="text-muted-foreground">At Risk:</span>
                 </div>
-                <span className="font-semibold">0</span>
+                <span className="font-semibold">{atRiskCount}</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-destructive" />
                   <span className="text-muted-foreground">Off Track:</span>
                 </div>
-                <span className="font-semibold">2</span>
+                <span className="font-semibold">{offTrackCount}</span>
               </div>
             </div>
           </StatCard>
 
           <StatCard
             title="Overall Progress"
-            value="50%"
+            value={`${avgProgress}%`}
             className="border-l-4 border-l-secondary-foreground"
             icon={<TrendingUp className="h-5 w-5 text-primary" />}
           >
             <div className="mt-2">
               <div className="text-xs text-muted-foreground mb-1">Progress</div>
-              <Progress value={50} className="h-2" />
+              <Progress value={avgProgress} className="h-2" />
             </div>
           </StatCard>
         </div>

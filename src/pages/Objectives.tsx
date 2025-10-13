@@ -14,7 +14,8 @@ import { Progress } from "@/components/ui/progress";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { Target, Flag, TrendingUp, BarChart3, Plus, ChevronRight } from "lucide-react";
+import { Target, Flag, TrendingUp, BarChart3, Plus, ChevronRight, AlertTriangle } from "lucide-react";
+import { mapToAggregatedStatus } from "@/types/status";
 import {
   Dialog,
   DialogContent,
@@ -92,8 +93,9 @@ const Objectives = () => {
   
   const allObjectives = goals.flatMap(g => g.objectives);
   const totalObjectives = allObjectives.length;
-  const onTrackCount = allObjectives.filter(o => o.status === "in-progress").length;
-  const offTrackCount = allObjectives.filter(o => o.status === "blocked").length;
+  const onTrackCount = allObjectives.filter(o => mapToAggregatedStatus(o.status) === "on-track").length;
+  const atRiskCount = allObjectives.filter(o => mapToAggregatedStatus(o.status) === "at-risk").length;
+  const offTrackCount = allObjectives.filter(o => mapToAggregatedStatus(o.status) === "off-track").length;
   const progress = totalObjectives > 0 ? (onTrackCount / totalObjectives) * 100 : 0;
 
   const [formData, setFormData] = useState({
@@ -174,12 +176,28 @@ const Objectives = () => {
           />
 
           <StatCard
-            title="Off Track"
-            value={offTrackCount}
-            subtitle="2025"
-            className="border-l-4 border-l-destructive"
-            icon={<BarChart3 className="h-5 w-5 text-destructive" />}
-          />
+            title="Objective Status"
+            value=""
+            className="border-l-4 border-l-secondary-foreground"
+            icon={<BarChart3 className="h-5 w-5 text-primary" />}
+          >
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-warning" />
+                  <span className="text-muted-foreground">At Risk:</span>
+                </div>
+                <span className="font-semibold">{atRiskCount}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-destructive" />
+                  <span className="text-muted-foreground">Off Track:</span>
+                </div>
+                <span className="font-semibold">{offTrackCount}</span>
+              </div>
+            </div>
+          </StatCard>
 
           <StatCard
             title="Overall Progress"
