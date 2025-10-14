@@ -5,20 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const objectiveSchema = z.object({
   title: z.string().trim().min(3, { message: "Title must be at least 3 characters" }).max(100, { message: "Title must be less than 100 characters" }),
   description: z.string().trim().max(500, { message: "Description must be less than 500 characters" }).optional(),
   owner: z.string().trim().min(2, { message: "Owner must be at least 2 characters" }).max(100, { message: "Owner must be less than 100 characters" }),
-  startDate: z.string().min(1, { message: "Start date is required" }),
-  endDate: z.string().min(1, { message: "End date is required" }),
+  startDate: z.date({ required_error: "Start date is required" }),
+  endDate: z.date({ required_error: "End date is required" }),
   status: z.enum(["todo", "in-progress", "in-review", "blocked", "done"]),
 }).refine((data) => {
-  const start = new Date(data.startDate);
-  const end = new Date(data.endDate);
-  return end >= start;
+  return data.endDate >= data.startDate;
 }, {
   message: "End date must be after or equal to start date",
   path: ["endDate"],
@@ -38,15 +41,13 @@ export function AddObjectiveForm({ onSuccess, onCancel }: AddObjectiveFormProps)
       title: "",
       description: "",
       owner: "",
-      startDate: "",
-      endDate: "",
       status: "todo",
     },
   });
 
   function onSubmit(data: ObjectiveFormValues) {
-    const startYear = new Date(data.startDate).getFullYear();
-    const endYear = new Date(data.endDate).getFullYear();
+    const startYear = data.startDate.getFullYear();
+    const endYear = data.endDate.getFullYear();
     const yearSpan = endYear - startYear + 1;
     
     console.log("New objective:", {
@@ -109,11 +110,37 @@ export function AddObjectiveForm({ onSuccess, onCancel }: AddObjectiveFormProps)
             control={form.control}
             name="startDate"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col">
                 <FormLabel>Start Date</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
@@ -123,11 +150,37 @@ export function AddObjectiveForm({ onSuccess, onCancel }: AddObjectiveFormProps)
             control={form.control}
             name="endDate"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col">
                 <FormLabel>End Date</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
