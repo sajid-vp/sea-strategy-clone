@@ -33,6 +33,7 @@ import {
   FolderKanban,
 } from "lucide-react";
 import { toast } from "sonner";
+import { AddGoalForm } from "@/components/forms/AddGoalForm";
 
 const goals = [
   {
@@ -96,6 +97,7 @@ const Index = () => {
   const [tempVision, setTempVision] = useState(vision);
   const [tempMission, setTempMission] = useState(mission);
   const [selectedPeriod, setSelectedPeriod] = useState("all");
+  const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
 
   const handleSaveVision = () => {
     setVision(tempVision);
@@ -222,9 +224,9 @@ const Index = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">Goals</h2>
-            <div className="w-64">
+            <div className="flex items-center gap-3">
               <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-                <SelectTrigger>
+                <SelectTrigger className="w-64">
                   <SelectValue placeholder="Filter by period" />
                 </SelectTrigger>
                 <SelectContent>
@@ -234,6 +236,28 @@ const Index = () => {
                   <SelectItem value="2027-2028">2027-2028</SelectItem>
                 </SelectContent>
               </Select>
+              
+              <Dialog open={isAddGoalOpen} onOpenChange={setIsAddGoalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    New Goal
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Create New Goal</DialogTitle>
+                    <DialogDescription>
+                      Add a new strategic goal to guide your organization's direction
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <AddGoalForm 
+                    onSuccess={() => setIsAddGoalOpen(false)}
+                    onCancel={() => setIsAddGoalOpen(false)}
+                  />
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
