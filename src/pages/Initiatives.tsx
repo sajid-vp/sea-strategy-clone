@@ -24,14 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { cn } from "@/lib/utils";
+import { AddInitiativeForm } from "@/components/forms/AddInitiativeForm";
 
 const goals = [
   {
@@ -109,8 +102,6 @@ const Initiatives = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedYear, setSelectedYear] = useState("2025");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [openObjectivePopover, setOpenObjectivePopover] = useState(false);
-  const { toast } = useToast();
   const allInitiatives = goals.flatMap(g => g.initiatives);
   const totalInitiatives = allInitiatives.length;
   
@@ -120,83 +111,6 @@ const Initiatives = () => {
   const offTrackCount = allInitiatives.filter(i => mapToAggregatedStatus(i.status) === "off-track").length;
   const doneCount = allInitiatives.filter(i => mapToAggregatedStatus(i.status) === "done").length;
   const avgProgress = totalInitiatives > 0 ? Math.round(((onTrackCount + doneCount) / totalInitiatives) * 100) : 0;
-
-  // Extract all objectives from goals for the form
-  const allObjectives = goals.flatMap(g => 
-    (g as any).objectives?.map((obj: any) => ({
-      ...obj,
-      goalTitle: g.title
-    })) || []
-  );
-
-  // Extract unique owners from existing data
-  const uniqueOwners = Array.from(
-    new Set(goals.flatMap(g => g.initiatives.map(i => i.owner)))
-  ).sort();
-
-  // Form state
-  const [formData, setFormData] = useState({
-    title: "",
-    objectives: [] as string[],
-    startYear: "2025",
-    endYear: "2025",
-    owner: "",
-    description: "",
-  });
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleObjectivesChange = (objectiveId: string) => {
-    setFormData(prev => ({
-      ...prev,
-      objectives: prev.objectives.includes(objectiveId)
-        ? prev.objectives.filter(id => id !== objectiveId)
-        : [...prev.objectives, objectiveId]
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!formData.title.trim() || formData.objectives.length === 0 || !formData.owner.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate date range
-    if (parseInt(formData.startYear) > parseInt(formData.endYear)) {
-      toast({
-        title: "Validation Error",
-        description: "Start year must be before or equal to end year",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Here you would normally save to a database
-    toast({
-      title: "Success",
-      description: "Initiative created successfully",
-    });
-
-    // Reset form and close dialog
-    setFormData({
-      title: "",
-      objectives: [],
-      startYear: "2025",
-      endYear: "2025",
-      owner: "",
-      description: "",
-    });
-    setIsDialogOpen(false);
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -307,195 +221,10 @@ const Initiatives = () => {
                       Add a new strategic initiative to track progress and KPIs
                     </DialogDescription>
                   </DialogHeader>
-                  
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-4">
-                      {/* Date Range */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="startYear">Start Year *</Label>
-                          <Select 
-                            value={formData.startYear} 
-                            onValueChange={(value) => handleInputChange("startYear", value)}
-                          >
-                            <SelectTrigger id="startYear">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="2025">2025</SelectItem>
-                              <SelectItem value="2026">2026</SelectItem>
-                              <SelectItem value="2027">2027</SelectItem>
-                              <SelectItem value="2028">2028</SelectItem>
-                              <SelectItem value="2029">2029</SelectItem>
-                              <SelectItem value="2030">2030</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="endYear">End Year *</Label>
-                          <Select 
-                            value={formData.endYear} 
-                            onValueChange={(value) => handleInputChange("endYear", value)}
-                          >
-                            <SelectTrigger id="endYear">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="2025">2025</SelectItem>
-                              <SelectItem value="2026">2026</SelectItem>
-                              <SelectItem value="2027">2027</SelectItem>
-                              <SelectItem value="2028">2028</SelectItem>
-                              <SelectItem value="2029">2029</SelectItem>
-                              <SelectItem value="2030">2030</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="title">Initiative Title *</Label>
-                        <Input
-                          id="title"
-                          placeholder="Enter initiative title"
-                          value={formData.title}
-                          onChange={(e) => handleInputChange("title", e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      {/* Owner - now a dropdown */}
-                      <div className="space-y-2">
-                        <Label htmlFor="owner">Initiative Owner *</Label>
-                        <Select 
-                          value={formData.owner} 
-                          onValueChange={(value) => handleInputChange("owner", value)}
-                        >
-                          <SelectTrigger id="owner">
-                            <SelectValue placeholder="Select owner" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {uniqueOwners.map((owner) => (
-                              <SelectItem key={owner} value={owner}>
-                                {owner}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {/* Objectives - searchable multi-select */}
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">Objectives * (Select one or more)</Label>
-                        <Popover open={openObjectivePopover} onOpenChange={setOpenObjectivePopover}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={openObjectivePopover}
-                              className="w-full justify-between h-auto min-h-10"
-                            >
-                              <span className="text-muted-foreground">
-                                {formData.objectives.length === 0 
-                                  ? "Search and select objectives..." 
-                                  : `${formData.objectives.length} objective${formData.objectives.length > 1 ? 's' : ''} selected`
-                                }
-                              </span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0" align="start">
-                            <Command>
-                              <CommandInput placeholder="Search objectives..." />
-                              <CommandList>
-                                <CommandEmpty>No objectives found.</CommandEmpty>
-                                <CommandGroup>
-                                  {allObjectives.map((objective: any) => (
-                                    <CommandItem
-                                      key={objective.id}
-                                      value={objective.title}
-                                      onSelect={() => handleObjectivesChange(objective.id.toString())}
-                                      className="cursor-pointer"
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          formData.objectives.includes(objective.id.toString())
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
-                                      />
-                                      <div className="flex-1">
-                                        <div className="font-medium text-sm">{objective.title}</div>
-                                        <div className="text-xs text-muted-foreground line-clamp-1">
-                                          {objective.description} • {objective.goalTitle}
-                                        </div>
-                                      </div>
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        
-                        {/* Selected objectives as badges */}
-                        {formData.objectives.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {formData.objectives.map((objectiveId) => {
-                              const objective = allObjectives.find((o: any) => o.id.toString() === objectiveId);
-                              return objective ? (
-                                <Badge 
-                                  key={objectiveId} 
-                                  variant="secondary"
-                                  className="gap-1 pr-1"
-                                >
-                                  {objective.title}
-                                  <button
-                                    type="button"
-                                    onClick={() => handleObjectivesChange(objectiveId)}
-                                    className="ml-1 hover:bg-muted rounded-sm p-0.5"
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </Badge>
-                              ) : null;
-                            })}
-                          </div>
-                        )}
-                        
-                        {formData.objectives.length === 0 && (
-                          <p className="text-xs text-muted-foreground">
-                            Please select at least one objective for this initiative
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
-                        <Textarea
-                          id="description"
-                          placeholder="Enter initiative description"
-                          value={formData.description}
-                          onChange={(e) => handleInputChange("description", e.target.value)}
-                          rows={3}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end gap-3">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => setIsDialogOpen(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button type="submit">
-                        Create Initiative
-                      </Button>
-                    </div>
-                  </form>
+                  <AddInitiativeForm 
+                    onSuccess={() => setIsDialogOpen(false)}
+                    onCancel={() => setIsDialogOpen(false)}
+                  />
                 </DialogContent>
               </Dialog>
               <Button

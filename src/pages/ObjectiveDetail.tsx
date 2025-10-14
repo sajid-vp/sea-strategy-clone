@@ -22,10 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { AddInitiativeForm } from "@/components/forms/AddInitiativeForm";
 
 const goals = [
   {
@@ -115,7 +112,6 @@ const goals = [
 
 const ObjectiveDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   // Find the objective and its parent goal
@@ -130,13 +126,6 @@ const ObjectiveDetail = () => {
       break;
     }
   }
-
-  const [formData, setFormData] = useState({
-    title: "",
-    owner: "",
-    year: objective?.year.toString() || "2025",
-    description: "",
-  });
 
   if (!objective || !parentGoal) {
     return (
@@ -161,36 +150,6 @@ const ObjectiveDetail = () => {
   const onTrackInitiatives = objective.initiatives.filter(i => i.status === "in-progress").length;
   const offTrackInitiatives = objective.initiatives.filter(i => i.status === "blocked").length;
   const progress = totalInitiatives > 0 ? (onTrackInitiatives / totalInitiatives) * 100 : 0;
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.title.trim() || !formData.owner.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Success",
-      description: "Initiative created successfully",
-    });
-
-    setFormData({
-      title: "",
-      owner: "",
-      year: objective.year.toString(),
-      description: "",
-    });
-    setIsDialogOpen(false);
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -307,78 +266,10 @@ const ObjectiveDetail = () => {
                     Create a new initiative for {objective.title}
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Objective</Label>
-                    <div className="px-3 py-2 border rounded-md bg-muted text-muted-foreground">
-                      {objective.title}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Title *</Label>
-                    <Input
-                      id="title"
-                      placeholder="Enter initiative title"
-                      value={formData.title}
-                      onChange={(e) => handleInputChange("title", e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="year">Year *</Label>
-                      <Select 
-                        value={formData.year} 
-                        onValueChange={(value) => handleInputChange("year", value)}
-                      >
-                        <SelectTrigger id="year">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="2025">2025</SelectItem>
-                          <SelectItem value="2026">2026</SelectItem>
-                          <SelectItem value="2027">2027</SelectItem>
-                          <SelectItem value="2028">2028</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="owner">Owner *</Label>
-                      <Input
-                        id="owner"
-                        placeholder="Enter owner name"
-                        value={formData.owner}
-                        onChange={(e) => handleInputChange("owner", e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Enter initiative description (optional)"
-                      className="min-h-[100px]"
-                      value={formData.description}
-                      onChange={(e) => handleInputChange("description", e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setIsDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Create Initiative</Button>
-                  </div>
-                </form>
+                <AddInitiativeForm 
+                  onSuccess={() => setIsDialogOpen(false)}
+                  onCancel={() => setIsDialogOpen(false)}
+                />
               </DialogContent>
             </Dialog>
           </div>
