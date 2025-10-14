@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { AddObjectiveForm } from "@/components/forms/AddObjectiveForm";
 
 const goals = [
   {
@@ -89,7 +90,6 @@ const goals = [
 const Objectives = () => {
   const [selectedYear, setSelectedYear] = useState("2025");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast } = useToast();
   
   const allObjectives = goals.flatMap(g => g.objectives);
   const totalObjectives = allObjectives.length;
@@ -97,43 +97,6 @@ const Objectives = () => {
   const atRiskCount = allObjectives.filter(o => mapToAggregatedStatus(o.status) === "at-risk").length;
   const offTrackCount = allObjectives.filter(o => mapToAggregatedStatus(o.status) === "off-track").length;
   const progress = totalObjectives > 0 ? (onTrackCount / totalObjectives) * 100 : 0;
-
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    goalId: "",
-    year: "2025",
-  });
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.title.trim() || !formData.goalId) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Success",
-      description: "Objective created successfully",
-    });
-
-    setFormData({
-      title: "",
-      description: "",
-      goalId: "",
-      year: "2025",
-    });
-    setIsDialogOpen(false);
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -230,81 +193,14 @@ const Objectives = () => {
                 <DialogHeader>
                   <DialogTitle>Create New Objective</DialogTitle>
                   <DialogDescription>
-                    Add a new objective to track strategic progress
+                    Add a new objective to track strategic progress. Objectives can span multiple years.
                   </DialogDescription>
                 </DialogHeader>
                 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="goal">Goal *</Label>
-                    <Select 
-                      value={formData.goalId} 
-                      onValueChange={(value) => handleInputChange("goalId", value)}
-                    >
-                      <SelectTrigger id="goal">
-                        <SelectValue placeholder="Select goal" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {goals.map((goal) => (
-                          <SelectItem key={goal.id} value={goal.id.toString()}>
-                            {goal.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="year">Year *</Label>
-                    <Select 
-                      value={formData.year} 
-                      onValueChange={(value) => handleInputChange("year", value)}
-                    >
-                      <SelectTrigger id="year">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="2025">2025</SelectItem>
-                        <SelectItem value="2026">2026</SelectItem>
-                        <SelectItem value="2027">2027</SelectItem>
-                        <SelectItem value="2028">2028</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Objective Title *</Label>
-                    <Input
-                      id="title"
-                      placeholder="Enter objective title"
-                      value={formData.title}
-                      onChange={(e) => handleInputChange("title", e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Enter objective description"
-                      value={formData.description}
-                      onChange={(e) => handleInputChange("description", e.target.value)}
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                  
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setIsDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Create Objective</Button>
-                  </div>
-                </form>
+                <AddObjectiveForm 
+                  onSuccess={() => setIsDialogOpen(false)}
+                  onCancel={() => setIsDialogOpen(false)}
+                />
               </DialogContent>
             </Dialog>
           </div>
