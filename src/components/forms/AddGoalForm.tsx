@@ -15,6 +15,13 @@ const goalSchema = z.object({
   startDate: z.string().min(1, { message: "Start date is required" }),
   endDate: z.string().min(1, { message: "End date is required" }),
   status: z.enum(["todo", "in-progress", "in-review", "blocked", "done"]),
+}).refine((data) => {
+  const start = new Date(data.startDate);
+  const end = new Date(data.endDate);
+  return end >= start;
+}, {
+  message: "End date must be after or equal to start date",
+  path: ["endDate"],
 });
 
 type GoalFormValues = z.infer<typeof goalSchema>;
@@ -38,8 +45,17 @@ export function AddGoalForm({ onSuccess, onCancel }: AddGoalFormProps) {
   });
 
   function onSubmit(data: GoalFormValues) {
-    console.log("New goal:", data);
-    toast.success("Goal added successfully!");
+    const startYear = new Date(data.startDate).getFullYear();
+    const endYear = new Date(data.endDate).getFullYear();
+    const yearSpan = endYear - startYear + 1;
+    
+    console.log("New goal:", {
+      ...data,
+      yearSpan,
+      years: `${startYear}-${endYear}`
+    });
+    
+    toast.success(`Goal added successfully! (${yearSpan} year${yearSpan > 1 ? 's' : ''})`);
     onSuccess();
   }
 
