@@ -47,11 +47,6 @@ const milestoneSchema = z.object({
   status: z.enum(["todo", "in-progress", "in-review", "done"], {
     required_error: "Status is required",
   }),
-  progress: z
-    .number()
-    .min(0, { message: "Progress must be at least 0" })
-    .max(100, { message: "Progress cannot exceed 100" })
-    .default(0),
   budget: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/, { message: "Budget must be a valid number" })
@@ -73,7 +68,6 @@ export function AddMilestoneForm({ onSuccess, onCancel }: AddMilestoneFormProps)
       name: "",
       description: "",
       status: "todo",
-      progress: 0,
       budget: "",
     },
   });
@@ -160,27 +154,6 @@ export function AddMilestoneForm({ onSuccess, onCancel }: AddMilestoneFormProps)
                   <SelectItem value="done">Done</SelectItem>
                 </SelectContent>
               </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="progress"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Initial Progress (%)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  placeholder="0"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
               <FormMessage />
             </FormItem>
           )}
