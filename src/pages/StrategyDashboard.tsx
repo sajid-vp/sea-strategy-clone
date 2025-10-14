@@ -8,12 +8,8 @@ import { BlockerAnalysisReport } from "@/components/strategy/BlockerAnalysisRepo
 import { DetailSheet } from "@/components/strategy/DetailSheet";
 import { useStrategyFlow } from "@/hooks/useStrategyFlow";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AddGoalForm } from "@/components/forms/AddGoalForm";
 import { findBlockerChainsEnhanced } from "@/utils/blockerAnalysis";
 import { toast } from "@/hooks/use-toast";
-import { Plus } from "lucide-react";
 
 
 // Mock data - in real app, these would come from your data sources
@@ -185,7 +181,6 @@ const StrategyDashboard = () => {
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedBlocker, setSelectedBlocker] = useState<any>(null);
-  const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
   
   // Blocker analysis filters
   const [blockerSearchQuery, setBlockerSearchQuery] = useState("");
@@ -300,48 +295,26 @@ const StrategyDashboard = () => {
           </TabsList>
 
           <TabsContent value="hierarchy" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <div className="flex-1">
-                <FilterPanel
-                  selectedYear={selectedYear}
-                  setSelectedYear={setSelectedYear}
-                  selectedStatus={selectedStatus}
-                  setSelectedStatus={setSelectedStatus}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  selectedOwners={selectedOwners}
-                  setSelectedOwners={setSelectedOwners}
-                  selectedInitiatives={selectedHierarchyInitiatives}
-                  setSelectedInitiatives={setSelectedHierarchyInitiatives}
-                  selectedProjects={selectedHierarchyProjects}
-                  setSelectedProjects={setSelectedHierarchyProjects}
-                  selectedGoals={selectedGoals}
-                  setSelectedGoals={setSelectedGoals}
-                  availableOwners={availableOwners}
-                  availableInitiatives={mockInitiatives.map(i => ({ id: i.id, title: i.title }))}
-                  availableProjects={mockProjects.map(p => ({ id: p.id, title: p.title }))}
-                  availableGoals={mockGoals.map(g => ({ id: g.id, title: g.title }))}
-                />
-              </div>
-              
-              <Dialog open={isAddGoalOpen} onOpenChange={setIsAddGoalOpen}>
-                <DialogTrigger asChild>
-                  <Button className="ml-4">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Goal
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add New Goal</DialogTitle>
-                  </DialogHeader>
-                  <AddGoalForm
-                    onSuccess={() => setIsAddGoalOpen(false)}
-                    onCancel={() => setIsAddGoalOpen(false)}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
+            <FilterPanel
+              selectedYear={selectedYear}
+              setSelectedYear={setSelectedYear}
+              selectedStatus={selectedStatus}
+              setSelectedStatus={setSelectedStatus}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              selectedOwners={selectedOwners}
+              setSelectedOwners={setSelectedOwners}
+              selectedInitiatives={selectedHierarchyInitiatives}
+              setSelectedInitiatives={setSelectedHierarchyInitiatives}
+              selectedProjects={selectedHierarchyProjects}
+              setSelectedProjects={setSelectedHierarchyProjects}
+              selectedGoals={selectedGoals}
+              setSelectedGoals={setSelectedGoals}
+              availableOwners={availableOwners}
+              availableInitiatives={mockInitiatives.map(i => ({ id: i.id, title: i.title }))}
+              availableProjects={mockProjects.map(p => ({ id: p.id, title: p.title }))}
+              availableGoals={mockGoals.map(g => ({ id: g.id, title: g.title }))}
+            />
             
             <FlowCanvas
               initialNodes={nodes}
