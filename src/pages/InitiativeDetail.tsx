@@ -31,6 +31,14 @@ import { initiatives } from "@/data/projectsData";
 import { programs, getProgramsByInitiative } from "@/data/programsData";
 import { getActivitiesByProgram } from "@/data/activitiesData";
 import { getKPIsByInitiative, getKPIProgress, KPI } from "@/data/kpisData";
+import { InitiativeObjective, KeyResult } from "@/types/initiative";
+import { AddObjectiveToInitiativeForm } from "@/components/forms/AddObjectiveToInitiativeForm";
+import { AddKeyResultForm } from "@/components/forms/AddKeyResultForm";
+import {
+  calculateKeyResultProgress,
+  calculateObjectiveProgress,
+  aggregateObjectiveStatus,
+} from "@/utils/initiativeAggregation";
 
 // Data structure with objectives
 const goals = [
@@ -146,6 +154,9 @@ const InitiativeDetail = () => {
   const [editingKPI, setEditingKPI] = useState<KPI | null>(null);
   const [updatingKPI, setUpdatingKPI] = useState<KPI | null>(null);
   const [progressUpdateValue, setProgressUpdateValue] = useState("");
+  const [isAddObjectiveDialogOpen, setIsAddObjectiveDialogOpen] = useState(false);
+  const [isAddKeyResultDialogOpen, setIsAddKeyResultDialogOpen] = useState(false);
+  const [selectedObjectiveId, setSelectedObjectiveId] = useState<number | null>(null);
   const [newKPIData, setNewKPIData] = useState({
     name: "",
     description: "",
@@ -191,6 +202,93 @@ const InitiativeDetail = () => {
 
   // Get KPIs for this initiative
   const initiativeKPIs = getKPIsByInitiative(initiative.id);
+
+  // Mock objectives and key results (in production, these would come from the database)
+  const [objectives, setObjectives] = useState<InitiativeObjective[]>([
+    {
+      id: 1,
+      title: "Achieve 95% Infrastructure Compliance",
+      description: "Ensure all IT infrastructure meets ISO 27001 standards",
+      year: 2025,
+      status: "on-track",
+      progress: 78,
+      owner: "John Smith",
+      keyResultIds: [1, 2],
+    },
+    {
+      id: 2,
+      title: "Modernize Campus Systems",
+      description: "Deploy smart campus technology across all facilities",
+      year: 2025,
+      status: "at-risk",
+      progress: 45,
+      owner: "Sarah Johnson",
+      keyResultIds: [3],
+    },
+  ]);
+
+  const [keyResults, setKeyResults] = useState<KeyResult[]>([
+    {
+      id: 1,
+      objectiveId: 1,
+      title: "Complete Security Audits",
+      description: "Conduct and pass all required security audits",
+      targetValue: 100,
+      currentValue: 78,
+      unit: "%",
+      status: "on-track",
+      progress: 78,
+      owner: "John Smith",
+      startDate: "2025-01-01",
+      endDate: "2025-06-30",
+      linkedProjectIds: [1],
+      linkedProjectKPIs: [
+        { projectId: 1, projectName: "ISO 27001 Implementation", kpiName: "Compliance Rate", kpiValue: 78 }
+      ],
+      frequency: "monthly",
+      lastUpdated: "2025-01-10",
+    },
+    {
+      id: 2,
+      objectiveId: 1,
+      title: "Deploy Security Monitoring",
+      description: "Implement 24/7 security monitoring system",
+      targetValue: 1,
+      currentValue: 0.8,
+      unit: "system",
+      status: "on-track",
+      progress: 80,
+      owner: "Mike Chen",
+      startDate: "2025-01-15",
+      endDate: "2025-05-31",
+      linkedProjectIds: [1],
+      linkedProjectKPIs: [
+        { projectId: 1, projectName: "ISO 27001 Implementation", kpiName: "System Deployment", kpiValue: 0.8 }
+      ],
+      frequency: "weekly",
+      lastUpdated: "2025-01-09",
+    },
+    {
+      id: 3,
+      objectiveId: 2,
+      title: "Campus WiFi Coverage",
+      description: "Achieve 100% WiFi coverage across campus",
+      targetValue: 100,
+      currentValue: 45,
+      unit: "%",
+      status: "at-risk",
+      progress: 45,
+      owner: "Sarah Johnson",
+      startDate: "2025-02-01",
+      endDate: "2025-08-31",
+      linkedProjectIds: [2],
+      linkedProjectKPIs: [
+        { projectId: 2, projectName: "Smart Campus Infrastructure", kpiName: "Coverage", kpiValue: 45 }
+      ],
+      frequency: "monthly",
+      lastUpdated: "2025-01-08",
+    },
+  ]);
 
   // Calculate progress based on projects
   const totalProjects = initiativeProjects.length;
@@ -392,13 +490,208 @@ const InitiativeDetail = () => {
         </div>
 
         {/* Tabbed Content */}
-        <Tabs defaultValue="programs" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="objectives" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="objectives">Objectives</TabsTrigger>
+            <TabsTrigger value="keyresults">Key Results</TabsTrigger>
             <TabsTrigger value="programs">Programs</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="kpis">KPIs</TabsTrigger>
           </TabsList>
+
+          {/* Objectives Tab */}
+          <TabsContent value="objectives" className="space-y-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Initiative Objectives</h2>
+              <Dialog open={isAddObjectiveDialogOpen} onOpenChange={setIsAddObjectiveDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add Objective
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Add Initiative Objective</DialogTitle>
+                    <DialogDescription>
+                      Create a new objective for this initiative with measurable key results
+                    </DialogDescription>
+                  </DialogHeader>
+                  <AddObjectiveToInitiativeForm
+                    initiativeId={initiative.id}
+                    onSuccess={() => setIsAddObjectiveDialogOpen(false)}
+                    onCancel={() => setIsAddObjectiveDialogOpen(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {objectives.length > 0 ? (
+              objectives.map((objective) => {
+                const objectiveKeyResults = keyResults.filter(kr => kr.objectiveId === objective.id);
+                return (
+                  <Card key={objective.id} className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-bold text-foreground">{objective.title}</h3>
+                          <StatusBadge status={objective.status} />
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{objective.description}</p>
+                        <div className="flex items-center gap-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Owner:</span>
+                            <span className="font-medium">{objective.owner}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Year:</span>
+                            <span className="font-medium">{objective.year}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Progress</span>
+                        <span className="font-semibold">{objective.progress}%</span>
+                      </div>
+                      <Progress value={objective.progress} className="h-2" />
+                    </div>
+
+                    <div className="pt-4 border-t border-border">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold">Key Results ({objectiveKeyResults.length})</h4>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedObjectiveId(objective.id);
+                            setIsAddKeyResultDialogOpen(true);
+                          }}
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Add Key Result
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        {objectiveKeyResults.map(kr => (
+                          <div key={kr.id} className="flex items-center justify-between p-2 rounded bg-muted/50">
+                            <div className="flex-1">
+                              <div className="text-sm font-medium">{kr.title}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {kr.currentValue} / {kr.targetValue} {kr.unit}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <StatusBadge status={kr.status} />
+                              <span className="text-sm font-semibold">{kr.progress}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })
+            ) : (
+              <Card className="p-12 text-center">
+                <Target className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground mb-4">No objectives defined for this initiative yet.</p>
+                <Button onClick={() => setIsAddObjectiveDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add First Objective
+                </Button>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Key Results Tab */}
+          <TabsContent value="keyresults" className="space-y-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">All Key Results</h2>
+            </div>
+
+            {keyResults.length > 0 ? (
+              <div className="space-y-4">
+                {keyResults.map((kr) => {
+                  const objective = objectives.find(o => o.id === kr.objectiveId);
+                  return (
+                    <Card key={kr.id} className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="text-xs text-muted-foreground mb-1">
+                            {objective?.title}
+                          </div>
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-bold text-foreground">{kr.title}</h3>
+                            <StatusBadge status={kr.status} />
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">{kr.description}</p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleOpenProgressUpdate(kr as any)}
+                        >
+                          <TrendingUp className="h-4 w-4 mr-1" />
+                          Update Progress
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Target</p>
+                          <p className="text-sm font-medium">{kr.targetValue} {kr.unit}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Current</p>
+                          <p className="text-sm font-medium">{kr.currentValue} {kr.unit}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Owner</p>
+                          <p className="text-sm font-medium">{kr.owner}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Frequency</p>
+                          <p className="text-sm font-medium capitalize">{kr.frequency}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Progress</span>
+                          <span className="font-semibold">{kr.progress}%</span>
+                        </div>
+                        <Progress value={kr.progress} className="h-2" />
+                      </div>
+
+                      {kr.linkedProjectKPIs.length > 0 && (
+                        <div className="pt-4 border-t border-border">
+                          <h4 className="text-sm font-semibold mb-2">Linked Project KPIs</h4>
+                          <div className="space-y-1">
+                            {kr.linkedProjectKPIs.map((pkpi, idx) => (
+                              <div key={idx} className="text-xs text-muted-foreground">
+                                • {pkpi.projectName}: {pkpi.kpiName} ({pkpi.kpiValue})
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </Card>
+                  );
+                })}
+              </div>
+            ) : (
+              <Card className="p-12 text-center">
+                <Target className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground">No key results defined yet. Add objectives first.</p>
+              </Card>
+            )}
+          </TabsContent>
 
           {/* Programs Tab */}
           <TabsContent value="programs" className="space-y-6">
@@ -990,6 +1283,31 @@ const InitiativeDetail = () => {
                 )}
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Key Result Dialog */}
+        <Dialog open={isAddKeyResultDialogOpen} onOpenChange={setIsAddKeyResultDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Add Key Result</DialogTitle>
+              <DialogDescription>
+                Create a measurable key result for the selected objective
+              </DialogDescription>
+            </DialogHeader>
+            {selectedObjectiveId && (
+              <AddKeyResultForm
+                objectiveId={selectedObjectiveId}
+                onSuccess={() => {
+                  setIsAddKeyResultDialogOpen(false);
+                  setSelectedObjectiveId(null);
+                }}
+                onCancel={() => {
+                  setIsAddKeyResultDialogOpen(false);
+                  setSelectedObjectiveId(null);
+                }}
+              />
+            )}
           </DialogContent>
         </Dialog>
       </main>
