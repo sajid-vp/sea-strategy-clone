@@ -490,20 +490,19 @@ const InitiativeDetail = () => {
         </div>
 
         {/* Tabbed Content */}
-        <Tabs defaultValue="objectives" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="objectives">Objectives</TabsTrigger>
-            <TabsTrigger value="keyresults">Key Results</TabsTrigger>
+        <Tabs defaultValue="okr" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="okr">OKR</TabsTrigger>
             <TabsTrigger value="programs">Programs</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="kpis">KPIs</TabsTrigger>
           </TabsList>
 
-          {/* Objectives Tab */}
-          <TabsContent value="objectives" className="space-y-6">
+          {/* OKR Tab - Combined Objectives and Key Results */}
+          <TabsContent value="okr" className="space-y-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Initiative Objectives</h2>
+              <h2 className="text-xl font-semibold">Objectives & Key Results</h2>
               <Dialog open={isAddObjectiveDialogOpen} onOpenChange={setIsAddObjectiveDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2">
@@ -577,19 +576,57 @@ const InitiativeDetail = () => {
                           Add Key Result
                         </Button>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {objectiveKeyResults.map(kr => (
-                          <div key={kr.id} className="flex items-center justify-between p-2 rounded bg-muted/50">
-                            <div className="flex-1">
-                              <div className="text-sm font-medium">{kr.title}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {kr.currentValue} / {kr.targetValue} {kr.unit}
+                          <div key={kr.id} className="p-4 rounded-lg bg-muted/50 space-y-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-sm font-medium">{kr.title}</span>
+                                  <StatusBadge status={kr.status} />
+                                </div>
+                                <p className="text-xs text-muted-foreground">{kr.description}</p>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleOpenProgressUpdate(kr as any)}
+                              >
+                                <TrendingUp className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            
+                            <div className="grid grid-cols-4 gap-2 text-xs">
+                              <div>
+                                <span className="text-muted-foreground">Target: </span>
+                                <span className="font-medium">{kr.targetValue} {kr.unit}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Current: </span>
+                                <span className="font-medium">{kr.currentValue} {kr.unit}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Owner: </span>
+                                <span className="font-medium">{kr.owner}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Progress: </span>
+                                <span className="font-semibold">{kr.progress}%</span>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <StatusBadge status={kr.status} />
-                              <span className="text-sm font-semibold">{kr.progress}%</span>
-                            </div>
+                            
+                            <Progress value={kr.progress} className="h-1.5" />
+                            
+                            {kr.linkedProjectKPIs.length > 0 && (
+                              <div className="pt-2 border-t border-border/50">
+                                <span className="text-xs text-muted-foreground">Linked: </span>
+                                {kr.linkedProjectKPIs.map((pkpi, idx) => (
+                                  <span key={idx} className="text-xs text-muted-foreground">
+                                    {pkpi.projectName}{idx < kr.linkedProjectKPIs.length - 1 ? ', ' : ''}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -605,90 +642,6 @@ const InitiativeDetail = () => {
                   <Plus className="h-4 w-4 mr-2" />
                   Add First Objective
                 </Button>
-              </Card>
-            )}
-          </TabsContent>
-
-          {/* Key Results Tab */}
-          <TabsContent value="keyresults" className="space-y-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">All Key Results</h2>
-            </div>
-
-            {keyResults.length > 0 ? (
-              <div className="space-y-4">
-                {keyResults.map((kr) => {
-                  const objective = objectives.find(o => o.id === kr.objectiveId);
-                  return (
-                    <Card key={kr.id} className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="text-xs text-muted-foreground mb-1">
-                            {objective?.title}
-                          </div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-bold text-foreground">{kr.title}</h3>
-                            <StatusBadge status={kr.status} />
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-3">{kr.description}</p>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleOpenProgressUpdate(kr as any)}
-                        >
-                          <TrendingUp className="h-4 w-4 mr-1" />
-                          Update Progress
-                        </Button>
-                      </div>
-
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div>
-                          <p className="text-xs text-muted-foreground">Target</p>
-                          <p className="text-sm font-medium">{kr.targetValue} {kr.unit}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">Current</p>
-                          <p className="text-sm font-medium">{kr.currentValue} {kr.unit}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">Owner</p>
-                          <p className="text-sm font-medium">{kr.owner}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">Frequency</p>
-                          <p className="text-sm font-medium capitalize">{kr.frequency}</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Progress</span>
-                          <span className="font-semibold">{kr.progress}%</span>
-                        </div>
-                        <Progress value={kr.progress} className="h-2" />
-                      </div>
-
-                      {kr.linkedProjectKPIs.length > 0 && (
-                        <div className="pt-4 border-t border-border">
-                          <h4 className="text-sm font-semibold mb-2">Linked Project KPIs</h4>
-                          <div className="space-y-1">
-                            {kr.linkedProjectKPIs.map((pkpi, idx) => (
-                              <div key={idx} className="text-xs text-muted-foreground">
-                                • {pkpi.projectName}: {pkpi.kpiName} ({pkpi.kpiValue})
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </Card>
-                  );
-                })}
-              </div>
-            ) : (
-              <Card className="p-12 text-center">
-                <Target className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
-                <p className="text-muted-foreground">No key results defined yet. Add objectives first.</p>
               </Card>
             )}
           </TabsContent>
