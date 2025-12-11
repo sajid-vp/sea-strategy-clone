@@ -1,4 +1,5 @@
 import { BaseStatus, AggregatedStatus } from "./status";
+import { TrackingSource, AggregationMethod } from "./tracking";
 
 export interface InitiativeObjective {
   id: number;
@@ -33,6 +34,11 @@ export interface KeyResult {
   }>;
   frequency: "daily" | "weekly" | "monthly" | "quarterly";
   lastUpdated: string;
+  // New tracking fields
+  trackingSources?: TrackingSource[];
+  aggregationMethod?: AggregationMethod;
+  isAutoTracked?: boolean;
+  manualOverride?: number;
 }
 
 export interface Initiative {

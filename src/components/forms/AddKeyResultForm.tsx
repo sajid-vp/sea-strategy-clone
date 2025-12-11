@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -15,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Link2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
@@ -26,6 +27,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { TrackingSourceSelector } from "./TrackingSourceSelector";
+import { TrackingSource, AggregationMethod } from "@/types/tracking";
+import { Badge } from "@/components/ui/badge";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const keyResultSchema = z.object({
   title: z
@@ -71,14 +80,19 @@ interface AddKeyResultFormProps {
   onSuccess: () => void;
   onCancel: () => void;
   objectiveId: number;
+  initiativeId?: number;
 }
 
 export function AddKeyResultForm({
   onSuccess,
   onCancel,
   objectiveId,
+  initiativeId = 1,
 }: AddKeyResultFormProps) {
   const { toast } = useToast();
+  const [trackingSources, setTrackingSources] = useState<TrackingSource[]>([]);
+  const [aggregationMethod, setAggregationMethod] = useState<AggregationMethod>("average");
+  const [isTrackingOpen, setIsTrackingOpen] = useState(false);
   
   const form = useForm<KeyResultFormValues>({
     resolver: zodResolver(keyResultSchema),
@@ -93,12 +107,43 @@ export function AddKeyResultForm({
     },
   });
 
+  // Calculate current value from tracking sources
+  const calculatedValue = trackingSources.length > 0
+    ? (() => {
+        switch (aggregationMethod) {
+          case "sum":
+            return trackingSources.reduce((sum, s) => sum + s.currentValue, 0);
+          case "average":
+            return trackingSources.reduce((sum, s) => sum + s.currentValue, 0) / trackingSources.length;
+          case "weighted":
+            const totalWeight = trackingSources.reduce((sum, s) => sum + (s.weight || 1), 0);
+            const weightedSum = trackingSources.reduce((sum, s) => sum + s.currentValue * (s.weight || 1), 0);
+            return totalWeight > 0 ? weightedSum / totalWeight : 0;
+          case "max":
+            return Math.max(...trackingSources.map((s) => s.currentValue));
+          case "min":
+            return Math.min(...trackingSources.map((s) => s.currentValue));
+          default:
+            return 0;
+        }
+      })()
+    : form.getValues("currentValue");
+
   const onSubmit = (data: KeyResultFormValues) => {
-    console.log("Creating key result for objective:", objectiveId, data);
+    const keyResultData = {
+      ...data,
+      objectiveId,
+      trackingSources,
+      aggregationMethod,
+      isAutoTracked: trackingSources.length > 0,
+      currentValue: trackingSources.length > 0 ? calculatedValue : data.currentValue,
+    };
+    
+    console.log("Creating key result:", keyResultData);
     
     toast({
       title: "Key Result Created",
-      description: `"${data.title}" has been added to the objective`,
+      description: `"${data.title}" has been added with ${trackingSources.length} tracking source(s)`,
     });
 
     onSuccess();
@@ -319,6 +364,39 @@ export function AddKeyResultForm({
             </FormItem>
           )}
         />
+
+        {/* Tracking Sources Section */}
+        <Collapsible open={isTrackingOpen} onOpenChange={setIsTrackingOpen}>
+          <CollapsibleTrigger asChild>
+            <Button type="button" variant="outline" className="w-full justify-between">
+              <div className="flex items-center gap-2">
+                <Link2 className="h-4 w-4" />
+                <span>Link Tracking Sources</span>
+              </div>
+              <Badge variant="secondary">
+                {trackingSources.length} source{trackingSources.length !== 1 ? "s" : ""}
+              </Badge>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4">
+            <TrackingSourceSelector
+              initiativeId={initiativeId}
+              selectedSources={trackingSources}
+              onSourcesChange={setTrackingSources}
+              aggregationMethod={aggregationMethod}
+              onAggregationMethodChange={setAggregationMethod}
+            />
+          </CollapsibleContent>
+        </Collapsible>
+
+        {trackingSources.length > 0 && (
+          <div className="p-3 rounded-lg bg-muted/50 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Auto-calculated value:</span>
+              <span className="font-semibold">{calculatedValue.toFixed(1)} {form.getValues("unit")}</span>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-end gap-3">
           <Button type="button" variant="outline" onClick={onCancel}>
