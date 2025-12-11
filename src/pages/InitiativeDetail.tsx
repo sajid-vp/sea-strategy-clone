@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, User, Users, Calendar, Target, Plus, MessageSquare, Send, FolderKanban, Activity, Pencil, TrendingUp } from "lucide-react";
+import { ArrowLeft, User, Users, Calendar, Target, Plus, MessageSquare, Send, FolderKanban, Activity, Pencil, TrendingUp, Link2, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -584,6 +584,12 @@ const InitiativeDetail = () => {
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="text-sm font-medium">{kr.title}</span>
                                   <StatusBadge status={kr.status} />
+                                  {kr.isAutoTracked && (
+                                    <Badge variant="outline" className="text-xs gap-1">
+                                      <Link2 className="h-3 w-3" />
+                                      Auto-tracked
+                                    </Badge>
+                                  )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">{kr.description}</p>
                               </div>
@@ -617,7 +623,25 @@ const InitiativeDetail = () => {
                             
                             <Progress value={kr.progress} className="h-1.5" />
                             
-                            {kr.linkedProjectKPIs.length > 0 && (
+                            {/* Show tracking sources if available */}
+                            {kr.trackingSources && kr.trackingSources.length > 0 && (
+                              <div className="pt-2 border-t border-border/50">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                  <BarChart3 className="h-3 w-3" />
+                                  <span>Tracking Sources ({kr.trackingSources.length}):</span>
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {kr.trackingSources.map((source, idx) => (
+                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                      {source.kpiName || source.entityName}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Legacy linked KPIs display */}
+                            {kr.linkedProjectKPIs.length > 0 && !kr.trackingSources?.length && (
                               <div className="pt-2 border-t border-border/50">
                                 <span className="text-xs text-muted-foreground">Linked: </span>
                                 {kr.linkedProjectKPIs.map((pkpi, idx) => (
@@ -1251,6 +1275,7 @@ const InitiativeDetail = () => {
             {selectedObjectiveId && (
               <AddKeyResultForm
                 objectiveId={selectedObjectiveId}
+                initiativeId={initiative.id}
                 onSuccess={() => {
                   setIsAddKeyResultDialogOpen(false);
                   setSelectedObjectiveId(null);
