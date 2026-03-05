@@ -34,7 +34,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { initiatives } from "@/data/projectsData";
-import { ProjectOverviewSnapshot } from "@/components/ProjectOverviewSnapshot";
 import { getActivitiesByProject } from "@/data/activitiesData";
 import { toast } from "sonner";
 
@@ -228,14 +227,131 @@ const ProjectDetail = () => {
             <TabsTrigger value="dependencies">Links</TabsTrigger>
           </TabsList>
 
-          {/* 1️⃣ Overview Tab - Comprehensive Snapshot */}
+          {/* 1️⃣ Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <ProjectOverviewSnapshot
-              project={project}
-              parentInitiative={parentInitiative}
-              completedMilestones={completedMilestones}
-              completedTasks={completedTasks}
-            />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Project Information</CardTitle>
+                    <CardDescription>Key details and metadata</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Project Type</p>
+                      <p className="font-semibold">{(project as any).projectType || 'Strategic'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Department</p>
+                      <p className="font-semibold">{project.department}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Start Date</p>
+                      <p className="font-semibold">{new Date(project.startDate).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">End Date</p>
+                      <p className="font-semibold">{new Date(project.endDate).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Project Owner</p>
+                      <p className="font-semibold">{project.owner}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Project Manager</p>
+                      <p className="font-semibold">{(project as any).manager || project.owner}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-sm text-muted-foreground mb-1">Parent Initiative</p>
+                      <Link to={`/initiatives/${parentInitiative.id}`}>
+                        <p className="font-semibold text-primary hover:underline">
+                          {parentInitiative.title}
+                        </p>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Progress Tracking</CardTitle>
+                    <CardDescription>Overall project completion status</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Overall Progress</span>
+                        <span className="text-sm font-bold">{project.progress}%</span>
+                      </div>
+                      <Progress value={project.progress} className="h-3" />
+                    </div>
+                    <Separator />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Milestones</p>
+                        <p className="text-lg font-bold">{completedMilestones}/{project.milestones.length}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Tasks</p>
+                        <p className="text-lg font-bold">{completedTasks}/{project.tasks.length}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-primary" />
+                      Team
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="p-2 bg-accent/50 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Owner</p>
+                        <p className="font-semibold text-sm">{project.owner}</p>
+                      </div>
+                      {project.team.map((member, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-xs font-semibold text-primary">
+                              {member.split(' ').map(n => n[0]).join('')}
+                            </span>
+                          </div>
+                          <p className="text-sm">{member}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      Recent Activity
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {project.activities.map((activity) => (
+                        <div key={activity.id} className="text-sm space-y-1">
+                          <p>
+                            <span className="font-medium">{activity.user}</span>{" "}
+                            <span className="text-muted-foreground">{activity.action}</span>
+                          </p>
+                          <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
 
           {/* 2️⃣ Tasks & Activities Tab */}
