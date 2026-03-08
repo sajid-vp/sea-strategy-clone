@@ -168,14 +168,103 @@ const ProjectDetail = () => {
               </div>
               <p className="text-muted-foreground mb-4">{project.description}</p>
             </div>
-            <Button 
-              variant="outline" 
-              className="gap-2"
-              onClick={() => setIsCommentsOpen(true)}
-            >
-              <MessageSquare className="h-4 w-4" />
-              Comments ({comments.length})
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => {
+                  const printContents = document.getElementById('project-detail-content');
+                  if (printContents) {
+                    const printWindow = window.open('', '_blank');
+                    if (printWindow) {
+                      printWindow.document.write(`
+                        <html>
+                          <head>
+                            <title>${project.title} - Project Report</title>
+                            <style>
+                              body { font-family: system-ui, -apple-system, sans-serif; padding: 40px; color: #1a1a1a; }
+                              h1 { font-size: 24px; margin-bottom: 8px; }
+                              h2 { font-size: 18px; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #e5e5e5; padding-bottom: 8px; }
+                              h3 { font-size: 15px; margin-top: 16px; margin-bottom: 8px; }
+                              p, li { font-size: 13px; line-height: 1.6; }
+                              ul { padding-left: 20px; }
+                              .meta { color: #666; font-size: 12px; }
+                              .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+                              .card { border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+                              .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #f0f0f0; }
+                              table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+                              th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e5e5e5; font-size: 13px; }
+                              th { font-weight: 600; background: #f9f9f9; }
+                              @media print { body { padding: 20px; } }
+                            </style>
+                          </head>
+                          <body>
+                            <h1>${project.title}</h1>
+                            <p class="meta">${(project as any).code || 'PRJ-001'} · ${project.department} · ${project.status}</p>
+                            <p class="meta">Owner: ${project.owner} · ${project.startDate} to ${project.endDate}</p>
+                            
+                            <h2>Description</h2>
+                            <p>${project.description}</p>
+                            
+                            <h2>Purpose / Business Justification</h2>
+                            <p>${(project as any).purpose || 'N/A'}</p>
+                            
+                            <h2>Project Objectives</h2>
+                            <ul>${((project as any).projectObjectives || []).map((o: string) => `<li>${o}</li>`).join('')}</ul>
+                            
+                            <h2>Key Deliverables</h2>
+                            <ul>${((project as any).keyDeliverables || []).map((d: string) => `<li>${d}</li>`).join('')}</ul>
+                            
+                            <h2>Scope</h2>
+                            <p>${(project as any).scope?.description || 'N/A'}</p>
+                            
+                            <h2>Assumptions</h2>
+                            <ul>${((project as any).assumptions || []).map((a: string) => `<li>${a}</li>`).join('')}</ul>
+                            
+                            <h2>Constraints</h2>
+                            <ul>${((project as any).constraints || []).map((c: string) => `<li>${c}</li>`).join('')}</ul>
+                            
+                            <h2>Budget</h2>
+                            <p>Planned: ${project.budget} · Actual: ${(project as any).actualBudget || 'N/A'}</p>
+                            
+                            <h2>Milestones</h2>
+                            <table>
+                              <tr><th>Milestone</th><th>Due Date</th><th>Progress</th><th>Status</th></tr>
+                              ${project.milestones.map(m => `<tr><td>${m.name}</td><td>${m.dueDate}</td><td>${m.progress}%</td><td>${m.status}</td></tr>`).join('')}
+                            </table>
+                            
+                            <h2>Risks</h2>
+                            ${((project as any).risks?.length > 0) ? `<table><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Status</th></tr>${(project as any).risks.map((r: any) => `<tr><td>${r.description}</td><td>${r.likelihood}</td><td>${r.impact}</td><td>${r.status}</td></tr>`).join('')}</table>` : '<p>No risks identified</p>'}
+                            
+                            <h2>Team</h2>
+                            <p>Owner: ${project.owner}</p>
+                            <ul>${project.team.map(t => `<li>${t}</li>`).join('')}</ul>
+                            
+                            <h2>Stakeholders</h2>
+                            <ul>${project.stakeholders.map(s => `<li>${s}</li>`).join('')}</ul>
+                            
+                            <p class="meta" style="margin-top: 32px; text-align: center;">Generated on ${new Date().toLocaleDateString()}</p>
+                          </body>
+                        </html>
+                      `);
+                      printWindow.document.close();
+                      printWindow.print();
+                    }
+                  }
+                }}
+              >
+                <Download className="h-4 w-4" />
+                Export PDF
+              </Button>
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => setIsCommentsOpen(true)}
+              >
+                <MessageSquare className="h-4 w-4" />
+                Comments ({comments.length})
+              </Button>
+            </div>
           </div>
 
           {/* Quick Stats */}
@@ -600,38 +689,6 @@ const ProjectDetail = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-primary" />
-                  Strategic Objectives
-                </CardTitle>
-                <CardDescription>Linked strategic objectives and their metrics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {(project as any).objectives?.length > 0 ? (
-                    (project as any).objectives.map((obj: any) => (
-                      <div key={obj.id} className="border rounded-lg p-4 space-y-2">
-                        <h4 className="font-semibold">{obj.title}</h4>
-                        <p className="text-sm text-muted-foreground">{obj.description}</p>
-                        {obj.metrics && (
-                          <div className="flex items-center gap-2 text-xs">
-                            <Badge variant="outline" className="bg-primary/5">
-                              <BarChart3 className="h-3 w-3 mr-1" />
-                              {obj.metrics}
-                            </Badge>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-8">No objectives linked yet</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-primary" />
                   Project Objectives
                 </CardTitle>
@@ -654,25 +711,6 @@ const ProjectDetail = () => {
                 )}
               </CardContent>
             </Card>
-
-            {/* Success Criteria */}
-            {(project as any).successCriteria?.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Success Criteria</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {(project as any).successCriteria.map((criteria: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                        {criteria}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
           </TabsContent>
 
           {/* 2️⃣ Tasks & Activities Tab */}
