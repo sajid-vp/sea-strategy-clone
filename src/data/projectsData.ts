@@ -292,6 +292,32 @@ export const initiatives = [
         kpis: ["Data Accuracy", "Insight Generation Rate", "User Engagement"],
         stakeholders: ["Executive Team", "Data Analysts", "Department Heads"],
         description: "Implement AI-powered business intelligence dashboards to provide real-time insights and predictive analytics for decision-making.",
+        purpose: "To enable data-driven decision-making through AI-powered analytics, providing leadership with real-time insights and predictive capabilities.",
+        projectObjectives: [
+          "Integrate 15+ data sources into unified analytics platform",
+          "Deploy predictive models with 85%+ accuracy",
+          "Train 50+ users on BI dashboard usage"
+        ],
+        keyDeliverables: [
+          "Data Integration Pipeline",
+          "AI Analytics Dashboard",
+          "Predictive Models Suite",
+          "Training Materials & Workshops"
+        ],
+        scope: {
+          description: "Covers data integration from all major systems (ERP, CRM, HR), AI model development, dashboard creation, and end-user training across all departments.",
+          attachments: []
+        },
+        assumptions: [
+          "Data quality from source systems is sufficient for analytics",
+          "Cloud infrastructure for AI model training is available",
+          "Department heads will champion adoption in their teams"
+        ],
+        constraints: [
+          "Must comply with data privacy regulations",
+          "AI model training requires GPU compute resources",
+          "Historical data availability limited to 3 years"
+        ],
         milestones: [
           { id: 16, name: "Data Source Integration", dueDate: "2025-04-15", progress: 70, status: "in-progress" as const, deliverables: [] },
           { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "in-review" as const, deliverables: [] },
