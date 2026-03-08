@@ -22,6 +22,38 @@ export const initiatives = [
         kpis: ["Security Compliance Rate", "Incident Response Time", "Policy Adherence"],
         stakeholders: ["CTO", "Legal Team", "Compliance Officer"],
         description: "Implement ISO 27001 information security management system across the organization to ensure data protection and compliance.",
+        purpose: "To establish a robust information security management system (ISMS) that protects organizational data assets, ensures regulatory compliance, and builds stakeholder confidence in our security posture.",
+        projectObjectives: [
+          "Achieve ISO 27001 certification by Q2 2025",
+          "Reduce security incidents by 80% within 6 months of implementation",
+          "Establish a continuous improvement framework for information security"
+        ],
+        keyDeliverables: [
+          "Gap Analysis Report",
+          "Information Security Policy Manual",
+          "Risk Assessment Framework",
+          "Security Controls Implementation",
+          "Internal Audit Report",
+          "ISO 27001 Certificate"
+        ],
+        scope: {
+          description: "The project covers all IT systems, data centers, and digital assets across the organization's three main offices. Includes policy development, technical controls implementation, staff training, and certification audit.",
+          attachments: [
+            { name: "Project Scope Document v2.1.pdf", uploadedDate: "2025-01-15" }
+          ]
+        },
+        assumptions: [
+          "All departments will allocate dedicated resources for security training",
+          "External auditor availability for Q2 2025 certification audit",
+          "Current IT infrastructure supports required security controls",
+          "Management will approve budget for additional security tools"
+        ],
+        constraints: [
+          "Certification must be achieved before end of Q2 2025",
+          "Budget limited to AED 1,000.00",
+          "Cannot disrupt ongoing business operations during implementation",
+          "Must comply with UAE data protection regulations"
+        ],
         objectives: [
           { id: 1, title: "Achieve ISO 27001 certification", description: "Complete all requirements for ISO 27001 certification by Q2 2025", metrics: "100% compliance score" },
           { id: 2, title: "Enhance security posture", description: "Reduce security incidents by 80%", metrics: "Incident count < 5 per month" }
