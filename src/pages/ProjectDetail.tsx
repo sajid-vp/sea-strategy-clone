@@ -222,7 +222,7 @@ const ProjectDetail = () => {
         </div>
 
         {/* Tabbed Content */}
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-4 lg:grid-cols-11 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="objectives">Objectives</TabsTrigger>
