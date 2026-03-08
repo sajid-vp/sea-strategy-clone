@@ -214,144 +214,465 @@ const ProjectDetail = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-4 lg:grid-cols-10 w-full">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-11 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="objectives">Objectives</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
             <TabsTrigger value="milestones">Milestones</TabsTrigger>
             <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
+            <TabsTrigger value="stakeholders">Stakeholders</TabsTrigger>
             <TabsTrigger value="budget">Budget</TabsTrigger>
             <TabsTrigger value="risks">Risks</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="kpis">KPIs</TabsTrigger>
-            <TabsTrigger value="dependencies">Links</TabsTrigger>
           </TabsList>
 
           {/* 1️⃣ Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Project Information</CardTitle>
-                    <CardDescription>Key details and metadata</CardDescription>
-                  </CardHeader>
-                  <CardContent className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Project Type</p>
-                      <p className="font-semibold">{(project as any).projectType || 'Strategic'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Department</p>
-                      <p className="font-semibold">{project.department}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Start Date</p>
-                      <p className="font-semibold">{new Date(project.startDate).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">End Date</p>
-                      <p className="font-semibold">{new Date(project.endDate).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Project Owner</p>
-                      <p className="font-semibold">{project.owner}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Project Manager</p>
-                      <p className="font-semibold">{(project as any).manager || project.owner}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm text-muted-foreground mb-1">Parent Initiative</p>
-                      <Link to={`/initiatives/${parentInitiative.id}`}>
-                        <p className="font-semibold text-primary hover:underline">
-                          {parentInitiative.title}
-                        </p>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
+            {/* Project Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Project Information</CardTitle>
+                <CardDescription>Key details and metadata</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Project Name</p>
+                    <p className="font-semibold">{project.title}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Project Code</p>
+                    <p className="font-semibold">{(project as any).code || 'PRJ-001'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Project Type</p>
+                    <p className="font-semibold">{(project as any).projectType || 'Strategic'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Department</p>
+                    <p className="font-semibold">{project.department}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Start Date</p>
+                    <p className="font-semibold">{new Date(project.startDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">End Date</p>
+                    <p className="font-semibold">{new Date(project.endDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Project Owner</p>
+                    <p className="font-semibold">{project.owner}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Project Manager</p>
+                    <p className="font-semibold">{(project as any).manager || project.owner}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-sm text-muted-foreground mb-1">Parent Initiative</p>
+                    <Link to={`/initiatives/${parentInitiative.id}`}>
+                      <p className="font-semibold text-primary hover:underline">
+                        {parentInitiative.title}
+                      </p>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Progress Tracking</CardTitle>
-                    <CardDescription>Overall project completion status</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Overall Progress</span>
-                        <span className="text-sm font-bold">{project.progress}%</span>
-                      </div>
-                      <Progress value={project.progress} className="h-3" />
-                    </div>
-                    <Separator />
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Milestones</p>
-                        <p className="text-lg font-bold">{completedMilestones}/{project.milestones.length}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Tasks</p>
-                        <p className="text-lg font-bold">{completedTasks}/{project.tasks.length}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+            {/* Purpose / Business Justification */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  Purpose / Business Justification
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm leading-relaxed">{(project as any).purpose || 'No purpose defined yet.'}</p>
+              </CardContent>
+            </Card>
 
-              {/* Sidebar */}
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-primary" />
-                      Team
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="p-2 bg-accent/50 rounded-lg">
-                        <p className="text-xs text-muted-foreground mb-1">Owner</p>
-                        <p className="font-semibold text-sm">{project.owner}</p>
-                      </div>
-                      {project.team.map((member, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-xs font-semibold text-primary">
-                              {member.split(' ').map(n => n[0]).join('')}
-                            </span>
-                          </div>
-                          <p className="text-sm">{member}</p>
-                        </div>
+            {/* Objectives & Key Deliverables */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    Project Objectives
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {(project as any).projectObjectives?.length > 0 ? (
+                    <ul className="space-y-2">
+                      {(project as any).projectObjectives.map((obj: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                          {obj}
+                        </li>
                       ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No objectives defined yet.</p>
+                  )}
+                </CardContent>
+              </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      Recent Activity
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {project.activities.map((activity) => (
-                        <div key={activity.id} className="text-sm space-y-1">
-                          <p>
-                            <span className="font-medium">{activity.user}</span>{" "}
-                            <span className="text-muted-foreground">{activity.action}</span>
-                          </p>
-                          <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
-                        </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="h-4 w-4 text-primary" />
+                    Key Deliverables
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {(project as any).keyDeliverables?.length > 0 ? (
+                    <ul className="space-y-2">
+                      {(project as any).keyDeliverables.map((del: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                          {del}
+                        </li>
                       ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No deliverables defined yet.</p>
+                  )}
+                </CardContent>
+              </Card>
             </div>
+
+            {/* Project Scope */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Project Scope
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm leading-relaxed">{(project as any).scope?.description || 'No scope defined yet.'}</p>
+                {(project as any).scope?.attachments?.length > 0 && (
+                  <div className="pt-2 border-t">
+                    <p className="text-xs text-muted-foreground mb-2">Attachments</p>
+                    <div className="space-y-1">
+                      {(project as any).scope.attachments.map((att: any, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2 text-sm p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors cursor-pointer">
+                          <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span>{att.name}</span>
+                          <span className="text-xs text-muted-foreground ml-auto">{att.uploadedDate}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Assumptions & Constraints */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-primary" />
+                    Assumptions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {(project as any).assumptions?.length > 0 ? (
+                    <ul className="space-y-2">
+                      {(project as any).assumptions.map((item: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-muted-foreground flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No assumptions documented.</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-primary" />
+                    Constraints
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {(project as any).constraints?.length > 0 ? (
+                    <ul className="space-y-2">
+                      {(project as any).constraints.map((item: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-destructive/60 flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No constraints documented.</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Team & Stakeholders summary */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-primary" />
+                    Team
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="p-2 bg-accent/50 rounded-lg">
+                      <p className="text-xs text-muted-foreground">Owner</p>
+                      <p className="font-semibold text-sm">{project.owner}</p>
+                    </div>
+                    {project.team.map((member, idx) => (
+                      <div key={idx} className="flex items-center gap-2 p-2">
+                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-xs font-semibold text-primary">
+                            {member.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                        <p className="text-sm">{member}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Network className="h-4 w-4 text-primary" />
+                    Stakeholders
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {project.stakeholders.map((stakeholder, idx) => (
+                      <div key={idx} className="flex items-center gap-2 p-2 rounded hover:bg-accent">
+                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-xs font-semibold text-primary">
+                            {stakeholder.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                        <p className="text-sm">{stakeholder}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Milestones Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Flag className="h-4 w-4 text-primary" />
+                  Milestones
+                </CardTitle>
+                <CardDescription>{completedMilestones} of {project.milestones.length} completed</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {project.milestones.map((milestone) => (
+                    <div key={milestone.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <StatusBadge status={milestone.status} />
+                        <div>
+                          <p className="font-medium text-sm">{milestone.name}</p>
+                          <p className="text-xs text-muted-foreground">Due: {new Date(milestone.dueDate).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Progress value={milestone.progress} className="h-2 w-20" />
+                        <span className="text-xs font-medium w-8 text-right">{milestone.progress}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Budget Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-primary" />
+                  Budget Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Planned</p>
+                    <p className="text-lg font-bold">{project.budget}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Actual</p>
+                    <p className="text-lg font-bold">{(project as any).actualBudget || 'AED 0.00'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Remaining</p>
+                    <p className="text-lg font-bold text-primary">
+                      {(project as any).actualBudget ? 
+                        `AED ${(parseFloat(project.budget.replace(/[^0-9.]/g, '')) - parseFloat((project as any).actualBudget.replace(/[^0-9.]/g, ''))).toFixed(2)}` : 
+                        project.budget}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Risks Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-warning" />
+                  Risks
+                </CardTitle>
+                <CardDescription>{(project as any).risks?.length || 0} identified risks</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {(project as any).risks?.length > 0 ? (
+                  <div className="space-y-2">
+                    {(project as any).risks.map((risk: any) => (
+                      <div key={risk.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{risk.description}</p>
+                          <div className="flex gap-3 text-xs text-muted-foreground mt-1">
+                            <span>Likelihood: <span className={`font-medium ${getRiskColor(risk.likelihood)}`}>{risk.likelihood}</span></span>
+                            <span>Impact: <span className={`font-medium ${getRiskColor(risk.impact)}`}>{risk.impact}</span></span>
+                          </div>
+                        </div>
+                        <Badge variant={risk.status === 'open' ? 'destructive' : 'secondary'} className="ml-2">
+                          {risk.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">No risks identified</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Progress Tracking */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Progress Tracking</CardTitle>
+                <CardDescription>Overall project completion status</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Overall Progress</span>
+                    <span className="text-sm font-bold">{project.progress}%</span>
+                  </div>
+                  <Progress value={project.progress} className="h-3" />
+                </div>
+                <Separator />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Milestones</p>
+                    <p className="text-lg font-bold">{completedMilestones}/{project.milestones.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Tasks</p>
+                    <p className="text-lg font-bold">{completedTasks}/{project.tasks.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Objectives Tab */}
+          <TabsContent value="objectives" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-primary" />
+                  Strategic Objectives
+                </CardTitle>
+                <CardDescription>Linked strategic objectives and their metrics</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {(project as any).objectives?.length > 0 ? (
+                    (project as any).objectives.map((obj: any) => (
+                      <div key={obj.id} className="border rounded-lg p-4 space-y-2">
+                        <h4 className="font-semibold">{obj.title}</h4>
+                        <p className="text-sm text-muted-foreground">{obj.description}</p>
+                        {obj.metrics && (
+                          <div className="flex items-center gap-2 text-xs">
+                            <Badge variant="outline" className="bg-primary/5">
+                              <BarChart3 className="h-3 w-3 mr-1" />
+                              {obj.metrics}
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-8">No objectives linked yet</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  Project Objectives
+                </CardTitle>
+                <CardDescription>Specific project-level objectives</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {(project as any).projectObjectives?.length > 0 ? (
+                  <div className="space-y-3">
+                    {(project as any).projectObjectives.map((obj: string, idx: number) => (
+                      <div key={idx} className="flex items-start gap-3 p-3 border rounded-lg">
+                        <div className="mt-0.5 h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-bold text-primary">{idx + 1}</span>
+                        </div>
+                        <p className="text-sm">{obj}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-8">No project objectives defined yet</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Success Criteria */}
+            {(project as any).successCriteria?.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Success Criteria</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {(project as any).successCriteria.map((criteria: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        {criteria}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* 2️⃣ Tasks & Activities Tab */}
