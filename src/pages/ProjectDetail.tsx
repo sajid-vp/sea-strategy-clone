@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
-import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send, ListChecks, Clock, TrendingUp, DollarSign, AlertTriangle, FileText, Link2, BarChart3, Flag, Network, Download, ChevronDown, ChevronRight, Package, Target, Paperclip, ShieldCheck, Lock } from "lucide-react";
+import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send, ListChecks, Clock, TrendingUp, DollarSign, AlertTriangle, FileText, Link2, BarChart3, Flag, Network, Download, ChevronDown, ChevronRight, Package, Target, Paperclip, ShieldCheck, Lock, Pencil, X, Trash2 } from "lucide-react";
 import { AddRiskForm } from "@/components/forms/AddRiskForm";
 import { AddIssueForm } from "@/components/forms/AddIssueForm";
 import { AddDependencyForm } from "@/components/forms/AddDependencyForm";
@@ -57,7 +57,15 @@ const ProjectDetail = () => {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [editSection, setEditSection] = useState<string | null>(null);
+  const [editPurpose, setEditPurpose] = useState("");
+  const [editObjectives, setEditObjectives] = useState<string[]>([]);
+  const [editDeliverables, setEditDeliverables] = useState<string[]>([]);
+  const [editScopeDesc, setEditScopeDesc] = useState("");
+  const [editAssumptions, setEditAssumptions] = useState<string[]>([]);
+  const [editConstraints, setEditConstraints] = useState<string[]>([]);
   
+
   let project = null;
   let parentInitiative = null;
 
@@ -281,11 +289,14 @@ const ProjectDetail = () => {
 
             {/* Purpose / Business Justification */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-4 w-4 text-primary" />
                   Purpose / Business Justification
                 </CardTitle>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditPurpose((project as any).purpose || ''); setEditSection('purpose'); }}>
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
               </CardHeader>
               <CardContent>
                 <p className="text-sm leading-relaxed">{(project as any).purpose || 'No purpose defined yet.'}</p>
@@ -295,11 +306,14 @@ const ProjectDetail = () => {
             {/* Objectives & Key Deliverables */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
                     Project Objectives
                   </CardTitle>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditObjectives([...((project as any).projectObjectives || [])]); setEditSection('objectives'); }}>
+                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   {(project as any).projectObjectives?.length > 0 ? (
@@ -318,11 +332,14 @@ const ProjectDetail = () => {
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="flex items-center gap-2">
                     <Package className="h-4 w-4 text-primary" />
                     Key Deliverables
                   </CardTitle>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditDeliverables([...((project as any).keyDeliverables || [])]); setEditSection('deliverables'); }}>
+                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   {(project as any).keyDeliverables?.length > 0 ? (
@@ -343,11 +360,14 @@ const ProjectDetail = () => {
 
             {/* Project Scope */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary" />
                   Project Scope
                 </CardTitle>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditScopeDesc((project as any).scope?.description || ''); setEditSection('scope'); }}>
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-sm leading-relaxed">{(project as any).scope?.description || 'No scope defined yet.'}</p>
@@ -371,11 +391,14 @@ const ProjectDetail = () => {
             {/* Assumptions & Constraints */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4 text-primary" />
                     Assumptions
                   </CardTitle>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditAssumptions([...((project as any).assumptions || [])]); setEditSection('assumptions'); }}>
+                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   {(project as any).assumptions?.length > 0 ? (
@@ -394,11 +417,14 @@ const ProjectDetail = () => {
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="flex items-center gap-2">
                     <Lock className="h-4 w-4 text-primary" />
                     Constraints
                   </CardTitle>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditConstraints([...((project as any).constraints || [])]); setEditSection('constraints'); }}>
+                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   {(project as any).constraints?.length > 0 ? (
@@ -563,6 +589,145 @@ const ProjectDetail = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Edit Dialogs */}
+          {/* Purpose Edit Dialog */}
+          <Dialog open={editSection === 'purpose'} onOpenChange={(open) => !open && setEditSection(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Purpose / Business Justification</DialogTitle>
+                <DialogDescription>Update the project's purpose and business justification.</DialogDescription>
+              </DialogHeader>
+              <Textarea value={editPurpose} onChange={(e) => setEditPurpose(e.target.value)} rows={5} placeholder="Enter purpose..." />
+              <div className="flex justify-end gap-2 mt-2">
+                <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
+                <Button onClick={() => { toast.success("Purpose updated successfully"); setEditSection(null); }}>Save</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Objectives Edit Dialog */}
+          <Dialog open={editSection === 'objectives'} onOpenChange={(open) => !open && setEditSection(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Project Objectives</DialogTitle>
+                <DialogDescription>Add, edit, or remove project objectives.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {editObjectives.map((obj, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Input value={obj} onChange={(e) => { const updated = [...editObjectives]; updated[idx] = e.target.value; setEditObjectives(updated); }} />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => setEditObjectives(editObjectives.filter((_, i) => i !== idx))}>
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" size="sm" className="gap-1" onClick={() => setEditObjectives([...editObjectives, ''])}>
+                <Plus className="h-3.5 w-3.5" /> Add Objective
+              </Button>
+              <div className="flex justify-end gap-2 mt-2">
+                <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
+                <Button onClick={() => { toast.success("Objectives updated successfully"); setEditSection(null); }}>Save</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Deliverables Edit Dialog */}
+          <Dialog open={editSection === 'deliverables'} onOpenChange={(open) => !open && setEditSection(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Key Deliverables</DialogTitle>
+                <DialogDescription>Add, edit, or remove key deliverables.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {editDeliverables.map((del, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Input value={del} onChange={(e) => { const updated = [...editDeliverables]; updated[idx] = e.target.value; setEditDeliverables(updated); }} />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => setEditDeliverables(editDeliverables.filter((_, i) => i !== idx))}>
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" size="sm" className="gap-1" onClick={() => setEditDeliverables([...editDeliverables, ''])}>
+                <Plus className="h-3.5 w-3.5" /> Add Deliverable
+              </Button>
+              <div className="flex justify-end gap-2 mt-2">
+                <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
+                <Button onClick={() => { toast.success("Deliverables updated successfully"); setEditSection(null); }}>Save</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Scope Edit Dialog */}
+          <Dialog open={editSection === 'scope'} onOpenChange={(open) => !open && setEditSection(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Project Scope</DialogTitle>
+                <DialogDescription>Update the project scope description.</DialogDescription>
+              </DialogHeader>
+              <Textarea value={editScopeDesc} onChange={(e) => setEditScopeDesc(e.target.value)} rows={5} placeholder="Enter scope description..." />
+              <div className="flex justify-end gap-2 mt-2">
+                <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
+                <Button onClick={() => { toast.success("Scope updated successfully"); setEditSection(null); }}>Save</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Assumptions Edit Dialog */}
+          <Dialog open={editSection === 'assumptions'} onOpenChange={(open) => !open && setEditSection(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Assumptions</DialogTitle>
+                <DialogDescription>Add, edit, or remove project assumptions.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {editAssumptions.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Input value={item} onChange={(e) => { const updated = [...editAssumptions]; updated[idx] = e.target.value; setEditAssumptions(updated); }} />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => setEditAssumptions(editAssumptions.filter((_, i) => i !== idx))}>
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" size="sm" className="gap-1" onClick={() => setEditAssumptions([...editAssumptions, ''])}>
+                <Plus className="h-3.5 w-3.5" /> Add Assumption
+              </Button>
+              <div className="flex justify-end gap-2 mt-2">
+                <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
+                <Button onClick={() => { toast.success("Assumptions updated successfully"); setEditSection(null); }}>Save</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Constraints Edit Dialog */}
+          <Dialog open={editSection === 'constraints'} onOpenChange={(open) => !open && setEditSection(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Constraints</DialogTitle>
+                <DialogDescription>Add, edit, or remove project constraints.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {editConstraints.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Input value={item} onChange={(e) => { const updated = [...editConstraints]; updated[idx] = e.target.value; setEditConstraints(updated); }} />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => setEditConstraints(editConstraints.filter((_, i) => i !== idx))}>
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" size="sm" className="gap-1" onClick={() => setEditConstraints([...editConstraints, ''])}>
+                <Plus className="h-3.5 w-3.5" /> Add Constraint
+              </Button>
+              <div className="flex justify-end gap-2 mt-2">
+                <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
+                <Button onClick={() => { toast.success("Constraints updated successfully"); setEditSection(null); }}>Save</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Objectives Tab */}
           <TabsContent value="objectives" className="space-y-6">
