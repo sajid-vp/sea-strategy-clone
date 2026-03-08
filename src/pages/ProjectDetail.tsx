@@ -543,11 +543,14 @@ const ProjectDetail = () => {
 
             {/* Budget Summary */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-primary" />
                   Budget Summary
                 </CardTitle>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setActiveTab('budget')}>
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
