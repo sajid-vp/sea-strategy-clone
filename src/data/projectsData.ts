@@ -232,6 +232,33 @@ export const initiatives = [
         kpis: ["User Adoption Rate", "App Performance", "Feature Completion"],
         stakeholders: ["Student Affairs", "IT Director", "Marketing Team"],
         description: "Develop a unified mobile application that integrates all campus services and information for students, staff, and parents.",
+        purpose: "To provide a single-point digital interface for all campus stakeholders, consolidating services and improving engagement.",
+        projectObjectives: [
+          "Launch unified mobile app with 10+ integrated services",
+          "Achieve 70% user adoption rate within first 3 months",
+          "Maintain app performance score above 90/100"
+        ],
+        keyDeliverables: [
+          "Mobile App (iOS & Android)",
+          "Backend API Services",
+          "Admin Dashboard",
+          "User Onboarding Guide"
+        ],
+        scope: {
+          description: "Development of cross-platform mobile application integrating student portal, library, cafeteria, events, and communication modules.",
+          attachments: [
+            { name: "Mobile App Requirements Spec.pdf", uploadedDate: "2025-01-10" }
+          ]
+        },
+        assumptions: [
+          "Third-party APIs for existing services are available and documented",
+          "App store approval process will take no more than 2 weeks"
+        ],
+        constraints: [
+          "Must support iOS 15+ and Android 12+",
+          "Backend API dependencies on infrastructure project",
+          "Limited to 2 frontend developers"
+        ],
         milestones: [
           { id: 11, name: "UI/UX Design", dueDate: "2025-02-28", progress: 100, status: "done" as const, deliverables: [] },
           { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "blocked" as const, deliverables: [] },
