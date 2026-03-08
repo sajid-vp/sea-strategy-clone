@@ -159,6 +159,33 @@ export const initiatives = [
         kpis: ["System Uptime", "Energy Efficiency", "User Satisfaction"],
         stakeholders: ["Facilities Manager", "Campus Director", "Sustainability Team"],
         description: "Deploy smart campus infrastructure including IoT sensors, automated systems, and integrated management platform.",
+        purpose: "To modernize campus operations through IoT technology, improving energy efficiency, operational visibility, and user experience across all campus facilities.",
+        projectObjectives: [
+          "Deploy 500+ IoT sensors across campus by Q3 2025",
+          "Achieve 95% system uptime for all smart infrastructure",
+          "Reduce energy consumption by 20% through automated systems"
+        ],
+        keyDeliverables: [
+          "IoT Sensor Network",
+          "Central Management Platform",
+          "Automated HVAC Controls",
+          "Smart Lighting System",
+          "Real-time Dashboard"
+        ],
+        scope: {
+          description: "Covers all campus buildings including main block, admin offices, and recreation center. Includes hardware procurement, installation, software integration, and staff training.",
+          attachments: []
+        },
+        assumptions: [
+          "Existing network infrastructure can support IoT bandwidth requirements",
+          "Vendor delivery timelines will be met as per contracts",
+          "Building access will be provided for sensor installation"
+        ],
+        constraints: [
+          "Installation cannot disrupt classes or operations",
+          "Must integrate with existing building management systems",
+          "Budget capped at AED 2,500.00"
+        ],
         objectives: [
           { id: 1, title: "Deploy IoT infrastructure", description: "Install 500+ IoT sensors across campus by Q3 2025", metrics: "500 sensors installed" }
         ],
