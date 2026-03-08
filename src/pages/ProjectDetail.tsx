@@ -33,7 +33,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { initiatives } from "@/data/projectsData";
+import { programs } from "@/data/programsData";
+import { cn } from "@/lib/utils";
 import { getActivitiesByProject } from "@/data/activitiesData";
 import { toast } from "sonner";
 
