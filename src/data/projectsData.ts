@@ -22,6 +22,38 @@ export const initiatives = [
         kpis: ["Security Compliance Rate", "Incident Response Time", "Policy Adherence"],
         stakeholders: ["CTO", "Legal Team", "Compliance Officer"],
         description: "Implement ISO 27001 information security management system across the organization to ensure data protection and compliance.",
+        purpose: "To establish a robust information security management system (ISMS) that protects organizational data assets, ensures regulatory compliance, and builds stakeholder confidence in our security posture.",
+        projectObjectives: [
+          "Achieve ISO 27001 certification by Q2 2025",
+          "Reduce security incidents by 80% within 6 months of implementation",
+          "Establish a continuous improvement framework for information security"
+        ],
+        keyDeliverables: [
+          "Gap Analysis Report",
+          "Information Security Policy Manual",
+          "Risk Assessment Framework",
+          "Security Controls Implementation",
+          "Internal Audit Report",
+          "ISO 27001 Certificate"
+        ],
+        scope: {
+          description: "The project covers all IT systems, data centers, and digital assets across the organization's three main offices. Includes policy development, technical controls implementation, staff training, and certification audit.",
+          attachments: [
+            { name: "Project Scope Document v2.1.pdf", uploadedDate: "2025-01-15" }
+          ]
+        },
+        assumptions: [
+          "All departments will allocate dedicated resources for security training",
+          "External auditor availability for Q2 2025 certification audit",
+          "Current IT infrastructure supports required security controls",
+          "Management will approve budget for additional security tools"
+        ],
+        constraints: [
+          "Certification must be achieved before end of Q2 2025",
+          "Budget limited to AED 1,000.00",
+          "Cannot disrupt ongoing business operations during implementation",
+          "Must comply with UAE data protection regulations"
+        ],
         objectives: [
           { id: 1, title: "Achieve ISO 27001 certification", description: "Complete all requirements for ISO 27001 certification by Q2 2025", metrics: "100% compliance score" },
           { id: 2, title: "Enhance security posture", description: "Reduce security incidents by 80%", metrics: "Incident count < 5 per month" }
@@ -127,6 +159,33 @@ export const initiatives = [
         kpis: ["System Uptime", "Energy Efficiency", "User Satisfaction"],
         stakeholders: ["Facilities Manager", "Campus Director", "Sustainability Team"],
         description: "Deploy smart campus infrastructure including IoT sensors, automated systems, and integrated management platform.",
+        purpose: "To modernize campus operations through IoT technology, improving energy efficiency, operational visibility, and user experience across all campus facilities.",
+        projectObjectives: [
+          "Deploy 500+ IoT sensors across campus by Q3 2025",
+          "Achieve 95% system uptime for all smart infrastructure",
+          "Reduce energy consumption by 20% through automated systems"
+        ],
+        keyDeliverables: [
+          "IoT Sensor Network",
+          "Central Management Platform",
+          "Automated HVAC Controls",
+          "Smart Lighting System",
+          "Real-time Dashboard"
+        ],
+        scope: {
+          description: "Covers all campus buildings including main block, admin offices, and recreation center. Includes hardware procurement, installation, software integration, and staff training.",
+          attachments: []
+        },
+        assumptions: [
+          "Existing network infrastructure can support IoT bandwidth requirements",
+          "Vendor delivery timelines will be met as per contracts",
+          "Building access will be provided for sensor installation"
+        ],
+        constraints: [
+          "Installation cannot disrupt classes or operations",
+          "Must integrate with existing building management systems",
+          "Budget capped at AED 2,500.00"
+        ],
         objectives: [
           { id: 1, title: "Deploy IoT infrastructure", description: "Install 500+ IoT sensors across campus by Q3 2025", metrics: "500 sensors installed" }
         ],
@@ -173,6 +232,33 @@ export const initiatives = [
         kpis: ["User Adoption Rate", "App Performance", "Feature Completion"],
         stakeholders: ["Student Affairs", "IT Director", "Marketing Team"],
         description: "Develop a unified mobile application that integrates all campus services and information for students, staff, and parents.",
+        purpose: "To provide a single-point digital interface for all campus stakeholders, consolidating services and improving engagement.",
+        projectObjectives: [
+          "Launch unified mobile app with 10+ integrated services",
+          "Achieve 70% user adoption rate within first 3 months",
+          "Maintain app performance score above 90/100"
+        ],
+        keyDeliverables: [
+          "Mobile App (iOS & Android)",
+          "Backend API Services",
+          "Admin Dashboard",
+          "User Onboarding Guide"
+        ],
+        scope: {
+          description: "Development of cross-platform mobile application integrating student portal, library, cafeteria, events, and communication modules.",
+          attachments: [
+            { name: "Mobile App Requirements Spec.pdf", uploadedDate: "2025-01-10" }
+          ]
+        },
+        assumptions: [
+          "Third-party APIs for existing services are available and documented",
+          "App store approval process will take no more than 2 weeks"
+        ],
+        constraints: [
+          "Must support iOS 15+ and Android 12+",
+          "Backend API dependencies on infrastructure project",
+          "Limited to 2 frontend developers"
+        ],
         milestones: [
           { id: 11, name: "UI/UX Design", dueDate: "2025-02-28", progress: 100, status: "done" as const, deliverables: [] },
           { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "blocked" as const, deliverables: [] },
@@ -206,6 +292,32 @@ export const initiatives = [
         kpis: ["Data Accuracy", "Insight Generation Rate", "User Engagement"],
         stakeholders: ["Executive Team", "Data Analysts", "Department Heads"],
         description: "Implement AI-powered business intelligence dashboards to provide real-time insights and predictive analytics for decision-making.",
+        purpose: "To enable data-driven decision-making through AI-powered analytics, providing leadership with real-time insights and predictive capabilities.",
+        projectObjectives: [
+          "Integrate 15+ data sources into unified analytics platform",
+          "Deploy predictive models with 85%+ accuracy",
+          "Train 50+ users on BI dashboard usage"
+        ],
+        keyDeliverables: [
+          "Data Integration Pipeline",
+          "AI Analytics Dashboard",
+          "Predictive Models Suite",
+          "Training Materials & Workshops"
+        ],
+        scope: {
+          description: "Covers data integration from all major systems (ERP, CRM, HR), AI model development, dashboard creation, and end-user training across all departments.",
+          attachments: []
+        },
+        assumptions: [
+          "Data quality from source systems is sufficient for analytics",
+          "Cloud infrastructure for AI model training is available",
+          "Department heads will champion adoption in their teams"
+        ],
+        constraints: [
+          "Must comply with data privacy regulations",
+          "AI model training requires GPU compute resources",
+          "Historical data availability limited to 3 years"
+        ],
         milestones: [
           { id: 16, name: "Data Source Integration", dueDate: "2025-04-15", progress: 70, status: "in-progress" as const, deliverables: [] },
           { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "in-review" as const, deliverables: [] },
