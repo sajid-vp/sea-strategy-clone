@@ -600,38 +600,6 @@ const ProjectDetail = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-primary" />
-                  Strategic Objectives
-                </CardTitle>
-                <CardDescription>Linked strategic objectives and their metrics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {(project as any).objectives?.length > 0 ? (
-                    (project as any).objectives.map((obj: any) => (
-                      <div key={obj.id} className="border rounded-lg p-4 space-y-2">
-                        <h4 className="font-semibold">{obj.title}</h4>
-                        <p className="text-sm text-muted-foreground">{obj.description}</p>
-                        {obj.metrics && (
-                          <div className="flex items-center gap-2 text-xs">
-                            <Badge variant="outline" className="bg-primary/5">
-                              <BarChart3 className="h-3 w-3 mr-1" />
-                              {obj.metrics}
-                            </Badge>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-8">No objectives linked yet</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-primary" />
                   Project Objectives
                 </CardTitle>
@@ -654,25 +622,6 @@ const ProjectDetail = () => {
                 )}
               </CardContent>
             </Card>
-
-            {/* Success Criteria */}
-            {(project as any).successCriteria?.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Success Criteria</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {(project as any).successCriteria.map((criteria: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                        {criteria}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
           </TabsContent>
 
           {/* 2️⃣ Tasks & Activities Tab */}
