@@ -230,52 +230,77 @@ const ProjectDetail = () => {
 
           {/* 1️⃣ Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            {/* Project Information */}
+            {/* Progress Tracking - moved to top */}
             <Card>
-              <CardHeader>
-                <CardTitle>Project Information</CardTitle>
-                <CardDescription>Key details and metadata</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle>Progress Tracking</CardTitle>
+                <CardDescription>Overall project completion status</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Overall Progress</span>
+                    <span className="text-sm font-bold">{project.progress}%</span>
+                  </div>
+                  <Progress value={project.progress} className="h-3" />
+                </div>
+                <Separator />
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Project Name</p>
-                    <p className="font-semibold">{project.title}</p>
+                    <p className="text-sm text-muted-foreground mb-1">Milestones</p>
+                    <p className="text-lg font-bold">{completedMilestones}/{project.milestones.length}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Project Code</p>
-                    <p className="font-semibold">{(project as any).code || 'PRJ-001'}</p>
+                    <p className="text-sm text-muted-foreground mb-1">Tasks</p>
+                    <p className="text-lg font-bold">{completedTasks}/{project.tasks.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Project Information - compact */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle>Project Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Project Name</p>
+                    <p className="text-sm font-medium">{project.title}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Project Type</p>
-                    <p className="font-semibold">{(project as any).projectType || 'Strategic'}</p>
+                    <p className="text-xs text-muted-foreground">Project Code</p>
+                    <p className="text-sm font-medium">{(project as any).code || 'PRJ-001'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Department</p>
-                    <p className="font-semibold">{project.department}</p>
+                    <p className="text-xs text-muted-foreground">Project Type</p>
+                    <p className="text-sm font-medium">{(project as any).projectType || 'Strategic'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Start Date</p>
-                    <p className="font-semibold">{new Date(project.startDate).toLocaleDateString()}</p>
+                    <p className="text-xs text-muted-foreground">Department</p>
+                    <p className="text-sm font-medium">{project.department}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">End Date</p>
-                    <p className="font-semibold">{new Date(project.endDate).toLocaleDateString()}</p>
+                    <p className="text-xs text-muted-foreground">Start Date</p>
+                    <p className="text-sm font-medium">{new Date(project.startDate).toLocaleDateString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Project Owner</p>
-                    <p className="font-semibold">{project.owner}</p>
+                    <p className="text-xs text-muted-foreground">End Date</p>
+                    <p className="text-sm font-medium">{new Date(project.endDate).toLocaleDateString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Project Manager</p>
-                    <p className="font-semibold">{(project as any).manager || project.owner}</p>
+                    <p className="text-xs text-muted-foreground">Owner</p>
+                    <p className="text-sm font-medium">{project.owner}</p>
                   </div>
-                  <div className="col-span-2">
-                    <p className="text-sm text-muted-foreground mb-1">Parent Initiative</p>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Manager</p>
+                    <p className="text-sm font-medium">{(project as any).manager || project.owner}</p>
+                  </div>
+                  <div className="md:col-span-2">
+                    <p className="text-xs text-muted-foreground">Parent Initiative</p>
                     <Link to={`/initiatives/${parentInitiative.id}`}>
-                      <p className="font-semibold text-primary hover:underline">
-                        {parentInitiative.title}
-                      </p>
+                      <p className="text-sm font-medium text-primary hover:underline">{parentInitiative.title}</p>
                     </Link>
                   </div>
                 </div>
@@ -284,7 +309,7 @@ const ProjectDetail = () => {
 
             {/* Purpose / Business Justification */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-4 w-4 text-primary" />
                   Purpose / Business Justification
@@ -298,7 +323,7 @@ const ProjectDetail = () => {
             {/* Objectives & Key Deliverables */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
                     Project Objectives
@@ -321,7 +346,7 @@ const ProjectDetail = () => {
               </Card>
 
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2">
                     <Package className="h-4 w-4 text-primary" />
                     Key Deliverables
@@ -346,7 +371,7 @@ const ProjectDetail = () => {
 
             {/* Project Scope */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary" />
                   Project Scope
@@ -374,7 +399,7 @@ const ProjectDetail = () => {
             {/* Assumptions & Constraints */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4 text-primary" />
                     Assumptions
@@ -397,7 +422,7 @@ const ProjectDetail = () => {
               </Card>
 
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2">
                     <Lock className="h-4 w-4 text-primary" />
                     Constraints
@@ -423,7 +448,7 @@ const ProjectDetail = () => {
             {/* Team & Stakeholders summary */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-primary" />
                     Team
@@ -450,7 +475,7 @@ const ProjectDetail = () => {
               </Card>
 
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2">
                     <Network className="h-4 w-4 text-primary" />
                     Stakeholders
@@ -475,7 +500,7 @@ const ProjectDetail = () => {
 
             {/* Milestones Summary */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Flag className="h-4 w-4 text-primary" />
                   Milestones
@@ -505,7 +530,7 @@ const ProjectDetail = () => {
 
             {/* Budget Summary */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-primary" />
                   Budget Summary
@@ -535,7 +560,7 @@ const ProjectDetail = () => {
 
             {/* Risks Summary */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-warning" />
                   Risks
@@ -563,34 +588,6 @@ const ProjectDetail = () => {
                 ) : (
                   <p className="text-sm text-muted-foreground text-center py-4">No risks identified</p>
                 )}
-              </CardContent>
-            </Card>
-
-            {/* Progress Tracking */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Progress Tracking</CardTitle>
-                <CardDescription>Overall project completion status</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Overall Progress</span>
-                    <span className="text-sm font-bold">{project.progress}%</span>
-                  </div>
-                  <Progress value={project.progress} className="h-3" />
-                </div>
-                <Separator />
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Milestones</p>
-                    <p className="text-lg font-bold">{completedMilestones}/{project.milestones.length}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Tasks</p>
-                    <p className="text-lg font-bold">{completedTasks}/{project.tasks.length}</p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
