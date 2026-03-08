@@ -57,6 +57,7 @@ const ProjectDetail = () => {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
   const [editSection, setEditSection] = useState<string | null>(null);
   const [editPurpose, setEditPurpose] = useState("");
   const [editObjectives, setEditObjectives] = useState<string[]>([]);
