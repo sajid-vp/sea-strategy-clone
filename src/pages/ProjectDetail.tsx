@@ -576,12 +576,17 @@ const ProjectDetail = () => {
 
             {/* Risks Summary */}
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-warning" />
-                  Risks
-                </CardTitle>
-                <CardDescription>{(project as any).risks?.length || 0} identified risks</CardDescription>
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-warning" />
+                    Risks
+                  </CardTitle>
+                  <CardDescription>{(project as any).risks?.length || 0} identified risks</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setActiveTab('risks')}>
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
               </CardHeader>
               <CardContent>
                 {(project as any).risks?.length > 0 ? (
