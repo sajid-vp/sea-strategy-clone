@@ -616,48 +616,148 @@ const ProjectDetail = () => {
           {/* Edit Dialogs */}
           {/* Project Information Edit Dialog */}
           <Dialog open={editSection === 'projectInfo'} onOpenChange={(open) => !open && setEditSection(null)}>
-            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Edit Project Information</DialogTitle>
-                <DialogDescription>Update project metadata and details.</DialogDescription>
+                <DialogTitle className="text-xl">Edit Project</DialogTitle>
+                <DialogDescription>Update all project details and metadata.</DialogDescription>
               </DialogHeader>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label>Project Name</Label>
-                  <Input defaultValue={project.title} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Project Code</Label>
-                  <Input defaultValue={(project as any).code || 'PRJ-001'} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Project Type</Label>
-                  <Input defaultValue={(project as any).projectType || 'Strategic'} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Department</Label>
-                  <Input defaultValue={project.department} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Start Date</Label>
-                  <Input type="date" defaultValue={project.startDate} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>End Date</Label>
-                  <Input type="date" defaultValue={project.endDate} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Owner</Label>
-                  <Input defaultValue={project.owner} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Manager</Label>
-                  <Input defaultValue={(project as any).manager || project.owner} />
+
+              {/* Section: Basic Information */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-foreground border-b pb-2">Basic Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label>Project Name <span className="text-destructive">*</span></Label>
+                    <Input defaultValue={project.title} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Project Code</Label>
+                    <Input defaultValue={(project as any).code || 'PRJ-001'} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Project Type</Label>
+                    <Select defaultValue={(project as any).projectType || 'Strategic'}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Strategic">Strategic</SelectItem>
+                        <SelectItem value="IT">IT</SelectItem>
+                        <SelectItem value="Operational">Operational</SelectItem>
+                        <SelectItem value="Research">Research</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Department</Label>
+                    <Input defaultValue={project.department} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Priority</Label>
+                    <Select defaultValue={(project as any).priority || 'medium'}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Status</Label>
+                    <Select defaultValue={project.status}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="in-review">In Review</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                        <SelectItem value="blocked">Blocked</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label>Description</Label>
+                    <Textarea defaultValue={project.description} rows={3} className="min-h-[80px]" />
+                  </div>
                 </div>
               </div>
+
+              {/* Section: Timeline & Budget */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-foreground border-b pb-2">Timeline & Budget</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label>Start Date</Label>
+                    <Input type="date" defaultValue={project.startDate} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>End Date</Label>
+                    <Input type="date" defaultValue={project.endDate} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Budget</Label>
+                    <Input defaultValue={project.budget} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Actual Budget</Label>
+                    <Input defaultValue={(project as any).actualBudget || ''} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section: People */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-foreground border-b pb-2">People</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label>Owner <span className="text-destructive">*</span></Label>
+                    <Input defaultValue={project.owner} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Manager</Label>
+                    <Input defaultValue={(project as any).manager || project.owner} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section: KPIs */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-foreground border-b pb-2">Key Performance Indicators</h3>
+                <div className="space-y-2">
+                  {(project.kpis || []).map((kpi, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <Input defaultValue={kpi} />
+                      <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" className="gap-1 mt-1">
+                    <Plus className="h-3.5 w-3.5" /> Add KPI
+                  </Button>
+                </div>
+              </div>
+
+              {/* Section: Success Criteria */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-foreground border-b pb-2">Success Criteria</h3>
+                <div className="space-y-2">
+                  {((project as any).successCriteria || []).map((criteria: string, idx: number) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <Input defaultValue={criteria} />
+                      <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" className="gap-1 mt-1">
+                    <Plus className="h-3.5 w-3.5" /> Add Criteria
+                  </Button>
+                </div>
+              </div>
+
               <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
-                <Button onClick={() => { toast.success("Project information updated"); setEditSection(null); }}>Save</Button>
+                <Button onClick={() => { toast.success("Project information updated"); setEditSection(null); }}>Save Changes</Button>
               </div>
             </DialogContent>
           </Dialog>
