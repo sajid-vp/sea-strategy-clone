@@ -1065,83 +1065,84 @@ const ProjectDetail = () => {
           </TabsContent>
 
 
-          {/* 6️⃣ Resources & Team Tab */}
+          {/* 6️⃣ Team Tab */}
           <TabsContent value="team" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <Users className="h-5 w-5 text-primary" />
-                        Team Members
-                      </CardTitle>
-                      <CardDescription>Project team and roles</CardDescription>
-                    </div>
-                    <Button variant="outline" size="sm">+ Add</Button>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      Team Members
+                    </CardTitle>
+                    <CardDescription>Project team and roles</CardDescription>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 border rounded-lg bg-accent/30">
+                  <Button variant="outline" size="sm">+ Add</Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="p-3 border rounded-lg bg-accent/30">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <User className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-semibold">{project.owner}</p>
+                        <p className="text-xs text-muted-foreground">Project Owner</p>
+                      </div>
+                    </div>
+                  </div>
+                  {project.team.map((member, idx) => (
+                    <div key={idx} className="p-3 border rounded-lg hover:bg-accent/50 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                          <User className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">{project.owner}</p>
-                          <p className="text-xs text-muted-foreground">Project Owner</p>
-                        </div>
-                      </div>
-                    </div>
-                    {project.team.map((member, idx) => (
-                      <div key={idx} className="p-3 border rounded-lg hover:bg-accent/50 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-sm font-semibold text-primary">
-                              {member.split(' ').map(n => n[0]).join('')}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium">{member}</p>
-                            <p className="text-xs text-muted-foreground">Team Member</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <Network className="h-5 w-5 text-primary" />
-                        Stakeholders
-                      </CardTitle>
-                      <CardDescription>Key stakeholders and departments</CardDescription>
-                    </div>
-                    <Button variant="outline" size="sm">+ Add</Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {project.stakeholders.map((stakeholder, idx) => (
-                      <div key={idx} className="flex items-center gap-3 p-2 rounded hover:bg-accent">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="text-xs font-semibold text-primary">
-                            {stakeholder.split(' ').map(n => n[0]).join('')}
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-sm font-semibold text-primary">
+                            {member.split(' ').map(n => n[0]).join('')}
                           </span>
                         </div>
-                        <p className="text-sm font-medium">{stakeholder}</p>
+                        <div>
+                          <p className="font-medium">{member}</p>
+                          <p className="text-xs text-muted-foreground">Team Member</p>
+                        </div>
                       </div>
-                    ))}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Stakeholders Tab */}
+          <TabsContent value="stakeholders" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Network className="h-5 w-5 text-primary" />
+                      Stakeholders
+                    </CardTitle>
+                    <CardDescription>Key stakeholders and departments</CardDescription>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                  <Button variant="outline" size="sm">+ Add</Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {project.stakeholders.map((stakeholder, idx) => (
+                    <div key={idx} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-sm font-semibold text-primary">
+                          {stakeholder.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                      <p className="font-medium">{stakeholder}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* 7️⃣ Budget Tab */}
