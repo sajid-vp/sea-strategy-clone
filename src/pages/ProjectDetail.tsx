@@ -57,6 +57,7 @@ const ProjectDetail = () => {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
   const [editSection, setEditSection] = useState<string | null>(null);
   const [editPurpose, setEditPurpose] = useState("");
   const [editObjectives, setEditObjectives] = useState<string[]>([]);
@@ -221,7 +222,7 @@ const ProjectDetail = () => {
         </div>
 
         {/* Tabbed Content */}
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-4 lg:grid-cols-11 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="objectives">Objectives</TabsTrigger>
@@ -240,8 +241,11 @@ const ProjectDetail = () => {
           <TabsContent value="overview" className="space-y-6">
             {/* Project Information - compact */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                 <CardTitle>Project Information</CardTitle>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditSection('projectInfo')}>
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3">
@@ -446,11 +450,14 @@ const ProjectDetail = () => {
             {/* Team & Stakeholders summary */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-primary" />
                     Team
                   </CardTitle>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setActiveTab('team')}>
+                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -473,11 +480,14 @@ const ProjectDetail = () => {
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="flex items-center gap-2">
                     <Network className="h-4 w-4 text-primary" />
                     Stakeholders
                   </CardTitle>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setActiveTab('stakeholders')}>
+                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -498,12 +508,17 @@ const ProjectDetail = () => {
 
             {/* Milestones Summary */}
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <Flag className="h-4 w-4 text-primary" />
-                  Milestones
-                </CardTitle>
-                <CardDescription>{completedMilestones} of {project.milestones.length} completed</CardDescription>
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Flag className="h-4 w-4 text-primary" />
+                    Milestones
+                  </CardTitle>
+                  <CardDescription>{completedMilestones} of {project.milestones.length} completed</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setActiveTab('milestones')}>
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -528,11 +543,14 @@ const ProjectDetail = () => {
 
             {/* Budget Summary */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-primary" />
                   Budget Summary
                 </CardTitle>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setActiveTab('budget')}>
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
@@ -558,12 +576,17 @@ const ProjectDetail = () => {
 
             {/* Risks Summary */}
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-warning" />
-                  Risks
-                </CardTitle>
-                <CardDescription>{(project as any).risks?.length || 0} identified risks</CardDescription>
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-warning" />
+                    Risks
+                  </CardTitle>
+                  <CardDescription>{(project as any).risks?.length || 0} identified risks</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setActiveTab('risks')}>
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
               </CardHeader>
               <CardContent>
                 {(project as any).risks?.length > 0 ? (
@@ -591,6 +614,54 @@ const ProjectDetail = () => {
           </TabsContent>
 
           {/* Edit Dialogs */}
+          {/* Project Information Edit Dialog */}
+          <Dialog open={editSection === 'projectInfo'} onOpenChange={(open) => !open && setEditSection(null)}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Edit Project Information</DialogTitle>
+                <DialogDescription>Update project metadata and details.</DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Project Name</Label>
+                  <Input defaultValue={project.title} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Project Code</Label>
+                  <Input defaultValue={(project as any).code || 'PRJ-001'} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Project Type</Label>
+                  <Input defaultValue={(project as any).projectType || 'Strategic'} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Department</Label>
+                  <Input defaultValue={project.department} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Start Date</Label>
+                  <Input type="date" defaultValue={project.startDate} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>End Date</Label>
+                  <Input type="date" defaultValue={project.endDate} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Owner</Label>
+                  <Input defaultValue={project.owner} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Manager</Label>
+                  <Input defaultValue={(project as any).manager || project.owner} />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 mt-2">
+                <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
+                <Button onClick={() => { toast.success("Project information updated"); setEditSection(null); }}>Save</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           {/* Purpose Edit Dialog */}
           <Dialog open={editSection === 'purpose'} onOpenChange={(open) => !open && setEditSection(null)}>
             <DialogContent>
