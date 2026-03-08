@@ -57,7 +57,15 @@ const ProjectDetail = () => {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Array<{id: number; user: string; text: string; timestamp: string}>>([]);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [editSection, setEditSection] = useState<string | null>(null);
+  const [editPurpose, setEditPurpose] = useState("");
+  const [editObjectives, setEditObjectives] = useState<string[]>([]);
+  const [editDeliverables, setEditDeliverables] = useState<string[]>([]);
+  const [editScopeDesc, setEditScopeDesc] = useState("");
+  const [editAssumptions, setEditAssumptions] = useState<string[]>([]);
+  const [editConstraints, setEditConstraints] = useState<string[]>([]);
   
+
   let project = null;
   let parentInitiative = null;
 
