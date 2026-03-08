@@ -616,7 +616,7 @@ const ProjectDetail = () => {
           {/* Edit Dialogs */}
           {/* Project Information Edit Dialog */}
           <Dialog open={editSection === 'projectInfo'} onOpenChange={(open) => !open && setEditSection(null)}>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Project Information</DialogTitle>
                 <DialogDescription>Update project metadata and details.</DialogDescription>
@@ -655,7 +655,7 @@ const ProjectDetail = () => {
                   <Input defaultValue={(project as any).manager || project.owner} />
                 </div>
               </div>
-              <div className="flex justify-end gap-2 mt-2">
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
                 <Button onClick={() => { toast.success("Project information updated"); setEditSection(null); }}>Save</Button>
               </div>
@@ -664,13 +664,24 @@ const ProjectDetail = () => {
 
           {/* Purpose Edit Dialog */}
           <Dialog open={editSection === 'purpose'} onOpenChange={(open) => !open && setEditSection(null)}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Purpose / Business Justification</DialogTitle>
                 <DialogDescription>Update the project's purpose and business justification.</DialogDescription>
               </DialogHeader>
-              <Textarea value={editPurpose} onChange={(e) => setEditPurpose(e.target.value)} rows={5} placeholder="Enter purpose..." />
-              <div className="flex justify-end gap-2 mt-2">
+              <div className="space-y-2">
+                <Label>Purpose</Label>
+                <Textarea value={editPurpose} onChange={(e) => setEditPurpose(e.target.value)} rows={8} placeholder="Enter purpose..." className="min-h-[200px]" />
+              </div>
+              <div className="space-y-2">
+                <Label>Attachments</Label>
+                <div className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                  <Paperclip className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Click to upload or drag & drop files here</p>
+                  <p className="text-xs text-muted-foreground mt-1">PDF, DOC, DOCX up to 10MB</p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
                 <Button onClick={() => { toast.success("Purpose updated successfully"); setEditSection(null); }}>Save</Button>
               </div>
@@ -679,16 +690,19 @@ const ProjectDetail = () => {
 
           {/* Objectives Edit Dialog */}
           <Dialog open={editSection === 'objectives'} onOpenChange={(open) => !open && setEditSection(null)}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Project Objectives</DialogTitle>
                 <DialogDescription>Add, edit, or remove project objectives.</DialogDescription>
               </DialogHeader>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                 {editObjectives.map((obj, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <Input value={obj} onChange={(e) => { const updated = [...editObjectives]; updated[idx] = e.target.value; setEditObjectives(updated); }} />
-                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => setEditObjectives(editObjectives.filter((_, i) => i !== idx))}>
+                  <div key={idx} className="flex items-start gap-2">
+                    <div className="mt-2.5 h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[10px] font-bold text-primary">{idx + 1}</span>
+                    </div>
+                    <Textarea value={obj} onChange={(e) => { const updated = [...editObjectives]; updated[idx] = e.target.value; setEditObjectives(updated); }} rows={2} className="min-h-[60px]" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0 mt-1" onClick={() => setEditObjectives(editObjectives.filter((_, i) => i !== idx))}>
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
                   </div>
@@ -697,7 +711,14 @@ const ProjectDetail = () => {
               <Button variant="outline" size="sm" className="gap-1" onClick={() => setEditObjectives([...editObjectives, ''])}>
                 <Plus className="h-3.5 w-3.5" /> Add Objective
               </Button>
-              <div className="flex justify-end gap-2 mt-2">
+              <div className="space-y-2">
+                <Label>Attachments</Label>
+                <div className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                  <Paperclip className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">Click to upload supporting documents</p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
                 <Button onClick={() => { toast.success("Objectives updated successfully"); setEditSection(null); }}>Save</Button>
               </div>
@@ -706,14 +727,15 @@ const ProjectDetail = () => {
 
           {/* Deliverables Edit Dialog */}
           <Dialog open={editSection === 'deliverables'} onOpenChange={(open) => !open && setEditSection(null)}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Key Deliverables</DialogTitle>
                 <DialogDescription>Add, edit, or remove key deliverables.</DialogDescription>
               </DialogHeader>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                 {editDeliverables.map((del, idx) => (
                   <div key={idx} className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-5 flex-shrink-0">{idx + 1}.</span>
                     <Input value={del} onChange={(e) => { const updated = [...editDeliverables]; updated[idx] = e.target.value; setEditDeliverables(updated); }} />
                     <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => setEditDeliverables(editDeliverables.filter((_, i) => i !== idx))}>
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
@@ -724,7 +746,14 @@ const ProjectDetail = () => {
               <Button variant="outline" size="sm" className="gap-1" onClick={() => setEditDeliverables([...editDeliverables, ''])}>
                 <Plus className="h-3.5 w-3.5" /> Add Deliverable
               </Button>
-              <div className="flex justify-end gap-2 mt-2">
+              <div className="space-y-2">
+                <Label>Attachments</Label>
+                <div className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                  <Paperclip className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">Click to upload supporting documents</p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
                 <Button onClick={() => { toast.success("Deliverables updated successfully"); setEditSection(null); }}>Save</Button>
               </div>
@@ -733,13 +762,38 @@ const ProjectDetail = () => {
 
           {/* Scope Edit Dialog */}
           <Dialog open={editSection === 'scope'} onOpenChange={(open) => !open && setEditSection(null)}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Project Scope</DialogTitle>
-                <DialogDescription>Update the project scope description.</DialogDescription>
+                <DialogDescription>Update the project scope description and attachments.</DialogDescription>
               </DialogHeader>
-              <Textarea value={editScopeDesc} onChange={(e) => setEditScopeDesc(e.target.value)} rows={5} placeholder="Enter scope description..." />
-              <div className="flex justify-end gap-2 mt-2">
+              <div className="space-y-2">
+                <Label>Scope Description</Label>
+                <Textarea value={editScopeDesc} onChange={(e) => setEditScopeDesc(e.target.value)} rows={8} placeholder="Enter scope description..." className="min-h-[200px]" />
+              </div>
+              <div className="space-y-2">
+                <Label>Attachments</Label>
+                {(project as any).scope?.attachments?.length > 0 && (
+                  <div className="space-y-1 mb-2">
+                    {(project as any).scope.attachments.map((att: any, idx: number) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm p-2 rounded-md bg-muted/50">
+                        <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="flex-1">{att.name}</span>
+                        <span className="text-xs text-muted-foreground">{att.uploadedDate}</span>
+                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                          <Trash2 className="h-3 w-3 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                  <Paperclip className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Click to upload or drag & drop files here</p>
+                  <p className="text-xs text-muted-foreground mt-1">PDF, DOC, DOCX, images up to 10MB</p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
                 <Button onClick={() => { toast.success("Scope updated successfully"); setEditSection(null); }}>Save</Button>
               </div>
@@ -748,14 +802,15 @@ const ProjectDetail = () => {
 
           {/* Assumptions Edit Dialog */}
           <Dialog open={editSection === 'assumptions'} onOpenChange={(open) => !open && setEditSection(null)}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Assumptions</DialogTitle>
                 <DialogDescription>Add, edit, or remove project assumptions.</DialogDescription>
               </DialogHeader>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                 {editAssumptions.map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-5 flex-shrink-0">{idx + 1}.</span>
                     <Input value={item} onChange={(e) => { const updated = [...editAssumptions]; updated[idx] = e.target.value; setEditAssumptions(updated); }} />
                     <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => setEditAssumptions(editAssumptions.filter((_, i) => i !== idx))}>
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
@@ -766,7 +821,14 @@ const ProjectDetail = () => {
               <Button variant="outline" size="sm" className="gap-1" onClick={() => setEditAssumptions([...editAssumptions, ''])}>
                 <Plus className="h-3.5 w-3.5" /> Add Assumption
               </Button>
-              <div className="flex justify-end gap-2 mt-2">
+              <div className="space-y-2">
+                <Label>Attachments</Label>
+                <div className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                  <Paperclip className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">Click to upload supporting documents</p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
                 <Button onClick={() => { toast.success("Assumptions updated successfully"); setEditSection(null); }}>Save</Button>
               </div>
@@ -775,14 +837,15 @@ const ProjectDetail = () => {
 
           {/* Constraints Edit Dialog */}
           <Dialog open={editSection === 'constraints'} onOpenChange={(open) => !open && setEditSection(null)}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Constraints</DialogTitle>
                 <DialogDescription>Add, edit, or remove project constraints.</DialogDescription>
               </DialogHeader>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                 {editConstraints.map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-5 flex-shrink-0">{idx + 1}.</span>
                     <Input value={item} onChange={(e) => { const updated = [...editConstraints]; updated[idx] = e.target.value; setEditConstraints(updated); }} />
                     <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => setEditConstraints(editConstraints.filter((_, i) => i !== idx))}>
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
@@ -793,7 +856,14 @@ const ProjectDetail = () => {
               <Button variant="outline" size="sm" className="gap-1" onClick={() => setEditConstraints([...editConstraints, ''])}>
                 <Plus className="h-3.5 w-3.5" /> Add Constraint
               </Button>
-              <div className="flex justify-end gap-2 mt-2">
+              <div className="space-y-2">
+                <Label>Attachments</Label>
+                <div className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                  <Paperclip className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">Click to upload supporting documents</p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
                 <Button onClick={() => { toast.success("Constraints updated successfully"); setEditSection(null); }}>Save</Button>
               </div>
