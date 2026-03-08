@@ -230,34 +230,6 @@ const ProjectDetail = () => {
 
           {/* 1️⃣ Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            {/* Progress Tracking - moved to top */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle>Progress Tracking</CardTitle>
-                <CardDescription>Overall project completion status</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Overall Progress</span>
-                    <span className="text-sm font-bold">{project.progress}%</span>
-                  </div>
-                  <Progress value={project.progress} className="h-3" />
-                </div>
-                <Separator />
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Milestones</p>
-                    <p className="text-lg font-bold">{completedMilestones}/{project.milestones.length}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Tasks</p>
-                    <p className="text-lg font-bold">{completedTasks}/{project.tasks.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Project Information - compact */}
             <Card>
               <CardHeader className="pb-3">
