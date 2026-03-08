@@ -626,35 +626,138 @@ const ProjectDetail = () => {
                 <DialogDescription>Update all project details and metadata.</DialogDescription>
               </DialogHeader>
 
-              {/* Section: Basic Information */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-foreground border-b pb-2">Basic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5 md:col-span-2">
-                    <Label>Project Name <span className="text-destructive">*</span></Label>
-                    <Input defaultValue={project.title} />
+              <div className="space-y-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Project Title <span className="text-destructive">*</span></Label>
+                    <Input defaultValue={project.title} placeholder="Enter project title" />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>Project Code</Label>
-                    <Input defaultValue={(project as any).code || 'PRJ-001'} />
+                    <Input defaultValue={(project as any).code || ''} placeholder="PRJ-2025-XXX" />
                   </div>
-                  <div className="space-y-1.5">
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea defaultValue={project.description} placeholder="Project description" rows={3} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Project Owner <span className="text-destructive">*</span></Label>
+                  <Input defaultValue={project.owner} placeholder="Owner name" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Project Manager</Label>
+                  <Input defaultValue={(project as any).manager || project.owner} placeholder="Manager name" />
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Initiatives * (Select one or more)</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" role="combobox" className="w-full justify-between h-auto min-h-10">
+                        <span className="text-muted-foreground">Search and select initiatives...</span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Search initiatives..." />
+                        <CommandList>
+                          <CommandEmpty>No initiatives found.</CommandEmpty>
+                          <CommandGroup>
+                            {initiatives.map((initiative) => (
+                              <CommandItem key={initiative.id} value={initiative.title} className="cursor-pointer">
+                                <Check className={cn("mr-2 h-4 w-4", initiative.projects.some(p => p.id === project.id) ? "opacity-100" : "opacity-0")} />
+                                <div className="flex-1">
+                                  <div className="font-medium text-sm">{initiative.title}</div>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  {initiatives.filter(i => i.projects.some(p => p.id === project.id)).length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {initiatives.filter(i => i.projects.some(p => p.id === project.id)).map((initiative) => (
+                        <Badge key={initiative.id} variant="secondary" className="gap-1">
+                          {initiative.title}
+                          <X className="h-3 w-3 cursor-pointer" />
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Programs (Optional)</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" role="combobox" className="w-full justify-between h-auto min-h-10">
+                        <span className="text-muted-foreground">Search and select programs...</span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Search programs..." />
+                        <CommandList>
+                          <CommandEmpty>No programs found.</CommandEmpty>
+                          <CommandGroup>
+                            {programs.map((program) => (
+                              <CommandItem key={program.id} value={program.title} className="cursor-pointer">
+                                <Check className="mr-2 h-4 w-4 opacity-0" />
+                                <div className="flex-1">
+                                  <div className="font-medium text-sm">{program.title}</div>
+                                  <div className="text-xs text-muted-foreground">{program.code}</div>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Department</Label>
+                    <Input defaultValue={project.department} placeholder="Department name" />
+                  </div>
+                  <div className="space-y-2">
                     <Label>Project Type</Label>
                     <Select defaultValue={(project as any).projectType || 'Strategic'}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Strategic">Strategic</SelectItem>
-                        <SelectItem value="IT">IT</SelectItem>
                         <SelectItem value="Operational">Operational</SelectItem>
+                        <SelectItem value="IT">IT</SelectItem>
                         <SelectItem value="Research">Research</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Department</Label>
-                    <Input defaultValue={project.department} />
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Status</Label>
+                    <Select defaultValue={project.status}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="in-review">In Review</SelectItem>
+                        <SelectItem value="blocked">Blocked</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>Priority</Label>
                     <Select defaultValue={(project as any).priority || 'medium'}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
@@ -665,97 +768,57 @@ const ProjectDetail = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Status</Label>
-                    <Select defaultValue={project.status}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todo">To Do</SelectItem>
-                        <SelectItem value="in-progress">In Progress</SelectItem>
-                        <SelectItem value="in-review">In Review</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
-                        <SelectItem value="blocked">Blocked</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5 md:col-span-2">
-                    <Label>Description</Label>
-                    <Textarea defaultValue={project.description} rows={3} className="min-h-[80px]" />
+                  <div className="space-y-2">
+                    <Label>Budget</Label>
+                    <Input defaultValue={project.budget} placeholder="AED 0.00" />
                   </div>
                 </div>
-              </div>
 
-              {/* Section: Timeline & Budget */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-foreground border-b pb-2">Timeline & Budget</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <Label>Start Date</Label>
                     <Input type="date" defaultValue={project.startDate} />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>End Date</Label>
                     <Input type="date" defaultValue={project.endDate} />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Budget</Label>
-                    <Input defaultValue={project.budget} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Actual Budget</Label>
-                    <Input defaultValue={(project as any).actualBudget || ''} />
+                </div>
+
+                {/* KPIs */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Key Performance Indicators</Label>
+                  <div className="space-y-2">
+                    {(project.kpis || []).map((kpi, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <Input defaultValue={kpi} />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                    <Button variant="outline" size="sm" className="gap-1 mt-1">
+                      <Plus className="h-3.5 w-3.5" /> Add KPI
+                    </Button>
                   </div>
                 </div>
-              </div>
 
-              {/* Section: People */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-foreground border-b pb-2">People</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label>Owner <span className="text-destructive">*</span></Label>
-                    <Input defaultValue={project.owner} />
+                {/* Success Criteria */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Success Criteria</Label>
+                  <div className="space-y-2">
+                    {((project as any).successCriteria || []).map((criteria: string, idx: number) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <Input defaultValue={criteria} />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                    <Button variant="outline" size="sm" className="gap-1 mt-1">
+                      <Plus className="h-3.5 w-3.5" /> Add Criteria
+                    </Button>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Manager</Label>
-                    <Input defaultValue={(project as any).manager || project.owner} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Section: KPIs */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-foreground border-b pb-2">Key Performance Indicators</h3>
-                <div className="space-y-2">
-                  {(project.kpis || []).map((kpi, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <Input defaultValue={kpi} />
-                      <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    </div>
-                  ))}
-                  <Button variant="outline" size="sm" className="gap-1 mt-1">
-                    <Plus className="h-3.5 w-3.5" /> Add KPI
-                  </Button>
-                </div>
-              </div>
-
-              {/* Section: Success Criteria */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-foreground border-b pb-2">Success Criteria</h3>
-                <div className="space-y-2">
-                  {((project as any).successCriteria || []).map((criteria: string, idx: number) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <Input defaultValue={criteria} />
-                      <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    </div>
-                  ))}
-                  <Button variant="outline" size="sm" className="gap-1 mt-1">
-                    <Plus className="h-3.5 w-3.5" /> Add Criteria
-                  </Button>
                 </div>
               </div>
 
