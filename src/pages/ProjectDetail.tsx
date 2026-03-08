@@ -241,8 +241,11 @@ const ProjectDetail = () => {
           <TabsContent value="overview" className="space-y-6">
             {/* Project Information - compact */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                 <CardTitle>Project Information</CardTitle>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditSection('projectInfo')}>
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3">
