@@ -614,6 +614,54 @@ const ProjectDetail = () => {
           </TabsContent>
 
           {/* Edit Dialogs */}
+          {/* Project Information Edit Dialog */}
+          <Dialog open={editSection === 'projectInfo'} onOpenChange={(open) => !open && setEditSection(null)}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Edit Project Information</DialogTitle>
+                <DialogDescription>Update project metadata and details.</DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Project Name</Label>
+                  <Input defaultValue={project.title} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Project Code</Label>
+                  <Input defaultValue={(project as any).code || 'PRJ-001'} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Project Type</Label>
+                  <Input defaultValue={(project as any).projectType || 'Strategic'} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Department</Label>
+                  <Input defaultValue={project.department} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Start Date</Label>
+                  <Input type="date" defaultValue={project.startDate} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>End Date</Label>
+                  <Input type="date" defaultValue={project.endDate} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Owner</Label>
+                  <Input defaultValue={project.owner} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Manager</Label>
+                  <Input defaultValue={(project as any).manager || project.owner} />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 mt-2">
+                <Button variant="outline" onClick={() => setEditSection(null)}>Cancel</Button>
+                <Button onClick={() => { toast.success("Project information updated"); setEditSection(null); }}>Save</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           {/* Purpose Edit Dialog */}
           <Dialog open={editSection === 'purpose'} onOpenChange={(open) => !open && setEditSection(null)}>
             <DialogContent>
