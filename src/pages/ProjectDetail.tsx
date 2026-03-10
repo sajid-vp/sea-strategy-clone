@@ -295,7 +295,7 @@ const ProjectDetail = () => {
                     <Target className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-base">Purpose / Business Justification</CardTitle>
+                    <CardTitle className="text-sm">Purpose / Business Justification</CardTitle>
                     <CardDescription className="text-xs">Why this project exists and its strategic value</CardDescription>
                   </div>
                 </div>
