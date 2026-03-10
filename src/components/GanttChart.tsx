@@ -776,7 +776,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate }: Gan
                                           {d.name}
                                         </span>
                                         {d.status === "done" && (
-                                          <CheckCircle2 className="h-3 w-3 text-emerald-500 flex-shrink-0 ml-auto" />
+                                          <CheckCircle2 className="h-3 w-3 text-success flex-shrink-0 ml-auto" />
                                         )}
                                       </div>
                                     );
