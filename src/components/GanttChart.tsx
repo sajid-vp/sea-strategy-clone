@@ -205,7 +205,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate }: Gan
           </div>
 
           <div className="flex items-center gap-1.5 bg-card rounded-lg border border-border px-3 py-1.5 shadow-sm">
-            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+            <CheckCircle2 className="h-3.5 w-3.5 text-success" />
             <span className="text-xs font-semibold text-foreground">
               {completedCount}/{milestones.length}
             </span>
