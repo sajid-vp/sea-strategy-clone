@@ -251,7 +251,7 @@ const ProjectDetail = () => {
                     <FolderKanban className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-base">Project Information</CardTitle>
+                    <CardTitle className="text-sm">Project Information</CardTitle>
                     <CardDescription className="text-xs">Core project details and metadata</CardDescription>
                   </div>
                 </div>
