@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send, ListChecks, Clock, TrendingUp, DollarSign, AlertTriangle, FileText, Link2, BarChart3, Flag, Network, Download, ChevronDown, ChevronRight, Package, Target, Paperclip, ShieldCheck, Lock, Pencil, X, Trash2, ChevronsUpDown, Check, FolderKanban } from "lucide-react";
+import { GanttChart } from "@/components/GanttChart";
 import { AddRiskForm } from "@/components/forms/AddRiskForm";
 import { AddIssueForm } from "@/components/forms/AddIssueForm";
 import { AddDependencyForm } from "@/components/forms/AddDependencyForm";
@@ -227,8 +228,9 @@ const ProjectDetail = () => {
 
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-4 lg:grid-cols-11 w-full">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-12 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="gantt">Gantt</TabsTrigger>
             <TabsTrigger value="objectives">Objectives</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
             <TabsTrigger value="milestones">Milestones</TabsTrigger>
@@ -1104,6 +1106,30 @@ const ProjectDetail = () => {
               </div>
             </DialogContent>
           </Dialog>
+
+          {/* Gantt Tab */}
+          <TabsContent value="gantt" className="space-y-6">
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-primary/5 to-transparent border-b">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-sm">Project Timeline</CardTitle>
+                    <CardDescription className="text-xs">Gantt chart view of milestones and progress</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-5">
+                <GanttChart
+                  milestones={project.milestones}
+                  projectStartDate={project.startDate}
+                  projectEndDate={project.endDate}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Objectives Tab */}
           <TabsContent value="objectives" className="space-y-6">
