@@ -455,7 +455,7 @@ const ProjectDetail = () => {
                       <ShieldCheck className="h-5 w-5 text-amber-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">Assumptions</CardTitle>
+                      <CardTitle className="text-sm">Assumptions</CardTitle>
                       <CardDescription className="text-xs">{(project as any).assumptions?.length || 0} assumptions documented</CardDescription>
                     </div>
                   </div>
