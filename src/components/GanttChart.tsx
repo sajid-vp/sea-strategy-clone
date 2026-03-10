@@ -351,7 +351,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate }: Gan
                     <span
                       className={cn(
                         "text-[11px] font-bold w-8 text-right tabular-nums",
-                        bar.progress === 100 ? "text-emerald-600" : "text-foreground"
+                        bar.progress === 100 ? "text-success" : "text-foreground"
                       )}
                     >
                       {bar.progress}%
