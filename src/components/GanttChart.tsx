@@ -377,10 +377,10 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate }: Gan
                           className={cn(
                             "text-[10px] font-medium capitalize px-2 py-0.5 rounded-full border",
                             d.status === "done"
-                              ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                              ? "bg-success/10 text-success border-success/20"
                               : d.status === "in-progress"
                               ? "bg-primary/10 text-primary border-primary/20"
-                              : "bg-slate-100 text-slate-500 border-slate-200"
+                              : "bg-muted text-muted-foreground border-border"
                           )}
                         >
                           {d.status.replace("-", " ")}
