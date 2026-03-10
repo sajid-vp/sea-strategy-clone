@@ -363,7 +363,7 @@ const ProjectDetail = () => {
                       <Package className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">Key Deliverables</CardTitle>
+                      <CardTitle className="text-sm">Key Deliverables</CardTitle>
                       <CardDescription className="text-xs">{(project as any).keyDeliverables?.length || 0} deliverables defined</CardDescription>
                     </div>
                   </div>
