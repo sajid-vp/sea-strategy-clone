@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { StatusBadge } from "@/components/StatusBadge";
 import { Header } from "@/components/Header";
 import { ArrowLeft, Users, User, Calendar, CheckCircle2, Plus, AlertCircle, MessageSquare, Send, ListChecks, Clock, TrendingUp, DollarSign, AlertTriangle, FileText, Link2, BarChart3, Flag, Network, Download, ChevronDown, ChevronRight, Package, Target, Paperclip, ShieldCheck, Lock, Pencil, X, Trash2, ChevronsUpDown, Check, FolderKanban } from "lucide-react";
+import { GanttChart } from "@/components/GanttChart";
 import { AddRiskForm } from "@/components/forms/AddRiskForm";
 import { AddIssueForm } from "@/components/forms/AddIssueForm";
 import { AddDependencyForm } from "@/components/forms/AddDependencyForm";
