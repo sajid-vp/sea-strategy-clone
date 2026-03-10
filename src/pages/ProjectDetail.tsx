@@ -490,7 +490,7 @@ const ProjectDetail = () => {
                       <Lock className="h-5 w-5 text-rose-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">Constraints</CardTitle>
+                      <CardTitle className="text-sm">Constraints</CardTitle>
                       <CardDescription className="text-xs">{(project as any).constraints?.length || 0} constraints documented</CardDescription>
                     </div>
                   </div>
