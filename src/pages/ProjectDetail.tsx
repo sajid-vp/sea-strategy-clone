@@ -326,7 +326,7 @@ const ProjectDetail = () => {
                       <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">Project Objectives</CardTitle>
+                      <CardTitle className="text-sm">Project Objectives</CardTitle>
                       <CardDescription className="text-xs">{(project as any).projectObjectives?.length || 0} objectives defined</CardDescription>
                     </div>
                   </div>
