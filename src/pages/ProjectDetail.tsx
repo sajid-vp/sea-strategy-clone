@@ -251,7 +251,7 @@ const ProjectDetail = () => {
                     <FolderKanban className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-base">Project Information</CardTitle>
+                    <CardTitle className="text-sm">Project Information</CardTitle>
                     <CardDescription className="text-xs">Core project details and metadata</CardDescription>
                   </div>
                 </div>
@@ -295,7 +295,7 @@ const ProjectDetail = () => {
                     <Target className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-base">Purpose / Business Justification</CardTitle>
+                    <CardTitle className="text-sm">Purpose / Business Justification</CardTitle>
                     <CardDescription className="text-xs">Why this project exists and its strategic value</CardDescription>
                   </div>
                 </div>
@@ -326,7 +326,7 @@ const ProjectDetail = () => {
                       <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">Project Objectives</CardTitle>
+                      <CardTitle className="text-sm">Project Objectives</CardTitle>
                       <CardDescription className="text-xs">{(project as any).projectObjectives?.length || 0} objectives defined</CardDescription>
                     </div>
                   </div>
@@ -363,7 +363,7 @@ const ProjectDetail = () => {
                       <Package className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">Key Deliverables</CardTitle>
+                      <CardTitle className="text-sm">Key Deliverables</CardTitle>
                       <CardDescription className="text-xs">{(project as any).keyDeliverables?.length || 0} deliverables defined</CardDescription>
                     </div>
                   </div>
@@ -402,7 +402,7 @@ const ProjectDetail = () => {
                     <FileText className="h-5 w-5 text-violet-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-base">Project Scope</CardTitle>
+                    <CardTitle className="text-sm">Project Scope</CardTitle>
                     <CardDescription className="text-xs">Boundaries and deliverable definitions</CardDescription>
                   </div>
                 </div>
@@ -455,7 +455,7 @@ const ProjectDetail = () => {
                       <ShieldCheck className="h-5 w-5 text-amber-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">Assumptions</CardTitle>
+                      <CardTitle className="text-sm">Assumptions</CardTitle>
                       <CardDescription className="text-xs">{(project as any).assumptions?.length || 0} assumptions documented</CardDescription>
                     </div>
                   </div>
@@ -490,7 +490,7 @@ const ProjectDetail = () => {
                       <Lock className="h-5 w-5 text-rose-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">Constraints</CardTitle>
+                      <CardTitle className="text-sm">Constraints</CardTitle>
                       <CardDescription className="text-xs">{(project as any).constraints?.length || 0} constraints documented</CardDescription>
                     </div>
                   </div>
