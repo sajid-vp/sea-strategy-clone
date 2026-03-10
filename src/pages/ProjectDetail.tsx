@@ -243,52 +243,44 @@ const ProjectDetail = () => {
 
           {/* 1️⃣ Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            {/* Project Information - compact */}
-            <Card>
-              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="flex items-center gap-2"><FolderKanban className="h-5 w-5 text-primary" />Project Information</CardTitle>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditSection('projectInfo')}>
-                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+            {/* Project Information */}
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-primary/5 to-transparent border-b">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <FolderKanban className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">Project Information</CardTitle>
+                    <CardDescription className="text-xs">Core project details and metadata</CardDescription>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => setEditSection('projectInfo')}>
+                  <Pencil className="h-3 w-3" />
+                  Edit
                 </Button>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Project Name</p>
-                    <p className="text-sm font-medium">{project.title}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Project Code</p>
-                    <p className="text-sm font-medium">{(project as any).code || 'PRJ-001'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Project Type</p>
-                    <p className="text-sm font-medium">{(project as any).projectType || 'Strategic'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Department</p>
-                    <p className="text-sm font-medium">{project.department}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Start Date</p>
-                    <p className="text-sm font-medium">{new Date(project.startDate).toLocaleDateString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">End Date</p>
-                    <p className="text-sm font-medium">{new Date(project.endDate).toLocaleDateString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Owner</p>
-                    <p className="text-sm font-medium">{project.owner}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Manager</p>
-                    <p className="text-sm font-medium">{(project as any).manager || project.owner}</p>
-                  </div>
-                  <div className="md:col-span-2">
-                    <p className="text-xs text-muted-foreground">Parent Initiative</p>
+              <CardContent className="pt-5">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                  {[
+                    { label: 'Project Name', value: project.title },
+                    { label: 'Project Code', value: (project as any).code || 'PRJ-001' },
+                    { label: 'Project Type', value: (project as any).projectType || 'Strategic' },
+                    { label: 'Department', value: project.department },
+                    { label: 'Start Date', value: new Date(project.startDate).toLocaleDateString() },
+                    { label: 'End Date', value: new Date(project.endDate).toLocaleDateString() },
+                    { label: 'Owner', value: project.owner },
+                    { label: 'Manager', value: (project as any).manager || project.owner },
+                  ].map((item, idx) => (
+                    <div key={idx} className="space-y-1">
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{item.label}</p>
+                      <p className="text-sm font-semibold">{item.value}</p>
+                    </div>
+                  ))}
+                  <div className="md:col-span-2 space-y-1">
+                    <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Parent Initiative</p>
                     <Link to={`/initiatives/${parentInitiative.id}`}>
-                      <p className="text-sm font-medium text-primary hover:underline">{parentInitiative.title}</p>
+                      <p className="text-sm font-semibold text-primary hover:underline">{parentInitiative.title}</p>
                     </Link>
                   </div>
                 </div>
@@ -296,98 +288,156 @@ const ProjectDetail = () => {
             </Card>
 
             {/* Purpose / Business Justification */}
-            <Card>
-              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-4 w-4 text-primary" />
-                  Purpose / Business Justification
-                </CardTitle>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditPurpose((project as any).purpose || ''); setEditSection('purpose'); }}>
-                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-accent/60 to-transparent border-b">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-accent flex items-center justify-center">
+                    <Target className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">Purpose / Business Justification</CardTitle>
+                    <CardDescription className="text-xs">Why this project exists and its strategic value</CardDescription>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => { setEditPurpose((project as any).purpose || ''); setEditSection('purpose'); }}>
+                  <Pencil className="h-3 w-3" />
+                  Edit
                 </Button>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm leading-relaxed">{(project as any).purpose || 'No purpose defined yet.'}</p>
+              <CardContent className="pt-5">
+                {(project as any).purpose ? (
+                  <p className="text-sm leading-relaxed text-foreground/90">{(project as any).purpose}</p>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6 text-center">
+                    <Target className="h-8 w-8 text-muted-foreground/30 mb-2" />
+                    <p className="text-sm text-muted-foreground">No purpose defined yet.</p>
+                    <p className="text-xs text-muted-foreground/60 mt-1">Click Edit to add the business justification</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             {/* Objectives & Key Deliverables */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-                  <CardTitle className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                    Project Objectives
-                  </CardTitle>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditObjectives([...((project as any).projectObjectives || [])]); setEditSection('objectives'); }}>
-                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-emerald-500/5 to-transparent border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                      <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base">Project Objectives</CardTitle>
+                      <CardDescription className="text-xs">{(project as any).projectObjectives?.length || 0} objectives defined</CardDescription>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => { setEditObjectives([...((project as any).projectObjectives || [])]); setEditSection('objectives'); }}>
+                    <Pencil className="h-3 w-3" />
+                    Edit
                   </Button>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                   {(project as any).projectObjectives?.length > 0 ? (
-                    <ul className="space-y-2">
+                    <ul className="space-y-2.5">
                       {(project as any).projectObjectives.map((obj: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
-                          {obj}
+                        <li key={idx} className="flex items-start gap-3 text-sm group">
+                          <span className="mt-0.5 h-5 w-5 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                            {idx + 1}
+                          </span>
+                          <span className="leading-relaxed">{obj}</span>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No objectives defined yet.</p>
+                    <div className="flex flex-col items-center justify-center py-6 text-center">
+                      <CheckCircle2 className="h-8 w-8 text-muted-foreground/30 mb-2" />
+                      <p className="text-sm text-muted-foreground">No objectives defined yet.</p>
+                    </div>
                   )}
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-                  <CardTitle className="flex items-center gap-2">
-                    <Package className="h-4 w-4 text-primary" />
-                    Key Deliverables
-                  </CardTitle>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditDeliverables([...((project as any).keyDeliverables || [])]); setEditSection('deliverables'); }}>
-                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-blue-500/5 to-transparent border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      <Package className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base">Key Deliverables</CardTitle>
+                      <CardDescription className="text-xs">{(project as any).keyDeliverables?.length || 0} deliverables defined</CardDescription>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => { setEditDeliverables([...((project as any).keyDeliverables || [])]); setEditSection('deliverables'); }}>
+                    <Pencil className="h-3 w-3" />
+                    Edit
                   </Button>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                   {(project as any).keyDeliverables?.length > 0 ? (
-                    <ul className="space-y-2">
+                    <ul className="space-y-2.5">
                       {(project as any).keyDeliverables.map((del: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
-                          {del}
+                        <li key={idx} className="flex items-start gap-3 text-sm group">
+                          <span className="mt-0.5 h-5 w-5 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                            {idx + 1}
+                          </span>
+                          <span className="leading-relaxed">{del}</span>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No deliverables defined yet.</p>
+                    <div className="flex flex-col items-center justify-center py-6 text-center">
+                      <Package className="h-8 w-8 text-muted-foreground/30 mb-2" />
+                      <p className="text-sm text-muted-foreground">No deliverables defined yet.</p>
+                    </div>
                   )}
                 </CardContent>
               </Card>
             </div>
 
             {/* Project Scope */}
-            <Card>
-              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-primary" />
-                  Project Scope
-                </CardTitle>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditScopeDesc((project as any).scope?.description || ''); setEditSection('scope'); }}>
-                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-violet-500/5 to-transparent border-b">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                    <FileText className="h-5 w-5 text-violet-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">Project Scope</CardTitle>
+                    <CardDescription className="text-xs">Boundaries and deliverable definitions</CardDescription>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => { setEditScopeDesc((project as any).scope?.description || ''); setEditSection('scope'); }}>
+                  <Pencil className="h-3 w-3" />
+                  Edit
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm leading-relaxed">{(project as any).scope?.description || 'No scope defined yet.'}</p>
+              <CardContent className="pt-5 space-y-4">
+                {(project as any).scope?.description ? (
+                  <p className="text-sm leading-relaxed text-foreground/90">{(project as any).scope.description}</p>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6 text-center">
+                    <FileText className="h-8 w-8 text-muted-foreground/30 mb-2" />
+                    <p className="text-sm text-muted-foreground">No scope defined yet.</p>
+                    <p className="text-xs text-muted-foreground/60 mt-1">Click Edit to define the project scope</p>
+                  </div>
+                )}
                 {(project as any).scope?.attachments?.length > 0 && (
-                  <div className="pt-2 border-t">
-                    <p className="text-xs text-muted-foreground mb-2">Attachments</p>
-                    <div className="space-y-1">
+                  <div className="pt-3 border-t">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Attachments ({(project as any).scope.attachments.length})</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {(project as any).scope.attachments.map((att: any, idx: number) => (
-                        <div key={idx} className="flex items-center gap-2 text-sm p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors cursor-pointer">
-                          <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span>{att.name}</span>
-                          <span className="text-xs text-muted-foreground ml-auto">{att.uploadedDate}</span>
+                        <div key={idx} className="flex items-center gap-3 text-sm p-3 rounded-lg border bg-muted/30 hover:bg-muted/60 transition-colors cursor-pointer group">
+                          <div className="h-8 w-8 rounded-md bg-violet-500/10 flex items-center justify-center flex-shrink-0">
+                            <FileText className="h-4 w-4 text-violet-600" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium truncate">{att.name}</p>
+                            <p className="text-[11px] text-muted-foreground">{att.uploadedDate}</p>
+                          </div>
+                          <Download className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                       ))}
                     </div>
@@ -398,54 +448,72 @@ const ProjectDetail = () => {
 
             {/* Assumptions & Constraints */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-                  <CardTitle className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
-                    Assumptions
-                  </CardTitle>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditAssumptions([...((project as any).assumptions || [])]); setEditSection('assumptions'); }}>
-                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-amber-500/5 to-transparent border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                      <ShieldCheck className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base">Assumptions</CardTitle>
+                      <CardDescription className="text-xs">{(project as any).assumptions?.length || 0} assumptions documented</CardDescription>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => { setEditAssumptions([...((project as any).assumptions || [])]); setEditSection('assumptions'); }}>
+                    <Pencil className="h-3 w-3" />
+                    Edit
                   </Button>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                   {(project as any).assumptions?.length > 0 ? (
                     <ul className="space-y-2">
                       {(project as any).assumptions.map((item: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-muted-foreground flex-shrink-0" />
-                          {item}
+                        <li key={idx} className="flex items-start gap-3 text-sm p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/10">
+                          <ShieldCheck className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                          <span className="leading-relaxed">{item}</span>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No assumptions documented.</p>
+                    <div className="flex flex-col items-center justify-center py-6 text-center">
+                      <ShieldCheck className="h-8 w-8 text-muted-foreground/30 mb-2" />
+                      <p className="text-sm text-muted-foreground">No assumptions documented.</p>
+                    </div>
                   )}
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-                  <CardTitle className="flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-primary" />
-                    Constraints
-                  </CardTitle>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditConstraints([...((project as any).constraints || [])]); setEditSection('constraints'); }}>
-                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-rose-500/5 to-transparent border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-rose-500/10 flex items-center justify-center">
+                      <Lock className="h-5 w-5 text-rose-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base">Constraints</CardTitle>
+                      <CardDescription className="text-xs">{(project as any).constraints?.length || 0} constraints documented</CardDescription>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => { setEditConstraints([...((project as any).constraints || [])]); setEditSection('constraints'); }}>
+                    <Pencil className="h-3 w-3" />
+                    Edit
                   </Button>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                   {(project as any).constraints?.length > 0 ? (
                     <ul className="space-y-2">
                       {(project as any).constraints.map((item: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-destructive/60 flex-shrink-0" />
-                          {item}
+                        <li key={idx} className="flex items-start gap-3 text-sm p-2.5 rounded-lg bg-rose-500/5 border border-rose-500/10">
+                          <Lock className="h-4 w-4 text-rose-500 mt-0.5 flex-shrink-0" />
+                          <span className="leading-relaxed">{item}</span>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No constraints documented.</p>
+                    <div className="flex flex-col items-center justify-center py-6 text-center">
+                      <Lock className="h-8 w-8 text-muted-foreground/30 mb-2" />
+                      <p className="text-sm text-muted-foreground">No constraints documented.</p>
+                    </div>
                   )}
                 </CardContent>
               </Card>
