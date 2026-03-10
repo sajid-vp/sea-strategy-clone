@@ -402,7 +402,7 @@ const ProjectDetail = () => {
                     <FileText className="h-5 w-5 text-violet-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-base">Project Scope</CardTitle>
+                    <CardTitle className="text-sm">Project Scope</CardTitle>
                     <CardDescription className="text-xs">Boundaries and deliverable definitions</CardDescription>
                   </div>
                 </div>
