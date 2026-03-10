@@ -1106,6 +1106,30 @@ const ProjectDetail = () => {
             </DialogContent>
           </Dialog>
 
+          {/* Gantt Tab */}
+          <TabsContent value="gantt" className="space-y-6">
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-primary/5 to-transparent border-b">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-sm">Project Timeline</CardTitle>
+                    <CardDescription className="text-xs">Gantt chart view of milestones and progress</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-5">
+                <GanttChart
+                  milestones={project.milestones}
+                  projectStartDate={project.startDate}
+                  projectEndDate={project.endDate}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Objectives Tab */}
           <TabsContent value="objectives" className="space-y-6">
             <Card>
