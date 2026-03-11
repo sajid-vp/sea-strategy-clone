@@ -129,11 +129,26 @@ export const initiatives = [
           },
         ],
         tasks: [
-          { id: 1, name: "Gap Analysis", status: "done" as const, priority: "high" as const, assignee: "John Smith", dependencies: [], subtasks: [] },
-          { id: 2, name: "Policy Documentation", status: "in-progress" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [1], subtasks: [] },
-          { id: 3, name: "Security Controls Implementation", status: "in-progress" as const, priority: "medium" as const, assignee: "Mike Chen", dependencies: [2], subtasks: [] },
-          { id: 4, name: "Internal Audit", status: "todo" as const, priority: "medium" as const, assignee: "John Smith", dependencies: [3], subtasks: [] },
-          { id: 5, name: "Certification Audit", status: "todo" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [4], subtasks: [] },
+          // Gap Analysis milestone tasks
+          { id: 1, name: "Identify current security controls", status: "done" as const, priority: "high" as const, assignee: "John Smith", dependencies: [], subtasks: [], milestoneId: 1 },
+          { id: 2, name: "Interview department heads", status: "done" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [1], subtasks: [], milestoneId: 1 },
+          { id: 3, name: "Document security gaps", status: "done" as const, priority: "high" as const, assignee: "John Smith", dependencies: [2], subtasks: [], milestoneId: 1 },
+          // Policy Documentation milestone tasks
+          { id: 4, name: "Draft information security policy", status: "done" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [3], subtasks: [], milestoneId: 2 },
+          { id: 5, name: "Create access control procedures", status: "in-progress" as const, priority: "high" as const, assignee: "Mike Chen", dependencies: [4], subtasks: [], milestoneId: 2 },
+          { id: 6, name: "Review & approve policies", status: "todo" as const, priority: "medium" as const, assignee: "John Smith", dependencies: [5], subtasks: [], milestoneId: 2 },
+          // Security Controls Implementation milestone tasks
+          { id: 7, name: "Configure firewall rules", status: "in-progress" as const, priority: "high" as const, assignee: "Mike Chen", dependencies: [4], subtasks: [], milestoneId: 3 },
+          { id: 8, name: "Deploy endpoint protection", status: "in-progress" as const, priority: "medium" as const, assignee: "Mike Chen", dependencies: [7], subtasks: [], milestoneId: 3 },
+          { id: 9, name: "Set up SIEM monitoring", status: "todo" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [8], subtasks: [], milestoneId: 3 },
+          // Internal Audit milestone tasks
+          { id: 10, name: "Prepare audit checklist", status: "todo" as const, priority: "medium" as const, assignee: "John Smith", dependencies: [9], subtasks: [], milestoneId: 4 },
+          { id: 11, name: "Conduct internal audit", status: "todo" as const, priority: "high" as const, assignee: "John Smith", dependencies: [10], subtasks: [], milestoneId: 4 },
+          { id: 12, name: "Write audit findings report", status: "todo" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [11], subtasks: [], milestoneId: 4 },
+          // Certification Audit milestone tasks
+          { id: 13, name: "Schedule external auditor", status: "todo" as const, priority: "high" as const, assignee: "John Smith", dependencies: [12], subtasks: [], milestoneId: 5 },
+          { id: 14, name: "Conduct certification audit", status: "todo" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [13], subtasks: [], milestoneId: 5 },
+          { id: 15, name: "Address non-conformities", status: "todo" as const, priority: "high" as const, assignee: "Mike Chen", dependencies: [14], subtasks: [], milestoneId: 5 },
         ],
         activities: [
           { id: 1, user: "John Smith", action: "updated milestone", detail: "Policy Documentation", timestamp: "2025-01-08 10:30" },
