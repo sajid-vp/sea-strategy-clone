@@ -141,7 +141,6 @@ type ViewMode = "gantt" | "list";
 
 export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks }: GanttChartProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   const [collapsedMilestones, setCollapsedMilestones] = useState<Record<number, boolean>>({});
@@ -255,11 +254,8 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
     return pct >= 0 && pct <= 100 ? pct : null;
   })();
 
-  const handleScroll = () => {
-    if (scrollRef.current && sidebarRef.current) {
-      sidebarRef.current.scrollTop = scrollRef.current.scrollTop;
-    }
-  };
+
+
 
   useEffect(() => {
     if (scrollRef.current && todayPct !== null) {
@@ -409,82 +405,21 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
     </div>
   );
 
+  const BAR_MIN_TEXT_WIDTH = 6; // minimum % width to show text
+
   // ─── Gantt View ───
   const renderGanttView = () => (
-    <div className="flex overflow-hidden" style={{ maxHeight: 600 }}>
-      {/* Sidebar */}
-      <div ref={sidebarRef} className="flex-shrink-0 border-r border-border bg-card overflow-hidden" style={{ width: SIDEBAR_WIDTH }}>
-        <div className="flex items-center px-3 border-b border-border bg-muted/20 sticky top-0 z-10" style={{ height: HEADER_HEIGHT }}>
-          <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground flex-1">Milestone / Task</span>
-          <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground w-16 text-right">Progress</span>
+    <div className="flex flex-col" style={{ maxHeight: 600 }}>
+      {/* Fixed Header Row */}
+      <div className="flex border-b border-border flex-shrink-0">
+        <div className="flex-shrink-0 border-r border-border bg-muted/20" style={{ width: SIDEBAR_WIDTH }}>
+          <div className="flex items-center px-3" style={{ height: HEADER_HEIGHT }}>
+            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground flex-1">Milestone / Task</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground w-16 text-right">Progress</span>
+          </div>
         </div>
-
-        {rows.map((row) => {
-          if (row.type === "milestone") {
-            const m = row.milestone;
-            const config = statusConfig[m.status] || statusConfig.todo;
-            const isCollapsed = collapsedMilestones[m.id];
-            const taskCount = tasksByMilestone.get(m.id)?.length || 0;
-
-            return (
-              <div
-                key={`m-${m.id}`}
-                className="flex items-center gap-2 px-3 border-b border-border/40 bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors"
-                style={{ height: MILESTONE_ROW_HEIGHT }}
-                onClick={() => toggleMilestone(m.id)}
-              >
-                <span className="text-muted-foreground flex-shrink-0">
-                  {isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                </span>
-                <div className={cn("h-2 w-2 rounded-sm flex-shrink-0", config.dot)} />
-                <div className="flex-1 min-w-0">
-                  <span className="text-[11px] font-semibold text-foreground truncate block">{m.name}</span>
-                  <span className="text-[8px] text-muted-foreground">
-                    {taskCount} task{taskCount !== 1 ? "s" : ""} · Due {format(parseISO(m.dueDate), "MMM d")}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 flex-shrink-0 w-16 justify-end">
-                  <div className="w-8 h-1 rounded-full bg-muted overflow-hidden">
-                    <div className={cn("h-full rounded-full", config.fill)} style={{ width: `${m.progress}%` }} />
-                  </div>
-                  <span className={cn("text-[9px] font-bold tabular-nums", m.progress === 100 ? "text-emerald-500" : "text-foreground")}>
-                    {m.progress}%
-                  </span>
-                </div>
-              </div>
-            );
-          }
-
-          const t = row.task;
-          const config = statusConfig[t.status] || statusConfig.todo;
-          const isHovered = hoveredRow === t.id;
-
-          return (
-            <div
-              key={`t-${t.id}`}
-              className={cn("flex items-center gap-2 px-3 pl-8 border-b border-border/15 transition-colors", isHovered && "bg-accent/50")}
-              style={{ height: TASK_ROW_HEIGHT }}
-              onMouseEnter={() => setHoveredRow(t.id)}
-              onMouseLeave={() => setHoveredRow(null)}
-            >
-              <div className={cn("h-1.5 w-1.5 rounded-full flex-shrink-0", config.dot)} />
-              <div className="flex-1 min-w-0">
-                <span className="text-[10px] font-medium text-foreground truncate block">{t.name}</span>
-                <span className="text-[8px] text-muted-foreground/60">{t.assignee}</span>
-              </div>
-              <Badge variant="outline" className={cn("text-[7px] h-3.5 px-1 capitalize shrink-0", config.bg, config.text, config.border)}>
-                {config.label}
-              </Badge>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Timeline */}
-      <div className="flex-1 overflow-auto" ref={scrollRef} onScroll={handleScroll}>
-        <div className="relative min-w-[700px]" ref={timelineRef}>
-          {/* Month headers */}
-          <div className="sticky top-0 z-20 border-b border-border bg-muted/30 backdrop-blur-sm relative" style={{ height: HEADER_HEIGHT }}>
+        <div className="flex-1 overflow-hidden">
+          <div className="relative bg-muted/30" style={{ height: HEADER_HEIGHT, minWidth: 700 }}>
             {months.map((month, idx) => {
               const mStart = idx === 0 ? projStart : month;
               const mEnd = idx === months.length - 1 ? projEnd : new Date(month.getFullYear(), month.getMonth() + 1, 0);
@@ -505,9 +440,77 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
               );
             })}
           </div>
+        </div>
+      </div>
 
-          {/* Timeline body */}
-          <div className="relative" style={{ height: totalBodyHeight }}>
+      {/* Scrollable Body - single scroll container */}
+      <div className="flex-1 overflow-auto" ref={scrollRef} style={{ maxHeight: 600 - HEADER_HEIGHT }}>
+        <div className="flex" style={{ minHeight: totalBodyHeight }}>
+          {/* Sidebar Body */}
+          <div className="flex-shrink-0 border-r border-border bg-card" style={{ width: SIDEBAR_WIDTH }}>
+            {rows.map((row) => {
+              if (row.type === "milestone") {
+                const m = row.milestone;
+                const config = statusConfig[m.status] || statusConfig.todo;
+                const isCollapsed = collapsedMilestones[m.id];
+                const taskCount = tasksByMilestone.get(m.id)?.length || 0;
+
+                return (
+                  <div
+                    key={`m-${m.id}`}
+                    className="flex items-center gap-2 px-3 border-b border-border/40 bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors"
+                    style={{ height: MILESTONE_ROW_HEIGHT }}
+                    onClick={() => toggleMilestone(m.id)}
+                  >
+                    <span className="text-muted-foreground flex-shrink-0">
+                      {isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                    </span>
+                    <div className={cn("h-2 w-2 rounded-sm flex-shrink-0", config.dot)} />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[11px] font-semibold text-foreground truncate block">{m.name}</span>
+                      <span className="text-[8px] text-muted-foreground">
+                        {taskCount} task{taskCount !== 1 ? "s" : ""} · Due {format(parseISO(m.dueDate), "MMM d")}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-shrink-0 w-16 justify-end">
+                      <div className="w-8 h-1 rounded-full bg-muted overflow-hidden">
+                        <div className={cn("h-full rounded-full", config.fill)} style={{ width: `${m.progress}%` }} />
+                      </div>
+                      <span className={cn("text-[9px] font-bold tabular-nums", m.progress === 100 ? "text-emerald-500" : "text-foreground")}>
+                        {m.progress}%
+                      </span>
+                    </div>
+                  </div>
+                );
+              }
+
+              const t = row.task;
+              const config = statusConfig[t.status] || statusConfig.todo;
+              const isHovered = hoveredRow === t.id;
+
+              return (
+                <div
+                  key={`t-${t.id}`}
+                  className={cn("flex items-center gap-2 px-3 pl-8 border-b border-border/15 transition-colors", isHovered && "bg-accent/50")}
+                  style={{ height: TASK_ROW_HEIGHT }}
+                  onMouseEnter={() => setHoveredRow(t.id)}
+                  onMouseLeave={() => setHoveredRow(null)}
+                >
+                  <div className={cn("h-1.5 w-1.5 rounded-full flex-shrink-0", config.dot)} />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[10px] font-medium text-foreground truncate block">{t.name}</span>
+                    <span className="text-[8px] text-muted-foreground/60">{t.assignee}</span>
+                  </div>
+                  <Badge variant="outline" className={cn("text-[7px] h-3.5 px-1 capitalize shrink-0", config.bg, config.text, config.border)}>
+                    {config.label}
+                  </Badge>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Timeline Body */}
+          <div className="flex-1 relative" ref={timelineRef} style={{ minWidth: 700 }}>
             {/* Weekend shading */}
             <div className="absolute inset-0 pointer-events-none z-0">
               {weekendDays.map((wd, idx) => (
@@ -612,7 +615,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                           <div className={cn("absolute inset-0 rounded opacity-20 bg-gradient-to-r", config.gradient)} />
                           <div className={cn("absolute left-0 top-0 bottom-0 w-1 rounded-l", config.fill, "opacity-60")} />
                           <div className={cn("absolute right-0 top-0 bottom-0 w-1 rounded-r", config.fill, "opacity-60")} />
-                          <div className="relative h-full flex items-center px-2">
+                          <div className="relative h-full flex items-center px-2 overflow-hidden">
                             <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-wider truncate">{m.name}</span>
                           </div>
                         </div>
@@ -629,6 +632,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                 const { s: adjStart, e: adjEnd } = getAdjustedDays(t.id, row.startDay, row.endDay);
                 const leftPct = (adjStart / totalDays) * 100;
                 const widthPct = Math.max(((adjEnd - adjStart) / totalDays) * 100, 2);
+                const showText = widthPct >= BAR_MIN_TEXT_WIDTH;
                 const startDate = addDays(projStart, adjStart);
                 const endDate = addDays(projStart, adjEnd);
 
@@ -662,10 +666,12 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                                   <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 3px, white 3px, white 4px)" }} />
                                 </div>
                               )}
-                              <div className="relative h-full flex items-center justify-between px-2 z-10">
-                                <span className={cn("text-[9px] font-semibold truncate", row.progress > 40 ? "text-white drop-shadow-sm" : config.text)}>{t.name}</span>
-                                <span className={cn("text-[8px] font-bold ml-1 flex-shrink-0 tabular-nums", row.progress > 60 ? "text-white/80" : config.text)}>{row.progress}%</span>
-                              </div>
+                              {showText && (
+                                <div className="relative h-full flex items-center justify-between px-2 z-10">
+                                  <span className={cn("text-[9px] font-semibold truncate", row.progress > 40 ? "text-white drop-shadow-sm" : config.text)}>{t.name}</span>
+                                  <span className={cn("text-[8px] font-bold ml-1 flex-shrink-0 tabular-nums", row.progress > 60 ? "text-white/80" : config.text)}>{row.progress}%</span>
+                                </div>
+                              )}
 
                               {/* Resize handles */}
                               <div
