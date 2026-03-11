@@ -31,6 +31,7 @@ interface Task {
   assignee: string;
   dependencies: number[];
   subtasks: any[];
+  milestoneId?: number;
 }
 
 interface Milestone {
