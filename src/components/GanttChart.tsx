@@ -141,7 +141,7 @@ type ViewMode = "gantt" | "list";
 
 export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks }: GanttChartProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   const [collapsedMilestones, setCollapsedMilestones] = useState<Record<number, boolean>>({});
