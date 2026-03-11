@@ -18,6 +18,8 @@ import {
   Ban,
   Search,
   CalendarDays,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -121,38 +123,104 @@ const priorityConfig: Record<string, { color: string; label: string }> = {
   low: { color: "text-muted-foreground", label: "Low" },
 };
 
-const ROW_HEIGHT = 44;
+const MILESTONE_ROW_HEIGHT = 40;
+const TASK_ROW_HEIGHT = 44;
 const SIDEBAR_WIDTH = 320;
 const HEADER_HEIGHT = 44;
+
+type RowItem =
+  | { type: "milestone"; milestone: Milestone; startDay: number; endDay: number }
+  | { type: "task"; task: Task; milestoneId: number; startDay: number; endDay: number; progress: number };
 
 export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks }: GanttChartProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const [collapsedMilestones, setCollapsedMilestones] = useState<Record<number, boolean>>({});
 
   const projStart = parseISO(projectStartDate);
   const projEnd = parseISO(projectEndDate);
   const totalDays = differenceInDays(projEnd, projStart) || 1;
 
-  // Build flat task rows with timeline positions
-  const taskRows = useMemo(() => {
-    if (!tasks || tasks.length === 0) return [];
+  const toggleMilestone = (id: number) =>
+    setCollapsedMilestones((prev) => ({ ...prev, [id]: !prev[id] }));
 
-    const count = tasks.length;
-    const sliceDays = Math.max(Math.floor(totalDays / count), 1);
+  // Sort milestones by due date
+  const sortedMilestones = useMemo(
+    () => [...milestones].sort((a, b) => parseISO(a.dueDate).getTime() - parseISO(b.dueDate).getTime()),
+    [milestones]
+  );
 
-    return tasks.map((task, idx) => {
-      const startDay = idx * sliceDays;
-      const endDay = idx === count - 1 ? totalDays : startDay + sliceDays;
-      const progress =
-        task.status === "done" ? 100 :
-        task.status === "in-progress" ? 55 :
-        task.status === "in-review" ? 80 :
-        task.status === "blocked" ? 20 : 0;
+  // Match tasks to milestones by name or index
+  const tasksByMilestone = useMemo(() => {
+    const map = new Map<number, Task[]>();
+    if (!tasks || tasks.length === 0) return map;
 
-      return { task, startDay, endDay, progress };
+    // Try matching by name first
+    sortedMilestones.forEach((m) => {
+      const matched = tasks.filter(
+        (t) => t.name.toLowerCase() === m.name.toLowerCase()
+      );
+      if (matched.length > 0) {
+        map.set(m.id, matched);
+      }
     });
-  }, [tasks, totalDays]);
+
+    // If no name matches, distribute tasks proportionally
+    if (map.size === 0 && sortedMilestones.length > 0) {
+      const perMilestone = Math.ceil(tasks.length / sortedMilestones.length);
+      sortedMilestones.forEach((m, idx) => {
+        const slice = tasks.slice(idx * perMilestone, (idx + 1) * perMilestone);
+        if (slice.length > 0) map.set(m.id, slice);
+      });
+    }
+
+    // Add unmatched tasks to last milestone
+    const matchedIds = new Set(Array.from(map.values()).flat().map((t) => t.id));
+    const unmatched = tasks.filter((t) => !matchedIds.has(t.id));
+    if (unmatched.length > 0) {
+      const lastM = sortedMilestones[sortedMilestones.length - 1];
+      const existing = map.get(lastM.id) || [];
+      map.set(lastM.id, [...existing, ...unmatched]);
+    }
+
+    return map;
+  }, [tasks, sortedMilestones]);
+
+  // Build flat row list with timeline positions
+  const rows = useMemo(() => {
+    const result: RowItem[] = [];
+    let prevEndDay = 0;
+
+    sortedMilestones.forEach((m, mIdx) => {
+      const mEndDay = Math.round((differenceInDays(parseISO(m.dueDate), projStart) / totalDays) * totalDays);
+      const mStartDay = prevEndDay;
+
+      result.push({ type: "milestone", milestone: m, startDay: mStartDay, endDay: mEndDay });
+
+      if (!collapsedMilestones[m.id]) {
+        const mTasks = tasksByMilestone.get(m.id) || [];
+        const taskCount = mTasks.length || 1;
+        const sliceDays = Math.max(Math.floor((mEndDay - mStartDay) / taskCount), 1);
+
+        mTasks.forEach((task, tIdx) => {
+          const tStart = mStartDay + tIdx * sliceDays;
+          const tEnd = tIdx === mTasks.length - 1 ? mEndDay : tStart + sliceDays;
+          const progress =
+            task.status === "done" ? 100 :
+            task.status === "in-progress" ? 55 :
+            task.status === "in-review" ? 80 :
+            task.status === "blocked" ? 20 : 0;
+
+          result.push({ type: "task", task, milestoneId: m.id, startDay: tStart, endDay: tEnd, progress });
+        });
+      }
+
+      prevEndDay = mEndDay;
+    });
+
+    return result;
+  }, [sortedMilestones, collapsedMilestones, tasksByMilestone, projStart, totalDays]);
 
   // Month headers
   const months = useMemo(
@@ -192,9 +260,15 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
     }
   }, []);
 
-  const totalBodyHeight = taskRows.length * ROW_HEIGHT;
-  const doneCount = tasks?.filter(t => t.status === "done").length || 0;
-  const overallProgress = tasks && tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
+  const totalBodyHeight = rows.reduce(
+    (h, r) => h + (r.type === "milestone" ? MILESTONE_ROW_HEIGHT : TASK_ROW_HEIGHT),
+    0
+  );
+
+  const overallProgress =
+    milestones.length > 0
+      ? Math.round(milestones.reduce((s, m) => s + m.progress, 0) / milestones.length)
+      : 0;
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
@@ -202,6 +276,9 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
         <div className="flex items-center gap-3 text-xs">
           <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+          <span className="font-semibold">{milestones.length}</span>
+          <span className="text-muted-foreground">milestones</span>
+          <div className="h-4 w-px bg-border" />
           <span className="font-semibold">{tasks?.length || 0}</span>
           <span className="text-muted-foreground">tasks</span>
           <div className="h-4 w-px bg-border" />
@@ -218,7 +295,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
       </div>
 
       <div className="flex overflow-hidden" style={{ maxHeight: 600 }}>
-        {/* Sidebar */}
+        {/* ─── Sidebar ─── */}
         <div
           ref={sidebarRef}
           className="flex-shrink-0 border-r border-border bg-card overflow-hidden"
@@ -228,28 +305,68 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
             className="flex items-center px-3 border-b border-border bg-muted/20 sticky top-0 z-10"
             style={{ height: HEADER_HEIGHT }}
           >
-            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground w-6 text-center">#</span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground flex-1 pl-2">Task</span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground w-14 text-center">Status</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground flex-1">
+              Milestone / Task
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground w-16 text-right">
+              Progress
+            </span>
           </div>
 
-          {taskRows.map((row, idx) => {
+          {rows.map((row, idx) => {
+            if (row.type === "milestone") {
+              const m = row.milestone;
+              const config = statusConfig[m.status] || statusConfig.todo;
+              const isCollapsed = collapsedMilestones[m.id];
+              const taskCount = tasksByMilestone.get(m.id)?.length || 0;
+
+              return (
+                <div
+                  key={`m-${m.id}`}
+                  className={cn(
+                    "flex items-center gap-2 px-3 border-b border-border/40 bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors"
+                  )}
+                  style={{ height: MILESTONE_ROW_HEIGHT }}
+                  onClick={() => toggleMilestone(m.id)}
+                >
+                  <span className="text-muted-foreground flex-shrink-0">
+                    {isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                  </span>
+                  <div className={cn("h-2 w-2 rounded-sm flex-shrink-0", config.dot)} />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[11px] font-semibold text-foreground truncate block">{m.name}</span>
+                    <span className="text-[8px] text-muted-foreground">
+                      {taskCount} task{taskCount !== 1 ? "s" : ""} · Due {format(parseISO(m.dueDate), "MMM d")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0 w-16 justify-end">
+                    <div className="w-8 h-1 rounded-full bg-muted overflow-hidden">
+                      <div className={cn("h-full rounded-full", config.fill)} style={{ width: `${m.progress}%` }} />
+                    </div>
+                    <span className={cn("text-[9px] font-bold tabular-nums", m.progress === 100 ? "text-emerald-500" : "text-foreground")}>
+                      {m.progress}%
+                    </span>
+                  </div>
+                </div>
+              );
+            }
+
+            // Task row
             const t = row.task;
             const config = statusConfig[t.status] || statusConfig.todo;
             const isHovered = hoveredRow === t.id;
 
             return (
               <div
-                key={t.id}
+                key={`t-${t.id}`}
                 className={cn(
-                  "flex items-center gap-2 px-3 border-b border-border/15 transition-colors",
+                  "flex items-center gap-2 px-3 pl-8 border-b border-border/15 transition-colors",
                   isHovered && "bg-accent/50"
                 )}
-                style={{ height: ROW_HEIGHT }}
+                style={{ height: TASK_ROW_HEIGHT }}
                 onMouseEnter={() => setHoveredRow(t.id)}
                 onMouseLeave={() => setHoveredRow(null)}
               >
-                <span className="text-[9px] text-muted-foreground/50 font-mono w-6 text-center">{idx + 1}</span>
                 <div className={cn("h-1.5 w-1.5 rounded-full flex-shrink-0", config.dot)} />
                 <div className="flex-1 min-w-0">
                   <span className="text-[10px] font-medium text-foreground truncate block">{t.name}</span>
@@ -266,7 +383,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
           })}
         </div>
 
-        {/* Timeline */}
+        {/* ─── Timeline ─── */}
         <div className="flex-1 overflow-auto" ref={scrollRef} onScroll={handleScroll}>
           <div className="relative min-w-[700px]">
             {/* Month headers */}
@@ -338,17 +455,31 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                   </marker>
                 </defs>
                 {(() => {
+                  // Build a map of task id -> row index & position
                   const taskRowMap = new Map<number, { rowIdx: number; leftPct: number; rightPct: number }>();
-                  taskRows.forEach((row, idx) => {
-                    const leftPct = (row.startDay / totalDays) * 100;
-                    const rightPct = (row.endDay / totalDays) * 100;
-                    taskRowMap.set(row.task.id, { rowIdx: idx, leftPct, rightPct });
+                  let yOffset = 0;
+                  rows.forEach((row, rIdx) => {
+                    const h = row.type === "milestone" ? MILESTONE_ROW_HEIGHT : TASK_ROW_HEIGHT;
+                    if (row.type === "task") {
+                      const leftPct = (row.startDay / totalDays) * 100;
+                      const rightPct = (row.endDay / totalDays) * 100;
+                      taskRowMap.set(row.task.id, { rowIdx: rIdx, leftPct, rightPct });
+                    }
+                    yOffset += h;
                   });
 
-                  const getRowYCenter = (rowIdx: number) => rowIdx * ROW_HEIGHT + ROW_HEIGHT / 2;
+                  // Get Y center of a row
+                  const getRowYCenter = (rowIdx: number) => {
+                    let y = 0;
+                    for (let i = 0; i < rowIdx; i++) {
+                      y += rows[i].type === "milestone" ? MILESTONE_ROW_HEIGHT : TASK_ROW_HEIGHT;
+                    }
+                    return y + (rows[rowIdx].type === "milestone" ? MILESTONE_ROW_HEIGHT : TASK_ROW_HEIGHT) / 2;
+                  };
 
-                  return taskRows.flatMap((row) =>
-                    row.task.dependencies.map((depId) => {
+                  return rows.flatMap((row) => {
+                    if (row.type !== "task") return [];
+                    return row.task.dependencies.map((depId) => {
                       const dep = taskRowMap.get(depId);
                       const curr = taskRowMap.get(row.task.id);
                       if (!dep || !curr) return null;
@@ -371,104 +502,144 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                           markerEnd="url(#gantt-arrow)"
                         />
                       );
-                    })
-                  );
+                    });
+                  });
                 })()}
               </svg>
 
-              {/* Task bars */}
-              {taskRows.map((row, rIdx) => {
-                const t = row.task;
-                const config = statusConfig[t.status] || statusConfig.todo;
-                const isHovered = hoveredRow === t.id;
-                const leftPct = (row.startDay / totalDays) * 100;
-                const widthPct = Math.max(((row.endDay - row.startDay) / totalDays) * 100, 3);
-                const startDate = addDays(projStart, row.startDay);
-                const endDate = addDays(projStart, row.endDay);
-                const top = rIdx * ROW_HEIGHT;
+              {/* Rows */}
+              {(() => {
+                let yOffset = 0;
+                return rows.map((row, rIdx) => {
+                  const h = row.type === "milestone" ? MILESTONE_ROW_HEIGHT : TASK_ROW_HEIGHT;
+                  const top = yOffset;
+                  yOffset += h;
 
-                return (
-                  <TooltipProvider key={t.id} delayDuration={100}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div
-                          className={cn(
-                            "absolute border-b border-border/10 transition-colors",
-                            isHovered && "bg-accent/30"
-                          )}
-                          style={{ top, height: ROW_HEIGHT, left: 0, right: 0 }}
-                          onMouseEnter={() => setHoveredRow(t.id)}
-                          onMouseLeave={() => setHoveredRow(null)}
-                        >
-                          <div className="absolute inset-0 flex items-center">
-                            <div
-                              className={cn(
-                                "absolute h-7 rounded-md overflow-hidden transition-shadow",
-                                isHovered && "shadow-lg ring-1 ring-foreground/5"
-                              )}
-                              style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
-                            >
-                              <div className={cn("absolute inset-0 rounded-md border", config.border, config.bg)} />
-                              <div
-                                className={cn("absolute inset-y-0 left-0 bg-gradient-to-r transition-all", config.gradient)}
-                                style={{
-                                  width: `${row.progress}%`,
-                                  borderRadius: row.progress === 100 ? "0.375rem" : "0.375rem 0 0 0.375rem",
-                                }}
-                              />
-                              {t.status === "in-progress" && (
-                                <div className="absolute inset-y-0 left-0 overflow-hidden rounded-l-md" style={{ width: `${row.progress}%` }}>
-                                  <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 3px, white 3px, white 4px)" }} />
-                                </div>
-                              )}
-                              <div className="relative h-full flex items-center justify-between px-2 z-10">
-                                <span className={cn("text-[9px] font-semibold truncate", row.progress > 40 ? "text-white drop-shadow-sm" : config.text)}>
-                                  {t.name}
-                                </span>
-                                <span className={cn("text-[8px] font-bold ml-1 flex-shrink-0 tabular-nums", row.progress > 60 ? "text-white/80" : config.text)}>
-                                  {row.progress}%
-                                </span>
-                              </div>
+                  if (row.type === "milestone") {
+                    const m = row.milestone;
+                    const config = statusConfig[m.status] || statusConfig.todo;
+                    const leftPct = (row.startDay / totalDays) * 100;
+                    const widthPct = Math.max(((row.endDay - row.startDay) / totalDays) * 100, 3);
+
+                    return (
+                      <div
+                        key={`m-${m.id}`}
+                        className="absolute border-b border-border/30 bg-muted/10"
+                        style={{ top, height: h, left: 0, right: 0 }}
+                      >
+                        <div className="absolute inset-0 flex items-center">
+                          {/* Milestone summary bar (thinner, semi-transparent) */}
+                          <div
+                            className="absolute h-5 rounded"
+                            style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
+                          >
+                            <div className={cn("absolute inset-0 rounded opacity-20 bg-gradient-to-r", config.gradient)} />
+                            {/* Bracket markers */}
+                            <div className={cn("absolute left-0 top-0 bottom-0 w-1 rounded-l", config.fill, "opacity-60")} />
+                            <div className={cn("absolute right-0 top-0 bottom-0 w-1 rounded-r", config.fill, "opacity-60")} />
+                            <div className="relative h-full flex items-center px-2">
+                              <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-wider truncate">
+                                {m.name}
+                              </span>
                             </div>
                           </div>
                         </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs p-3 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <div className={cn("p-1 rounded", config.bg)}>
-                            <config.icon className={cn("h-3 w-3", config.text)} />
+                      </div>
+                    );
+                  }
+
+                  // Task bar
+                  const t = row.task;
+                  const config = statusConfig[t.status] || statusConfig.todo;
+                  const isHovered = hoveredRow === t.id;
+                  const leftPct = (row.startDay / totalDays) * 100;
+                  const widthPct = Math.max(((row.endDay - row.startDay) / totalDays) * 100, 3);
+                  const startDate = addDays(projStart, row.startDay);
+                  const endDate = addDays(projStart, row.endDay);
+
+                  return (
+                    <TooltipProvider key={`t-${t.id}`} delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={cn(
+                              "absolute border-b border-border/10 transition-colors",
+                              isHovered && "bg-accent/30"
+                            )}
+                            style={{ top, height: h, left: 0, right: 0 }}
+                            onMouseEnter={() => setHoveredRow(t.id)}
+                            onMouseLeave={() => setHoveredRow(null)}
+                          >
+                            <div className="absolute inset-0 flex items-center">
+                              <div
+                                className={cn(
+                                  "absolute h-7 rounded-md overflow-hidden transition-shadow",
+                                  isHovered && "shadow-lg ring-1 ring-foreground/5"
+                                )}
+                                style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
+                              >
+                                <div className={cn("absolute inset-0 rounded-md border", config.border, config.bg)} />
+                                <div
+                                  className={cn("absolute inset-y-0 left-0 bg-gradient-to-r transition-all", config.gradient)}
+                                  style={{
+                                    width: `${row.progress}%`,
+                                    borderRadius: row.progress === 100 ? "0.375rem" : "0.375rem 0 0 0.375rem",
+                                  }}
+                                />
+                                {t.status === "in-progress" && (
+                                  <div className="absolute inset-y-0 left-0 overflow-hidden rounded-l-md" style={{ width: `${row.progress}%` }}>
+                                    <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 3px, white 3px, white 4px)" }} />
+                                  </div>
+                                )}
+                                <div className="relative h-full flex items-center justify-between px-2 z-10">
+                                  <span className={cn("text-[9px] font-semibold truncate", row.progress > 40 ? "text-white drop-shadow-sm" : config.text)}>
+                                    {t.name}
+                                  </span>
+                                  <span className={cn("text-[8px] font-bold ml-1 flex-shrink-0 tabular-nums", row.progress > 60 ? "text-white/80" : config.text)}>
+                                    {row.progress}%
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-semibold text-xs">{t.name}</p>
-                            <p className={cn("text-[10px]", config.text)}>{config.label}</p>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs p-3 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className={cn("p-1 rounded", config.bg)}>
+                              <config.icon className={cn("h-3 w-3", config.text)} />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-xs">{t.name}</p>
+                              <p className={cn("text-[10px]", config.text)}>{config.label}</p>
+                            </div>
                           </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-                          <div>
-                            <span className="text-muted-foreground">Start</span>
-                            <p className="font-medium">{format(startDate, "MMM d")}</p>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                            <div>
+                              <span className="text-muted-foreground">Start</span>
+                              <p className="font-medium">{format(startDate, "MMM d")}</p>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">End</span>
+                              <p className="font-medium">{format(endDate, "MMM d")}</p>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Assignee</span>
+                              <p className="font-medium">{t.assignee || "—"}</p>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Priority</span>
+                              <p className={cn("font-medium", priorityConfig[t.priority]?.color)}>{priorityConfig[t.priority]?.label}</p>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-muted-foreground">End</span>
-                            <p className="font-medium">{format(endDate, "MMM d")}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Assignee</span>
-                            <p className="font-medium">{t.assignee || "—"}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Priority</span>
-                            <p className={cn("font-medium", priorityConfig[t.priority]?.color)}>{priorityConfig[t.priority]?.label}</p>
-                          </div>
-                        </div>
-                        {t.dependencies.length > 0 && (
-                          <p className="text-[9px] text-muted-foreground">Depends on: #{t.dependencies.join(", #")}</p>
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                );
-              })}
+                          {t.dependencies.length > 0 && (
+                            <p className="text-[9px] text-muted-foreground">Depends on: #{t.dependencies.join(", #")}</p>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
