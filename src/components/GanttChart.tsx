@@ -255,11 +255,8 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
     return pct >= 0 && pct <= 100 ? pct : null;
   })();
 
-  const handleScroll = () => {
-    if (scrollRef.current && sidebarRef.current) {
-      sidebarRef.current.scrollTop = scrollRef.current.scrollTop;
-    }
-  };
+
+
 
   useEffect(() => {
     if (scrollRef.current && todayPct !== null) {
