@@ -292,11 +292,22 @@ export const initiatives = [
           { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "todo" as const, deliverables: [] },
         ],
         tasks: [
-          { id: 11, name: "UI/UX Design", status: "done" as const, priority: "high" as const, assignee: "Lisa Anderson", dependencies: [], subtasks: [] },
-          { id: 12, name: "Backend API Development", status: "blocked" as const, priority: "high" as const, assignee: "David Brown", dependencies: [11], subtasks: [] },
-          { id: 13, name: "Frontend Development", status: "in-review" as const, priority: "high" as const, assignee: "Chris Taylor", dependencies: [11], subtasks: [] },
-          { id: 14, name: "Integration Testing", status: "todo" as const, priority: "medium" as const, assignee: "Lisa Anderson", dependencies: [12, 13], subtasks: [] },
-          { id: 15, name: "Beta Testing", status: "todo" as const, priority: "medium" as const, assignee: "David Brown", dependencies: [14], subtasks: [] },
+          // UI/UX Design milestone tasks
+          { id: 26, name: "Create wireframes", status: "done" as const, priority: "high" as const, assignee: "Lisa Anderson", dependencies: [], subtasks: [], milestoneId: 11 },
+          { id: 27, name: "Design UI component library", status: "done" as const, priority: "high" as const, assignee: "Lisa Anderson", dependencies: [26], subtasks: [], milestoneId: 11 },
+          // Backend API Development milestone tasks
+          { id: 28, name: "Design API schema", status: "done" as const, priority: "high" as const, assignee: "David Brown", dependencies: [27], subtasks: [], milestoneId: 12 },
+          { id: 29, name: "Build authentication endpoints", status: "blocked" as const, priority: "high" as const, assignee: "David Brown", dependencies: [28], subtasks: [], milestoneId: 12 },
+          { id: 30, name: "Build service endpoints", status: "blocked" as const, priority: "high" as const, assignee: "David Brown", dependencies: [29], subtasks: [], milestoneId: 12 },
+          // Frontend Development milestone tasks
+          { id: 31, name: "Implement navigation & routing", status: "in-review" as const, priority: "high" as const, assignee: "Chris Taylor", dependencies: [27], subtasks: [], milestoneId: 13 },
+          { id: 32, name: "Build feature screens", status: "in-progress" as const, priority: "high" as const, assignee: "Chris Taylor", dependencies: [31], subtasks: [], milestoneId: 13 },
+          // Integration Testing milestone tasks
+          { id: 33, name: "Write integration test cases", status: "todo" as const, priority: "medium" as const, assignee: "Lisa Anderson", dependencies: [30, 32], subtasks: [], milestoneId: 14 },
+          { id: 34, name: "Execute end-to-end tests", status: "todo" as const, priority: "medium" as const, assignee: "Lisa Anderson", dependencies: [33], subtasks: [], milestoneId: 14 },
+          // Beta Testing milestone tasks
+          { id: 35, name: "Recruit beta testers", status: "todo" as const, priority: "medium" as const, assignee: "David Brown", dependencies: [34], subtasks: [], milestoneId: 15 },
+          { id: 36, name: "Collect & analyze feedback", status: "todo" as const, priority: "low" as const, assignee: "Lisa Anderson", dependencies: [35], subtasks: [], milestoneId: 15 },
         ],
         activities: [
           { id: 4, user: "David Brown", action: "requested additional resources", detail: "Backend development team", timestamp: "2025-01-07 14:20" },
