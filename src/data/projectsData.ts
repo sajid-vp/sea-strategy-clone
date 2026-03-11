@@ -217,11 +217,21 @@ export const initiatives = [
           { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "todo" as const, deliverables: [] },
         ],
         tasks: [
-          { id: 6, name: "Requirements Analysis", status: "done" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [], subtasks: [] },
-          { id: 7, name: "Vendor Selection", status: "done" as const, priority: "high" as const, assignee: "Emma Wilson", dependencies: [6], subtasks: [] },
-          { id: 8, name: "Hardware Installation", status: "in-progress" as const, priority: "high" as const, assignee: "Tom Martinez", dependencies: [7], subtasks: [] },
-          { id: 9, name: "Software Integration", status: "in-review" as const, priority: "high" as const, assignee: "Emma Wilson", dependencies: [8], subtasks: [] },
-          { id: 10, name: "Testing & Deployment", status: "todo" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [9], subtasks: [] },
+          // Requirements Analysis milestone tasks
+          { id: 16, name: "Survey campus infrastructure", status: "done" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [], subtasks: [], milestoneId: 6 },
+          { id: 17, name: "Define IoT sensor requirements", status: "done" as const, priority: "high" as const, assignee: "Emma Wilson", dependencies: [16], subtasks: [], milestoneId: 6 },
+          // Vendor Selection milestone tasks
+          { id: 18, name: "Issue RFP to vendors", status: "done" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [17], subtasks: [], milestoneId: 7 },
+          { id: 19, name: "Evaluate vendor proposals", status: "done" as const, priority: "medium" as const, assignee: "Emma Wilson", dependencies: [18], subtasks: [], milestoneId: 7 },
+          // Hardware Installation milestone tasks
+          { id: 20, name: "Install building sensors", status: "in-progress" as const, priority: "high" as const, assignee: "Tom Martinez", dependencies: [19], subtasks: [], milestoneId: 8 },
+          { id: 21, name: "Wire network cabling", status: "in-progress" as const, priority: "high" as const, assignee: "Tom Martinez", dependencies: [20], subtasks: [], milestoneId: 8 },
+          // Software Integration milestone tasks
+          { id: 22, name: "Configure management platform", status: "in-review" as const, priority: "high" as const, assignee: "Emma Wilson", dependencies: [21], subtasks: [], milestoneId: 9 },
+          { id: 23, name: "Integrate HVAC controls", status: "todo" as const, priority: "medium" as const, assignee: "Emma Wilson", dependencies: [22], subtasks: [], milestoneId: 9 },
+          // Testing & Deployment milestone tasks
+          { id: 24, name: "Run system stress tests", status: "todo" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [23], subtasks: [], milestoneId: 10 },
+          { id: 25, name: "Go-live deployment", status: "todo" as const, priority: "high" as const, assignee: "Tom Martinez", dependencies: [24], subtasks: [], milestoneId: 10 },
         ],
         activities: [
           { id: 3, user: "Emma Wilson", action: "flagged issue", detail: "Software Integration delays", timestamp: "2025-01-08 09:15" },
