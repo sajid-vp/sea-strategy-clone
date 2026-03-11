@@ -129,11 +129,26 @@ export const initiatives = [
           },
         ],
         tasks: [
-          { id: 1, name: "Gap Analysis", status: "done" as const, priority: "high" as const, assignee: "John Smith", dependencies: [], subtasks: [] },
-          { id: 2, name: "Policy Documentation", status: "in-progress" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [1], subtasks: [] },
-          { id: 3, name: "Security Controls Implementation", status: "in-progress" as const, priority: "medium" as const, assignee: "Mike Chen", dependencies: [2], subtasks: [] },
-          { id: 4, name: "Internal Audit", status: "todo" as const, priority: "medium" as const, assignee: "John Smith", dependencies: [3], subtasks: [] },
-          { id: 5, name: "Certification Audit", status: "todo" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [4], subtasks: [] },
+          // Gap Analysis milestone tasks
+          { id: 1, name: "Identify current security controls", status: "done" as const, priority: "high" as const, assignee: "John Smith", dependencies: [], subtasks: [], milestoneId: 1 },
+          { id: 2, name: "Interview department heads", status: "done" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [1], subtasks: [], milestoneId: 1 },
+          { id: 3, name: "Document security gaps", status: "done" as const, priority: "high" as const, assignee: "John Smith", dependencies: [2], subtasks: [], milestoneId: 1 },
+          // Policy Documentation milestone tasks
+          { id: 4, name: "Draft information security policy", status: "done" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [3], subtasks: [], milestoneId: 2 },
+          { id: 5, name: "Create access control procedures", status: "in-progress" as const, priority: "high" as const, assignee: "Mike Chen", dependencies: [4], subtasks: [], milestoneId: 2 },
+          { id: 6, name: "Review & approve policies", status: "todo" as const, priority: "medium" as const, assignee: "John Smith", dependencies: [5], subtasks: [], milestoneId: 2 },
+          // Security Controls Implementation milestone tasks
+          { id: 7, name: "Configure firewall rules", status: "in-progress" as const, priority: "high" as const, assignee: "Mike Chen", dependencies: [4], subtasks: [], milestoneId: 3 },
+          { id: 8, name: "Deploy endpoint protection", status: "in-progress" as const, priority: "medium" as const, assignee: "Mike Chen", dependencies: [7], subtasks: [], milestoneId: 3 },
+          { id: 9, name: "Set up SIEM monitoring", status: "todo" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [8], subtasks: [], milestoneId: 3 },
+          // Internal Audit milestone tasks
+          { id: 10, name: "Prepare audit checklist", status: "todo" as const, priority: "medium" as const, assignee: "John Smith", dependencies: [9], subtasks: [], milestoneId: 4 },
+          { id: 11, name: "Conduct internal audit", status: "todo" as const, priority: "high" as const, assignee: "John Smith", dependencies: [10], subtasks: [], milestoneId: 4 },
+          { id: 12, name: "Write audit findings report", status: "todo" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [11], subtasks: [], milestoneId: 4 },
+          // Certification Audit milestone tasks
+          { id: 13, name: "Schedule external auditor", status: "todo" as const, priority: "high" as const, assignee: "John Smith", dependencies: [12], subtasks: [], milestoneId: 5 },
+          { id: 14, name: "Conduct certification audit", status: "todo" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [13], subtasks: [], milestoneId: 5 },
+          { id: 15, name: "Address non-conformities", status: "todo" as const, priority: "high" as const, assignee: "Mike Chen", dependencies: [14], subtasks: [], milestoneId: 5 },
         ],
         activities: [
           { id: 1, user: "John Smith", action: "updated milestone", detail: "Policy Documentation", timestamp: "2025-01-08 10:30" },
@@ -202,11 +217,21 @@ export const initiatives = [
           { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "todo" as const, deliverables: [] },
         ],
         tasks: [
-          { id: 6, name: "Requirements Analysis", status: "done" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [], subtasks: [] },
-          { id: 7, name: "Vendor Selection", status: "done" as const, priority: "high" as const, assignee: "Emma Wilson", dependencies: [6], subtasks: [] },
-          { id: 8, name: "Hardware Installation", status: "in-progress" as const, priority: "high" as const, assignee: "Tom Martinez", dependencies: [7], subtasks: [] },
-          { id: 9, name: "Software Integration", status: "in-review" as const, priority: "high" as const, assignee: "Emma Wilson", dependencies: [8], subtasks: [] },
-          { id: 10, name: "Testing & Deployment", status: "todo" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [9], subtasks: [] },
+          // Requirements Analysis milestone tasks
+          { id: 16, name: "Survey campus infrastructure", status: "done" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [], subtasks: [], milestoneId: 6 },
+          { id: 17, name: "Define IoT sensor requirements", status: "done" as const, priority: "high" as const, assignee: "Emma Wilson", dependencies: [16], subtasks: [], milestoneId: 6 },
+          // Vendor Selection milestone tasks
+          { id: 18, name: "Issue RFP to vendors", status: "done" as const, priority: "high" as const, assignee: "Sarah Johnson", dependencies: [17], subtasks: [], milestoneId: 7 },
+          { id: 19, name: "Evaluate vendor proposals", status: "done" as const, priority: "medium" as const, assignee: "Emma Wilson", dependencies: [18], subtasks: [], milestoneId: 7 },
+          // Hardware Installation milestone tasks
+          { id: 20, name: "Install building sensors", status: "in-progress" as const, priority: "high" as const, assignee: "Tom Martinez", dependencies: [19], subtasks: [], milestoneId: 8 },
+          { id: 21, name: "Wire network cabling", status: "in-progress" as const, priority: "high" as const, assignee: "Tom Martinez", dependencies: [20], subtasks: [], milestoneId: 8 },
+          // Software Integration milestone tasks
+          { id: 22, name: "Configure management platform", status: "in-review" as const, priority: "high" as const, assignee: "Emma Wilson", dependencies: [21], subtasks: [], milestoneId: 9 },
+          { id: 23, name: "Integrate HVAC controls", status: "todo" as const, priority: "medium" as const, assignee: "Emma Wilson", dependencies: [22], subtasks: [], milestoneId: 9 },
+          // Testing & Deployment milestone tasks
+          { id: 24, name: "Run system stress tests", status: "todo" as const, priority: "medium" as const, assignee: "Sarah Johnson", dependencies: [23], subtasks: [], milestoneId: 10 },
+          { id: 25, name: "Go-live deployment", status: "todo" as const, priority: "high" as const, assignee: "Tom Martinez", dependencies: [24], subtasks: [], milestoneId: 10 },
         ],
         activities: [
           { id: 3, user: "Emma Wilson", action: "flagged issue", detail: "Software Integration delays", timestamp: "2025-01-08 09:15" },
@@ -267,11 +292,22 @@ export const initiatives = [
           { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "todo" as const, deliverables: [] },
         ],
         tasks: [
-          { id: 11, name: "UI/UX Design", status: "done" as const, priority: "high" as const, assignee: "Lisa Anderson", dependencies: [], subtasks: [] },
-          { id: 12, name: "Backend API Development", status: "blocked" as const, priority: "high" as const, assignee: "David Brown", dependencies: [11], subtasks: [] },
-          { id: 13, name: "Frontend Development", status: "in-review" as const, priority: "high" as const, assignee: "Chris Taylor", dependencies: [11], subtasks: [] },
-          { id: 14, name: "Integration Testing", status: "todo" as const, priority: "medium" as const, assignee: "Lisa Anderson", dependencies: [12, 13], subtasks: [] },
-          { id: 15, name: "Beta Testing", status: "todo" as const, priority: "medium" as const, assignee: "David Brown", dependencies: [14], subtasks: [] },
+          // UI/UX Design milestone tasks
+          { id: 26, name: "Create wireframes", status: "done" as const, priority: "high" as const, assignee: "Lisa Anderson", dependencies: [], subtasks: [], milestoneId: 11 },
+          { id: 27, name: "Design UI component library", status: "done" as const, priority: "high" as const, assignee: "Lisa Anderson", dependencies: [26], subtasks: [], milestoneId: 11 },
+          // Backend API Development milestone tasks
+          { id: 28, name: "Design API schema", status: "done" as const, priority: "high" as const, assignee: "David Brown", dependencies: [27], subtasks: [], milestoneId: 12 },
+          { id: 29, name: "Build authentication endpoints", status: "blocked" as const, priority: "high" as const, assignee: "David Brown", dependencies: [28], subtasks: [], milestoneId: 12 },
+          { id: 30, name: "Build service endpoints", status: "blocked" as const, priority: "high" as const, assignee: "David Brown", dependencies: [29], subtasks: [], milestoneId: 12 },
+          // Frontend Development milestone tasks
+          { id: 31, name: "Implement navigation & routing", status: "in-review" as const, priority: "high" as const, assignee: "Chris Taylor", dependencies: [27], subtasks: [], milestoneId: 13 },
+          { id: 32, name: "Build feature screens", status: "in-progress" as const, priority: "high" as const, assignee: "Chris Taylor", dependencies: [31], subtasks: [], milestoneId: 13 },
+          // Integration Testing milestone tasks
+          { id: 33, name: "Write integration test cases", status: "todo" as const, priority: "medium" as const, assignee: "Lisa Anderson", dependencies: [30, 32], subtasks: [], milestoneId: 14 },
+          { id: 34, name: "Execute end-to-end tests", status: "todo" as const, priority: "medium" as const, assignee: "Lisa Anderson", dependencies: [33], subtasks: [], milestoneId: 14 },
+          // Beta Testing milestone tasks
+          { id: 35, name: "Recruit beta testers", status: "todo" as const, priority: "medium" as const, assignee: "David Brown", dependencies: [34], subtasks: [], milestoneId: 15 },
+          { id: 36, name: "Collect & analyze feedback", status: "todo" as const, priority: "low" as const, assignee: "Lisa Anderson", dependencies: [35], subtasks: [], milestoneId: 15 },
         ],
         activities: [
           { id: 4, user: "David Brown", action: "requested additional resources", detail: "Backend development team", timestamp: "2025-01-07 14:20" },
@@ -325,10 +361,19 @@ export const initiatives = [
           { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "todo" as const, deliverables: [] },
         ],
         tasks: [
-          { id: 16, name: "Data Source Integration", status: "in-progress" as const, priority: "high" as const, assignee: "Rachel Green", dependencies: [], subtasks: [] },
-          { id: 17, name: "Dashboard Development", status: "in-review" as const, priority: "high" as const, assignee: "Jennifer Lee", dependencies: [16], subtasks: [] },
-          { id: 18, name: "AI Model Training", status: "in-review" as const, priority: "high" as const, assignee: "Michael Scott", dependencies: [16], subtasks: [] },
-          { id: 19, name: "User Training", status: "todo" as const, priority: "low" as const, assignee: "Rachel Green", dependencies: [17, 18], subtasks: [] },
+          // Data Source Integration milestone tasks
+          { id: 37, name: "Map ERP data schema", status: "done" as const, priority: "high" as const, assignee: "Rachel Green", dependencies: [], subtasks: [], milestoneId: 16 },
+          { id: 38, name: "Build ETL pipelines", status: "in-progress" as const, priority: "high" as const, assignee: "Rachel Green", dependencies: [37], subtasks: [], milestoneId: 16 },
+          { id: 39, name: "Validate data quality", status: "todo" as const, priority: "medium" as const, assignee: "Jennifer Lee", dependencies: [38], subtasks: [], milestoneId: 16 },
+          // Dashboard Development milestone tasks
+          { id: 40, name: "Design dashboard layouts", status: "in-review" as const, priority: "high" as const, assignee: "Jennifer Lee", dependencies: [38], subtasks: [], milestoneId: 17 },
+          { id: 41, name: "Implement chart components", status: "in-progress" as const, priority: "high" as const, assignee: "Jennifer Lee", dependencies: [40], subtasks: [], milestoneId: 17 },
+          // AI Model Training milestone tasks
+          { id: 42, name: "Prepare training datasets", status: "in-review" as const, priority: "high" as const, assignee: "Michael Scott", dependencies: [38], subtasks: [], milestoneId: 18 },
+          { id: 43, name: "Train predictive models", status: "todo" as const, priority: "high" as const, assignee: "Michael Scott", dependencies: [42], subtasks: [], milestoneId: 18 },
+          // User Training milestone tasks
+          { id: 44, name: "Create training materials", status: "todo" as const, priority: "low" as const, assignee: "Rachel Green", dependencies: [41, 43], subtasks: [], milestoneId: 19 },
+          { id: 45, name: "Conduct training workshops", status: "todo" as const, priority: "low" as const, assignee: "Rachel Green", dependencies: [44], subtasks: [], milestoneId: 19 },
         ],
         activities: [
           { id: 6, user: "Rachel Green", action: "updated progress", detail: "Data Source Integration at 70%", timestamp: "2025-01-08 08:00" },

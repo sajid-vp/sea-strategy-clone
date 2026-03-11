@@ -31,6 +31,7 @@ interface Task {
   assignee: string;
   dependencies: number[];
   subtasks: any[];
+  milestoneId?: number;
 }
 
 interface Milestone {
@@ -151,37 +152,33 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
     [milestones]
   );
 
-  // Match tasks to milestones by name or index
+  // Match tasks to milestones by milestoneId
   const tasksByMilestone = useMemo(() => {
     const map = new Map<number, Task[]>();
     if (!tasks || tasks.length === 0) return map;
 
-    // Try matching by name first
-    sortedMilestones.forEach((m) => {
-      const matched = tasks.filter(
-        (t) => t.name.toLowerCase() === m.name.toLowerCase()
-      );
-      if (matched.length > 0) {
-        map.set(m.id, matched);
+    const hasIds = tasks.some((t) => t.milestoneId != null);
+    if (hasIds) {
+      tasks.forEach((t) => {
+        const mId = t.milestoneId;
+        if (mId != null) {
+          const arr = map.get(mId) || [];
+          arr.push(t);
+          map.set(mId, arr);
+        }
+      });
+      const unmatched = tasks.filter((t) => t.milestoneId == null);
+      if (unmatched.length > 0 && sortedMilestones.length > 0) {
+        const lastM = sortedMilestones[sortedMilestones.length - 1];
+        const existing = map.get(lastM.id) || [];
+        map.set(lastM.id, [...existing, ...unmatched]);
       }
-    });
-
-    // If no name matches, distribute tasks proportionally
-    if (map.size === 0 && sortedMilestones.length > 0) {
+    } else {
       const perMilestone = Math.ceil(tasks.length / sortedMilestones.length);
       sortedMilestones.forEach((m, idx) => {
         const slice = tasks.slice(idx * perMilestone, (idx + 1) * perMilestone);
         if (slice.length > 0) map.set(m.id, slice);
       });
-    }
-
-    // Add unmatched tasks to last milestone
-    const matchedIds = new Set(Array.from(map.values()).flat().map((t) => t.id));
-    const unmatched = tasks.filter((t) => !matchedIds.has(t.id));
-    if (unmatched.length > 0) {
-      const lastM = sortedMilestones[sortedMilestones.length - 1];
-      const existing = map.get(lastM.id) || [];
-      map.set(lastM.id, [...existing, ...unmatched]);
     }
 
     return map;
