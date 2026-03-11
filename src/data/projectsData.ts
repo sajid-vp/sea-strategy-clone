@@ -361,10 +361,19 @@ export const initiatives = [
           { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "todo" as const, deliverables: [] },
         ],
         tasks: [
-          { id: 16, name: "Data Source Integration", status: "in-progress" as const, priority: "high" as const, assignee: "Rachel Green", dependencies: [], subtasks: [] },
-          { id: 17, name: "Dashboard Development", status: "in-review" as const, priority: "high" as const, assignee: "Jennifer Lee", dependencies: [16], subtasks: [] },
-          { id: 18, name: "AI Model Training", status: "in-review" as const, priority: "high" as const, assignee: "Michael Scott", dependencies: [16], subtasks: [] },
-          { id: 19, name: "User Training", status: "todo" as const, priority: "low" as const, assignee: "Rachel Green", dependencies: [17, 18], subtasks: [] },
+          // Data Source Integration milestone tasks
+          { id: 37, name: "Map ERP data schema", status: "done" as const, priority: "high" as const, assignee: "Rachel Green", dependencies: [], subtasks: [], milestoneId: 16 },
+          { id: 38, name: "Build ETL pipelines", status: "in-progress" as const, priority: "high" as const, assignee: "Rachel Green", dependencies: [37], subtasks: [], milestoneId: 16 },
+          { id: 39, name: "Validate data quality", status: "todo" as const, priority: "medium" as const, assignee: "Jennifer Lee", dependencies: [38], subtasks: [], milestoneId: 16 },
+          // Dashboard Development milestone tasks
+          { id: 40, name: "Design dashboard layouts", status: "in-review" as const, priority: "high" as const, assignee: "Jennifer Lee", dependencies: [38], subtasks: [], milestoneId: 17 },
+          { id: 41, name: "Implement chart components", status: "in-progress" as const, priority: "high" as const, assignee: "Jennifer Lee", dependencies: [40], subtasks: [], milestoneId: 17 },
+          // AI Model Training milestone tasks
+          { id: 42, name: "Prepare training datasets", status: "in-review" as const, priority: "high" as const, assignee: "Michael Scott", dependencies: [38], subtasks: [], milestoneId: 18 },
+          { id: 43, name: "Train predictive models", status: "todo" as const, priority: "high" as const, assignee: "Michael Scott", dependencies: [42], subtasks: [], milestoneId: 18 },
+          // User Training milestone tasks
+          { id: 44, name: "Create training materials", status: "todo" as const, priority: "low" as const, assignee: "Rachel Green", dependencies: [41, 43], subtasks: [], milestoneId: 19 },
+          { id: 45, name: "Conduct training workshops", status: "todo" as const, priority: "low" as const, assignee: "Rachel Green", dependencies: [44], subtasks: [], milestoneId: 19 },
         ],
         activities: [
           { id: 6, user: "Rachel Green", action: "updated progress", detail: "Data Source Integration at 70%", timestamp: "2025-01-08 08:00" },
