@@ -1117,7 +1117,7 @@ const ProjectDetail = () => {
                   </div>
                   <div>
                     <CardTitle className="text-sm">Project Timeline</CardTitle>
-                    <CardDescription className="text-xs">Gantt chart view of milestones and progress</CardDescription>
+                    <CardDescription className="text-xs">Task-level Gantt chart with dependencies</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -1126,6 +1126,7 @@ const ProjectDetail = () => {
                   milestones={project.milestones}
                   projectStartDate={project.startDate}
                   projectEndDate={project.endDate}
+                  tasks={project.tasks}
                 />
               </CardContent>
             </Card>
