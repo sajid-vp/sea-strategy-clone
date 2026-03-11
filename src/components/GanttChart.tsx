@@ -347,6 +347,16 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
   // ─── List View ───
   const renderListView = () => (
     <div className="divide-y divide-border">
+      {/* Column Headers */}
+      <div className="flex items-center gap-3 px-4 py-2 bg-muted/30 text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+        <span className="w-6" />
+        <span className="w-3" />
+        <span className="flex-1 min-w-0">Name</span>
+        <span className="w-28 text-left">Owner</span>
+        <span className="w-16 text-left">Priority</span>
+        <span className="w-20 text-center">Status</span>
+        <span className="w-20 text-right">Progress</span>
+      </div>
       {sortedMilestones.map((m) => {
         const config = statusConfig[m.status] || statusConfig.todo;
         const isCollapsed = collapsedMilestones[m.id];
@@ -358,20 +368,24 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
               className="flex items-center gap-3 px-4 py-3 bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors"
               onClick={() => toggleMilestone(m.id)}
             >
-              <span className="text-muted-foreground">
+              <span className="text-muted-foreground w-6 flex-shrink-0 flex items-center justify-center">
                 {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </span>
-              <div className={cn("h-2.5 w-2.5 rounded-sm", config.dot)} />
+              <div className={cn("h-2.5 w-2.5 rounded-sm flex-shrink-0", config.dot)} />
               <div className="flex-1 min-w-0">
                 <span className="text-sm font-semibold">{m.name}</span>
                 <span className="text-xs text-muted-foreground ml-2">
                   {mTasks.length} task{mTasks.length !== 1 ? "s" : ""} · Due {format(parseISO(m.dueDate), "MMM d, yyyy")}
                 </span>
               </div>
-              <Badge variant="outline" className={cn("text-[10px] capitalize", config.bg, config.text, config.border)}>
-                {config.label}
-              </Badge>
-              <div className="flex items-center gap-2 w-20">
+              <span className="w-28" />
+              <span className="w-16" />
+              <div className="w-20 flex justify-center">
+                <Badge variant="outline" className={cn("text-[10px] capitalize", config.bg, config.text, config.border)}>
+                  {config.label}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2 w-20 justify-end">
                 <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                   <div className={cn("h-full rounded-full", config.fill)} style={{ width: `${m.progress}%` }} />
                 </div>
@@ -384,16 +398,20 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                   const tc = statusConfig[t.status] || statusConfig.todo;
                   const pc = priorityConfig[t.priority];
                   return (
-                    <div key={t.id} className="flex items-center gap-3 px-4 py-2.5 pl-12 border-t border-border/20 hover:bg-accent/30 transition-colors">
-                      <div className={cn("h-2 w-2 rounded-full", tc.dot)} />
+                    <div key={t.id} className="flex items-center gap-3 px-4 py-2.5 border-t border-border/20 hover:bg-accent/30 transition-colors">
+                      <span className="w-6 flex-shrink-0" />
+                      <div className={cn("h-2 w-2 rounded-full flex-shrink-0", tc.dot)} />
                       <div className="flex-1 min-w-0">
                         <span className="text-[13px] font-medium">{t.name}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground w-24 truncate">{t.assignee}</span>
-                      <span className={cn("text-[11px] font-medium w-12", pc?.color)}>{pc?.label}</span>
-                      <Badge variant="outline" className={cn("text-[9px] capitalize h-5", tc.bg, tc.text, tc.border)}>
-                        {tc.label}
-                      </Badge>
+                      <span className="text-xs text-muted-foreground w-28 truncate text-left">{t.assignee}</span>
+                      <span className={cn("text-[11px] font-medium w-16 text-left", pc?.color)}>{pc?.label}</span>
+                      <div className="w-20 flex justify-center">
+                        <Badge variant="outline" className={cn("text-[10px] capitalize h-5", tc.bg, tc.text, tc.border)}>
+                          {tc.label}
+                        </Badge>
+                      </div>
+                      <span className="w-20" />
                     </div>
                   );
                 })}
