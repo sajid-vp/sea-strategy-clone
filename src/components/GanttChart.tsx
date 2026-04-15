@@ -150,7 +150,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   const [collapsedMilestones, setCollapsedMilestones] = useState<Record<number, boolean>>({});
   const [viewMode, setViewMode] = useState<ViewMode>("gantt");
-  
+  const [showCriticalPath, setShowCriticalPath] = useState(false);
   // Drag state
   const [dragState, setDragState] = useState<{
     taskId: number;
