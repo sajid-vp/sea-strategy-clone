@@ -238,6 +238,11 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
     return result;
   }, [sortedMilestones, collapsedMilestones, tasksByMilestone, projStart, totalDays]);
 
+  const criticalPath = useMemo(() => {
+    if (!tasks || tasks.length === 0) return { criticalTaskIds: new Set<number>(), taskSlack: new Map<number, number>() };
+    return computeCriticalPath(tasks);
+  }, [tasks]);
+
   const months = useMemo(
     () => eachMonthOfInterval({ start: projStart, end: projEnd }),
     [projectStartDate, projectEndDate]
