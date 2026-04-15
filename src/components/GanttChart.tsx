@@ -671,6 +671,8 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                 const config = statusConfig[t.status] || statusConfig.todo;
                 const isHovered = hoveredRow === t.id;
                 const isDragging = dragState?.taskId === t.id;
+                const isCritical = showCriticalPath && criticalPath.criticalTaskIds.has(t.id);
+                const isNonCriticalDimmed = showCriticalPath && !criticalPath.criticalTaskIds.has(t.id);
                 const { s: adjStart, e: adjEnd } = getAdjustedDays(t.id, row.startDay, row.endDay);
                 const leftPct = (adjStart / totalDays) * 100;
                 const widthPct = Math.max(((adjEnd - adjStart) / totalDays) * 100, 2);
@@ -691,9 +693,11 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                           <div className="absolute inset-0 flex items-center">
                             <div
                               className={cn(
-                                "absolute h-7 rounded-md overflow-hidden transition-shadow group",
+                                "absolute h-7 rounded-md overflow-hidden transition-all group",
                                 isHovered && "shadow-lg ring-1 ring-foreground/5",
-                                isDragging && "shadow-xl ring-2 ring-primary/30 z-40 opacity-90"
+                                isDragging && "shadow-xl ring-2 ring-primary/30 z-40 opacity-90",
+                                isCritical && "ring-2 ring-destructive/50 shadow-md shadow-destructive/10",
+                                isNonCriticalDimmed && "opacity-40"
                               )}
                               style={{ left: `${leftPct}%`, width: `${widthPct}%`, cursor: isDragging ? "grabbing" : "grab" }}
                               onMouseDown={(e) => handleDragStart(e, t.id, "move", row.startDay, row.endDay)}
