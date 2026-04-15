@@ -36,6 +36,8 @@ interface Task {
   dependencies: number[];
   subtasks: any[];
   milestoneId?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 interface Milestone {
