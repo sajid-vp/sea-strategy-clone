@@ -408,11 +408,20 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                   const tc = statusConfig[t.status] || statusConfig.todo;
                   const pc = priorityConfig[t.priority];
                   return (
-                    <div key={t.id} className="flex items-center gap-3 px-4 py-2.5 border-t border-border/20 hover:bg-accent/30 transition-colors">
+                    <div key={t.id} className={cn(
+                      "flex items-center gap-3 px-4 py-2.5 border-t border-border/20 hover:bg-accent/30 transition-colors",
+                      showCriticalPath && criticalPath.criticalTaskIds.has(t.id) && "bg-destructive/5"
+                    )}>
                       <span className="w-6 flex-shrink-0" />
                       <div className={cn("h-2 w-2 rounded-full flex-shrink-0", tc.dot)} />
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 flex items-center gap-2">
                         <span className="text-[13px] font-medium">{t.name}</span>
+                        {showCriticalPath && criticalPath.criticalTaskIds.has(t.id) && (
+                          <Badge className="text-[8px] h-4 px-1.5 bg-destructive/10 text-destructive border-destructive/30 hover:bg-destructive/20" variant="outline">
+                            <Zap className="h-2.5 w-2.5 mr-0.5" />
+                            Critical
+                          </Badge>
+                        )}
                       </div>
                       <span className="text-xs text-muted-foreground w-28 truncate text-left">{t.assignee}</span>
                       <span className={cn("text-[11px] font-medium w-16 text-left", pc?.color)}>{pc?.label}</span>
@@ -571,6 +580,9 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                 <marker id="gantt-arrow" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
                   <polygon points="0 0, 6 2.5, 0 5" fill="hsl(var(--muted-foreground))" opacity="0.4" />
                 </marker>
+                <marker id="gantt-arrow-critical" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+                  <polygon points="0 0, 6 2.5, 0 5" fill="hsl(var(--destructive))" opacity="0.8" />
+                </marker>
               </defs>
               {(() => {
                 const taskRowMap = new Map<number, { rowIdx: number; leftPct: number; rightPct: number }>();
@@ -605,16 +617,18 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                     const x2 = curr.leftPct;
                     const midX = (x1 + x2) / 2;
 
+                    const isCriticalArrow = showCriticalPath && criticalPath.criticalTaskIds.has(depId) && criticalPath.criticalTaskIds.has(row.task.id);
+
                     return (
                       <path
                         key={`${depId}-${row.task.id}`}
                         d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
                         fill="none"
-                        stroke="hsl(var(--muted-foreground))"
-                        strokeWidth="1"
-                        strokeDasharray="4 3"
-                        opacity="0.25"
-                        markerEnd="url(#gantt-arrow)"
+                        stroke={isCriticalArrow ? "hsl(var(--destructive))" : "hsl(var(--muted-foreground))"}
+                        strokeWidth={isCriticalArrow ? "2" : "1"}
+                        strokeDasharray={isCriticalArrow ? "none" : "4 3"}
+                        opacity={isCriticalArrow ? "0.7" : "0.25"}
+                        markerEnd={isCriticalArrow ? "url(#gantt-arrow-critical)" : "url(#gantt-arrow)"}
                       />
                     );
                   });
@@ -770,26 +784,34 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
           </div>
         </div>
 
-        {/* View Toggle */}
-        <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
-          <Button
-            variant={viewMode === "gantt" ? "secondary" : "ghost"}
-            size="sm"
-            className="h-7 px-2.5 text-xs gap-1.5"
-            onClick={() => setViewMode("gantt")}
-          >
-            <GanttChartSquare className="h-3.5 w-3.5" />
-            Gantt
-          </Button>
-          <Button
-            variant={viewMode === "list" ? "secondary" : "ghost"}
-            size="sm"
-            className="h-7 px-2.5 text-xs gap-1.5"
-            onClick={() => setViewMode("list")}
-          >
-            <List className="h-3.5 w-3.5" />
-            List
-          </Button>
+        {/* Critical Path Toggle + View Toggle */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Zap className={cn("h-3.5 w-3.5", showCriticalPath ? "text-destructive" : "text-muted-foreground")} />
+            <span className={cn("text-[11px] font-medium", showCriticalPath ? "text-destructive" : "text-muted-foreground")}>Critical Path</span>
+            <Switch checked={showCriticalPath} onCheckedChange={setShowCriticalPath} className="scale-75" />
+          </div>
+          <div className="h-4 w-px bg-border" />
+          <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
+            <Button
+              variant={viewMode === "gantt" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 px-2.5 text-xs gap-1.5"
+              onClick={() => setViewMode("gantt")}
+            >
+              <GanttChartSquare className="h-3.5 w-3.5" />
+              Gantt
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 px-2.5 text-xs gap-1.5"
+              onClick={() => setViewMode("list")}
+            >
+              <List className="h-3.5 w-3.5" />
+              List
+            </Button>
+          </div>
         </div>
       </div>
 
