@@ -12,6 +12,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   CheckCircle2,
   Clock,
@@ -23,9 +24,11 @@ import {
   GanttChartSquare,
   List,
   GripVertical,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { computeCriticalPath } from "@/utils/criticalPath";
 
 interface Task {
   id: number;
