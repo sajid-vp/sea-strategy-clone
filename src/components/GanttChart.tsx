@@ -766,7 +766,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                         strokeWidth="1.75"
                         opacity="0.8"
                         strokeLinejoin="miter"
-                        markerEnd="url(#gantt-arrow-milestone)"
+                        markerEnd={enterFromRight ? "url(#gantt-arrow-milestone-left)" : "url(#gantt-arrow-milestone)"}
                       />
                     );
                   });
