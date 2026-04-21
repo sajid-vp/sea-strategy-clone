@@ -657,6 +657,9 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                 <marker id="gantt-arrow-milestone" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
                   <polygon points="0 0, 7 3, 0 6" fill="hsl(var(--primary))" opacity="0.6" />
                 </marker>
+                <marker id="gantt-arrow-milestone-left" markerWidth="7" markerHeight="6" refX="1" refY="3" orient="auto">
+                  <polygon points="7 0, 0 3, 7 6" fill="hsl(var(--primary))" opacity="0.6" />
+                </marker>
               </defs>
               {(() => {
                 const taskRowMap = new Map<number, { rowIdx: number; leftPct: number; rightPct: number; milestoneId: number }>();
