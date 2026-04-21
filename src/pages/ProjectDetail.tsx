@@ -52,7 +52,9 @@ const ProjectDetail = () => {
   const [isAddDeliverableOpen, setIsAddDeliverableOpen] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<{ id: number; name: string } | null>(null);
   const [expandedMilestones, setExpandedMilestones] = useState<Record<number, boolean>>({});
-  const [milestoneDepsOverride, setMilestoneDepsOverride] = useState<Record<number, number[]>>({});
+  type DepType = "FS" | "SS" | "FF" | "SF";
+  type MilestoneDep = { id: number; type: DepType };
+  const [milestoneDepsOverride, setMilestoneDepsOverride] = useState<Record<number, MilestoneDep[]>>({});
   const [openDepPopover, setOpenDepPopover] = useState<number | null>(null);
   const [newTask, setNewTask] = useState({
     name: "",
