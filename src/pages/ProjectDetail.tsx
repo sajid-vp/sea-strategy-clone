@@ -1325,7 +1325,12 @@ const ProjectDetail = () => {
                     const completedDeliverables = milestone.deliverables?.filter(d => d.status === "done").length || 0;
                     const totalDeliverables = milestone.deliverables?.length || 0;
                     const isExpanded = expandedMilestones[milestone.id] ?? true;
-                    
+                    const currentDeps = milestoneDepsOverride[milestone.id] ?? (milestone as any).dependencies ?? [];
+                    const otherMilestones = project.milestones.filter((m: any) => m.id !== milestone.id);
+                    const depNames = currentDeps
+                      .map((id: number) => project.milestones.find((m: any) => m.id === id)?.name)
+                      .filter(Boolean);
+
                     return (
                       <div key={milestone.id} className="border rounded-lg p-4 space-y-3">
                         <div className="flex items-start justify-between">
@@ -1339,6 +1344,91 @@ const ProjectDetail = () => {
                               Due: {new Date(milestone.dueDate).toLocaleDateString()}
                             </p>
                           </div>
+                        </div>
+
+                        {/* Dependency editor */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                              <Link2 className="h-3.5 w-3.5" />
+                              Depends on
+                            </span>
+                            <Popover
+                              open={openDepPopover === milestone.id}
+                              onOpenChange={(open) => setOpenDepPopover(open ? milestone.id : null)}
+                            >
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-7 gap-1.5 text-xs">
+                                  <Plus className="h-3 w-3" />
+                                  {currentDeps.length > 0 ? "Edit" : "Add"} dependencies
+                                  <ChevronsUpDown className="h-3 w-3 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-72 p-0" align="end">
+                                <Command>
+                                  <CommandInput placeholder="Search milestones..." className="h-9" />
+                                  <CommandList>
+                                    <CommandEmpty>No milestones found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {otherMilestones.map((m: any) => {
+                                        const isSelected = currentDeps.includes(m.id);
+                                        return (
+                                          <CommandItem
+                                            key={m.id}
+                                            value={m.name}
+                                            onSelect={() => {
+                                              const next = isSelected
+                                                ? currentDeps.filter((id: number) => id !== m.id)
+                                                : [...currentDeps, m.id];
+                                              setMilestoneDepsOverride((prev) => ({ ...prev, [milestone.id]: next }));
+                                              toast.success(
+                                                isSelected
+                                                  ? `Removed dependency: ${m.name}`
+                                                  : `Added dependency: ${m.name}`
+                                              );
+                                            }}
+                                          >
+                                            <Check className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
+                                            <span className="flex-1 truncate">{m.name}</span>
+                                            <StatusBadge status={m.status} className="text-[10px] px-1.5 py-0 ml-2" />
+                                          </CommandItem>
+                                        );
+                                      })}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          {depNames.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5">
+                              {depNames.map((name: string, idx: number) => {
+                                const depId = currentDeps[idx];
+                                return (
+                                  <Badge
+                                    key={depId}
+                                    variant="secondary"
+                                    className="text-[11px] gap-1 pr-1"
+                                  >
+                                    {name}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const next = currentDeps.filter((id: number) => id !== depId);
+                                        setMilestoneDepsOverride((prev) => ({ ...prev, [milestone.id]: next }));
+                                      }}
+                                      className="ml-0.5 rounded-sm hover:bg-muted-foreground/20 p-0.5"
+                                      aria-label={`Remove ${name}`}
+                                    >
+                                      <X className="h-2.5 w-2.5" />
+                                    </button>
+                                  </Badge>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-muted-foreground italic">No dependencies</p>
+                          )}
                         </div>
                         
                         <div className="space-y-1">
