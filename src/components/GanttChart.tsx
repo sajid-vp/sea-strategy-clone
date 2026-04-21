@@ -724,8 +724,8 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
 
                     const prevY = getRowYCenter(dep.rowIdx);
                     const currY = getRowYCenter(curr.rowIdx);
-                    const x1 = dep.rightPct; // end of predecessor
-                    const x2 = curr.leftPct;  // start of successor
+                    const x1 = (dep.rightPct / 100) * timelineWidth; // end of predecessor (px)
+                    const x2 = (curr.leftPct / 100) * timelineWidth; // start of successor (px)
                     const isCriticalArrow = showCriticalPath && criticalPath.criticalTaskIds.has(depId) && criticalPath.criticalTaskIds.has(row.task.id);
                     const d = buildFinishToStartPath(x1, prevY, x2, currY);
 
@@ -762,10 +762,12 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                     // SS: pred start -> succ start
                     // FF: pred end -> succ end
                     // SF: pred start -> succ end
-                    const x1 = depType === "SS" || depType === "SF" ? from.leftPct : from.rightPct;
-                    const x2 = depType === "FF" || depType === "SF" ? to.rightPct : to.leftPct;
+                    const x1Pct = depType === "SS" || depType === "SF" ? from.leftPct : from.rightPct;
+                    const x2Pct = depType === "FF" || depType === "SF" ? to.rightPct : to.leftPct;
+                    const x1 = (x1Pct / 100) * timelineWidth;
+                    const x2 = (x2Pct / 100) * timelineWidth;
                     const enterFromRight = depType === "FF" || depType === "SF";
-                    const d = buildDependencyPath(x1, prevY, x2, currY, enterFromRight);
+                    const d = buildDependencyPath(x1, prevY, x2, currY, enterFromRight, timelineWidth);
                     arrows.push(
                       <path
                         key={`m-${depId}-${m.id}-${depType}`}
