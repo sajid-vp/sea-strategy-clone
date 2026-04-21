@@ -1112,7 +1112,10 @@ const ProjectDetail = () => {
           {/* Timeline Tab */}
           <TabsContent value="timeline" className="space-y-6">
             <GanttChart
-              milestones={project.milestones}
+              milestones={project.milestones.map((m: any) => ({
+                ...m,
+                dependencies: milestoneDepsOverride[m.id] ?? m.dependencies ?? [],
+              }))}
               projectStartDate={project.startDate}
               projectEndDate={project.endDate}
               tasks={project.tasks}
