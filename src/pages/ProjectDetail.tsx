@@ -1327,11 +1327,20 @@ const ProjectDetail = () => {
                     const completedDeliverables = milestone.deliverables?.filter(d => d.status === "done").length || 0;
                     const totalDeliverables = milestone.deliverables?.length || 0;
                     const isExpanded = expandedMilestones[milestone.id] ?? true;
-                    const currentDeps = milestoneDepsOverride[milestone.id] ?? (milestone as any).dependencies ?? [];
+                    // Normalize legacy number[] dependencies to {id, type}[]
+                    const normalizeDeps = (deps: any[]): MilestoneDep[] =>
+                      (deps || []).map((d) =>
+                        typeof d === "number" ? { id: d, type: "FS" as DepType } : { id: d.id, type: (d.type ?? "FS") as DepType }
+                      );
+                    const currentDeps: MilestoneDep[] =
+                      milestoneDepsOverride[milestone.id] ?? normalizeDeps((milestone as any).dependencies);
                     const otherMilestones = project.milestones.filter((m: any) => m.id !== milestone.id);
-                    const depNames = currentDeps
-                      .map((id: number) => project.milestones.find((m: any) => m.id === id)?.name)
-                      .filter(Boolean);
+                    const depTypeLabel: Record<DepType, string> = {
+                      FS: "Finish → Start",
+                      SS: "Start → Start",
+                      FF: "Finish → Finish",
+                      SF: "Start → Finish",
+                    };
 
                     return (
                       <div key={milestone.id} className="border rounded-lg p-4 space-y-3">
@@ -1373,15 +1382,15 @@ const ProjectDetail = () => {
                                     <CommandEmpty>No milestones found.</CommandEmpty>
                                     <CommandGroup>
                                       {otherMilestones.map((m: any) => {
-                                        const isSelected = currentDeps.includes(m.id);
+                                        const isSelected = currentDeps.some((d) => d.id === m.id);
                                         return (
                                           <CommandItem
                                             key={m.id}
                                             value={m.name}
                                             onSelect={() => {
-                                              const next = isSelected
-                                                ? currentDeps.filter((id: number) => id !== m.id)
-                                                : [...currentDeps, m.id];
+                                              const next: MilestoneDep[] = isSelected
+                                                ? currentDeps.filter((d) => d.id !== m.id)
+                                                : [...currentDeps, { id: m.id, type: "FS" as DepType }];
                                               setMilestoneDepsOverride((prev) => ({ ...prev, [milestone.id]: next }));
                                               toast.success(
                                                 isSelected
@@ -1402,21 +1411,44 @@ const ProjectDetail = () => {
                               </PopoverContent>
                             </Popover>
                           </div>
-                          {depNames.length > 0 ? (
+                          {currentDeps.length > 0 ? (
                             <div className="flex flex-wrap gap-1.5">
-                              {depNames.map((name: string, idx: number) => {
-                                const depId = currentDeps[idx];
+                              {currentDeps.map((dep) => {
+                                const name = project.milestones.find((m: any) => m.id === dep.id)?.name;
+                                if (!name) return null;
                                 return (
                                   <Badge
-                                    key={depId}
+                                    key={dep.id}
                                     variant="secondary"
-                                    className="text-[11px] gap-1 pr-1"
+                                    className="text-[11px] gap-1 pl-2 pr-1 py-0 h-6"
                                   >
-                                    {name}
+                                    <span className="truncate max-w-[160px]">{name}</span>
+                                    <Select
+                                      value={dep.type}
+                                      onValueChange={(val) => {
+                                        const next = currentDeps.map((d) =>
+                                          d.id === dep.id ? { ...d, type: val as DepType } : d
+                                        );
+                                        setMilestoneDepsOverride((prev) => ({ ...prev, [milestone.id]: next }));
+                                      }}
+                                    >
+                                      <SelectTrigger
+                                        className="h-5 px-1.5 text-[10px] font-bold border-0 bg-background/60 hover:bg-background gap-0.5 rounded [&>svg]:h-2.5 [&>svg]:w-2.5"
+                                        title={depTypeLabel[dep.type]}
+                                      >
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent align="end" className="min-w-[180px]">
+                                        <SelectItem value="FS"><span className="font-mono mr-2">FS</span>Finish → Start</SelectItem>
+                                        <SelectItem value="SS"><span className="font-mono mr-2">SS</span>Start → Start</SelectItem>
+                                        <SelectItem value="FF"><span className="font-mono mr-2">FF</span>Finish → Finish</SelectItem>
+                                        <SelectItem value="SF"><span className="font-mono mr-2">SF</span>Start → Finish</SelectItem>
+                                      </SelectContent>
+                                    </Select>
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        const next = currentDeps.filter((id: number) => id !== depId);
+                                        const next = currentDeps.filter((d) => d.id !== dep.id);
                                         setMilestoneDepsOverride((prev) => ({ ...prev, [milestone.id]: next }));
                                       }}
                                       className="ml-0.5 rounded-sm hover:bg-muted-foreground/20 p-0.5"
