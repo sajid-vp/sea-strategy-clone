@@ -50,6 +50,7 @@ interface Milestone {
   progress: number;
   status: string;
   deliverables?: any[];
+  dependencies?: number[];
 }
 
 interface GanttChartProps {
@@ -662,28 +663,32 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                   });
                 });
 
-                // Milestone → Milestone sequential connectors (chronological order)
-                for (let i = 0; i < sortedMilestones.length - 1; i++) {
-                  const from = milestoneRowMap.get(sortedMilestones[i].id);
-                  const to = milestoneRowMap.get(sortedMilestones[i + 1].id);
-                  if (!from || !to) continue;
-                  const prevY = getRowYCenter(from.rowIdx);
-                  const currY = getRowYCenter(to.rowIdx);
-                  const x1 = from.rightPct;
-                  const x2 = to.leftPct;
-                  const midX = x1 + Math.max((x2 - x1) / 2, 0.5);
-                  arrows.push(
-                    <path
-                      key={`m-${sortedMilestones[i].id}-${sortedMilestones[i + 1].id}`}
-                      d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
-                      fill="none"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth="2"
-                      opacity="0.75"
-                      markerEnd="url(#gantt-arrow-milestone)"
-                    />
-                  );
-                }
+                // Milestone → Milestone explicit dependency connectors
+                sortedMilestones.forEach((m) => {
+                  const deps = m.dependencies || [];
+                  const to = milestoneRowMap.get(m.id);
+                  if (!to) return;
+                  deps.forEach((depId) => {
+                    const from = milestoneRowMap.get(depId);
+                    if (!from) return;
+                    const prevY = getRowYCenter(from.rowIdx);
+                    const currY = getRowYCenter(to.rowIdx);
+                    const x1 = from.rightPct;
+                    const x2 = to.leftPct;
+                    const midX = x1 + Math.max((x2 - x1) / 2, 0.5);
+                    arrows.push(
+                      <path
+                        key={`m-${depId}-${m.id}`}
+                        d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
+                        fill="none"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth="2"
+                        opacity="0.75"
+                        markerEnd="url(#gantt-arrow-milestone)"
+                      />
+                    );
+                  });
+                });
 
                 return arrows;
               })()}
