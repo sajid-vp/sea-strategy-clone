@@ -583,17 +583,20 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                 <marker id="gantt-arrow-critical" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
                   <polygon points="0 0, 6 2.5, 0 5" fill="hsl(var(--destructive))" opacity="0.8" />
                 </marker>
+                <marker id="gantt-arrow-milestone" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+                  <polygon points="0 0, 7 3, 0 6" fill="hsl(var(--primary))" opacity="0.6" />
+                </marker>
               </defs>
               {(() => {
-                const taskRowMap = new Map<number, { rowIdx: number; leftPct: number; rightPct: number }>();
-                let yOff = 0;
+                const taskRowMap = new Map<number, { rowIdx: number; leftPct: number; rightPct: number; milestoneId: number }>();
+                const milestoneRowMap = new Map<number, { rowIdx: number; leftPct: number; rightPct: number }>();
                 rows.forEach((row, rIdx) => {
-                  const h = row.type === "milestone" ? MILESTONE_ROW_HEIGHT : TASK_ROW_HEIGHT;
                   if (row.type === "task") {
                     const { s, e } = getAdjustedDays(row.task.id, row.startDay, row.endDay);
-                    taskRowMap.set(row.task.id, { rowIdx: rIdx, leftPct: (s / totalDays) * 100, rightPct: (e / totalDays) * 100 });
+                    taskRowMap.set(row.task.id, { rowIdx: rIdx, leftPct: (s / totalDays) * 100, rightPct: (e / totalDays) * 100, milestoneId: row.milestoneId });
+                  } else {
+                    milestoneRowMap.set(row.milestone.id, { rowIdx: rIdx, leftPct: (row.startDay / totalDays) * 100, rightPct: (row.endDay / totalDays) * 100 });
                   }
-                  yOff += h;
                 });
 
                 const getRowYCenter = (rowIdx: number) => {
@@ -604,12 +607,37 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                   return y + (rows[rowIdx].type === "milestone" ? MILESTONE_ROW_HEIGHT : TASK_ROW_HEIGHT) / 2;
                 };
 
-                return rows.flatMap((row) => {
-                  if (row.type !== "task") return [];
-                  return row.task.dependencies.map((depId) => {
-                    const dep = taskRowMap.get(depId);
-                    const curr = taskRowMap.get(row.task.id);
-                    if (!dep || !curr) return null;
+                const arrows: JSX.Element[] = [];
+
+                // Helper: resolve a task dependency to its visible row anchor.
+                // If the source task's milestone is collapsed, fall back to the milestone row.
+                const resolveAnchor = (taskId: number) => {
+                  const t = taskRowMap.get(taskId);
+                  if (t) return { rowIdx: t.rowIdx, leftPct: t.leftPct, rightPct: t.rightPct };
+                  // Task hidden — find its milestone
+                  const taskObj = tasks?.find((tk) => tk.id === taskId);
+                  if (!taskObj) return null;
+                  let mId = taskObj.milestoneId;
+                  if (mId == null) {
+                    // map by tasksByMilestone
+                    for (const [k, arr] of tasksByMilestone.entries()) {
+                      if (arr.some((x) => x.id === taskId)) { mId = k; break; }
+                    }
+                  }
+                  if (mId == null) return null;
+                  const m = milestoneRowMap.get(mId);
+                  if (!m) return null;
+                  return { rowIdx: m.rowIdx, leftPct: m.leftPct, rightPct: m.rightPct };
+                };
+
+                // Task → Task (or Task → Milestone when collapsed) dependency arrows
+                rows.forEach((row) => {
+                  if (row.type !== "task") return;
+                  const curr = taskRowMap.get(row.task.id);
+                  if (!curr) return;
+                  row.task.dependencies.forEach((depId) => {
+                    const dep = resolveAnchor(depId);
+                    if (!dep) return;
 
                     const prevY = getRowYCenter(dep.rowIdx);
                     const currY = getRowYCenter(curr.rowIdx);
@@ -619,9 +647,9 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
 
                     const isCriticalArrow = showCriticalPath && criticalPath.criticalTaskIds.has(depId) && criticalPath.criticalTaskIds.has(row.task.id);
 
-                    return (
+                    arrows.push(
                       <path
-                        key={`${depId}-${row.task.id}`}
+                        key={`t-${depId}-${row.task.id}`}
                         d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
                         fill="none"
                         stroke={isCriticalArrow ? "hsl(var(--destructive))" : "hsl(var(--muted-foreground))"}
@@ -633,6 +661,31 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                     );
                   });
                 });
+
+                // Milestone → Milestone sequential connectors (chronological order)
+                for (let i = 0; i < sortedMilestones.length - 1; i++) {
+                  const from = milestoneRowMap.get(sortedMilestones[i].id);
+                  const to = milestoneRowMap.get(sortedMilestones[i + 1].id);
+                  if (!from || !to) continue;
+                  const prevY = getRowYCenter(from.rowIdx);
+                  const currY = getRowYCenter(to.rowIdx);
+                  const x1 = from.rightPct;
+                  const x2 = to.leftPct;
+                  const midX = x1 + Math.max((x2 - x1) / 2, 0.5);
+                  arrows.push(
+                    <path
+                      key={`m-${sortedMilestones[i].id}-${sortedMilestones[i + 1].id}`}
+                      d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="1.5"
+                      opacity="0.45"
+                      markerEnd="url(#gantt-arrow-milestone)"
+                    />
+                  );
+                }
+
+                return arrows;
               })()}
             </svg>
 
