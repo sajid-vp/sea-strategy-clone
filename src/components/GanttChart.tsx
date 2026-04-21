@@ -153,21 +153,22 @@ const HEADER_HEIGHT = 44;
  * If the successor starts before the predecessor ends (overlap), route
  * around with a small back-step so the line doesn't cut through bars.
  */
+/**
+ * Build a Gantt finish-to-start path. All x values are in pixels.
+ * SVG path data does NOT support percent units, so callers must convert
+ * percentages to pixels using the measured timeline width before calling.
+ */
 const buildFinishToStartPath = (x1: number, y1: number, x2: number, y2: number) => {
-  // Small horizontal jog after leaving predecessor (in percent units; tiny).
-  const JOG = 0.4;
-  // Approach length before successor (so arrowhead enters horizontally).
-  const APPROACH = 0.6;
+  const JOG = 6;       // px
+  const APPROACH = 10; // px
 
   if (x2 > x1 + JOG + APPROACH) {
-    // Normal forward case
     const elbowX = x2 - APPROACH;
-    return `M ${x1}% ${y1} L ${x1 + JOG}% ${y1} L ${elbowX}% ${y1} L ${elbowX}% ${y2} L ${x2}% ${y2}`;
+    return `M ${x1} ${y1} L ${x1 + JOG} ${y1} L ${elbowX} ${y1} L ${elbowX} ${y2} L ${x2} ${y2}`;
   }
-  // Overlap / reverse case — wrap around predecessor
   const overshoot = x1 + JOG;
   const wrapBack = Math.max(x2 - APPROACH, 0);
-  return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
+  return `M ${x1} ${y1} L ${overshoot} ${y1} L ${overshoot} ${(y1 + y2) / 2} L ${wrapBack} ${(y1 + y2) / 2} L ${wrapBack} ${y2} L ${x2} ${y2}`;
 };
 
 /**
@@ -182,31 +183,28 @@ const buildDependencyPath = (
   y1: number,
   x2: number,
   y2: number,
-  enterFromRight: boolean
+  enterFromRight: boolean,
+  maxX: number
 ) => {
-  const JOG = 0.4;
-  const APPROACH = 0.6;
+  const JOG = 6;
+  const APPROACH = 10;
 
   if (!enterFromRight) {
-    // Arrowhead points right, entering successor's left edge
     if (x2 > x1 + JOG + APPROACH) {
       const elbowX = x2 - APPROACH;
-      return `M ${x1}% ${y1} L ${x1 + JOG}% ${y1} L ${elbowX}% ${y1} L ${elbowX}% ${y2} L ${x2}% ${y2}`;
+      return `M ${x1} ${y1} L ${x1 + JOG} ${y1} L ${elbowX} ${y1} L ${elbowX} ${y2} L ${x2} ${y2}`;
     }
-    // Overlap — wrap
     const overshoot = x1 + JOG;
     const wrapBack = Math.max(x2 - APPROACH, 0);
-    return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
+    return `M ${x1} ${y1} L ${overshoot} ${y1} L ${overshoot} ${(y1 + y2) / 2} L ${wrapBack} ${(y1 + y2) / 2} L ${wrapBack} ${y2} L ${x2} ${y2}`;
   }
-  // Arrowhead points LEFT, entering successor's right edge
   if (x2 < x1 - JOG - APPROACH) {
     const elbowX = x2 + APPROACH;
-    return `M ${x1}% ${y1} L ${x1 - JOG}% ${y1} L ${elbowX}% ${y1} L ${elbowX}% ${y2} L ${x2}% ${y2}`;
+    return `M ${x1} ${y1} L ${x1 - JOG} ${y1} L ${elbowX} ${y1} L ${elbowX} ${y2} L ${x2} ${y2}`;
   }
-  // Overlap — wrap
   const overshoot = x1 - JOG;
-  const wrapBack = Math.min(x2 + APPROACH, 100);
-  return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
+  const wrapBack = Math.min(x2 + APPROACH, maxX);
+  return `M ${x1} ${y1} L ${overshoot} ${y1} L ${overshoot} ${(y1 + y2) / 2} L ${wrapBack} ${(y1 + y2) / 2} L ${wrapBack} ${y2} L ${x2} ${y2}`;
 };
 
 type RowItem =
