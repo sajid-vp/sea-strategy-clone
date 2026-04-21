@@ -139,6 +139,34 @@ const TASK_ROW_HEIGHT = 44;
 const SIDEBAR_WIDTH = 320;
 const HEADER_HEIGHT = 44;
 
+/**
+ * Build a Gantt-style finish-to-start dependency path.
+ * x1,x2 are in percent (0-100) of the timeline width.
+ * y1,y2 are in pixels.
+ *
+ * Standard L-shape: leave predecessor's right edge horizontally a few px,
+ * drop vertically to the successor's row, then approach the successor's
+ * left edge horizontally so the arrowhead points right into the bar.
+ * If the successor starts before the predecessor ends (overlap), route
+ * around with a small back-step so the line doesn't cut through bars.
+ */
+const buildFinishToStartPath = (x1: number, y1: number, x2: number, y2: number) => {
+  // Small horizontal jog after leaving predecessor (in percent units; tiny).
+  const JOG = 0.4;
+  // Approach length before successor (so arrowhead enters horizontally).
+  const APPROACH = 0.6;
+
+  if (x2 > x1 + JOG + APPROACH) {
+    // Normal forward case
+    const elbowX = x2 - APPROACH;
+    return `M ${x1}% ${y1} L ${x1 + JOG}% ${y1} L ${elbowX}% ${y1} L ${elbowX}% ${y2} L ${x2}% ${y2}`;
+  }
+  // Overlap / reverse case — wrap around predecessor
+  const overshoot = x1 + JOG;
+  const wrapBack = Math.max(x2 - APPROACH, 0);
+  return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
+};
+
 type RowItem =
   | { type: "milestone"; milestone: Milestone; startDay: number; endDay: number }
   | { type: "task"; task: Task; milestoneId: number; startDay: number; endDay: number; progress: number };
