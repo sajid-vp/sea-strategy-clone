@@ -92,7 +92,7 @@ export const initiatives = [
             dueDate: "2025-03-30", 
             progress: 80, 
             status: "in-progress" as const,
-            dependencies: [1],
+            dependencies: [{ id: 1, type: "FS" as const }],
             deliverables: [
               { id: 3, name: "Security Policy Manual", status: "in-progress" as const, description: "Complete security policies documentation" },
               { id: 4, name: "Employee Guidelines", status: "done" as const, description: "Security guidelines for staff", completedDate: "2025-03-15" }
@@ -104,7 +104,7 @@ export const initiatives = [
             dueDate: "2025-05-15", 
             progress: 60, 
             status: "in-progress" as const,
-            dependencies: [2],
+            dependencies: [{ id: 2, type: "FS" as const }],
             deliverables: [
               { id: 5, name: "Access Control System", status: "in-progress" as const, description: "Implement role-based access controls" },
               { id: 6, name: "Encryption Standards", status: "todo" as const, description: "Deploy encryption across systems" }
@@ -116,7 +116,7 @@ export const initiatives = [
             dueDate: "2025-06-15", 
             progress: 0, 
             status: "todo" as const,
-            dependencies: [3],
+            dependencies: [{ id: 3, type: "FS" as const }],
             deliverables: [
               { id: 7, name: "Audit Report", status: "todo" as const, description: "Internal audit findings and recommendations" }
             ]
@@ -127,7 +127,7 @@ export const initiatives = [
             dueDate: "2025-06-30", 
             progress: 0, 
             status: "todo" as const,
-            dependencies: [4],
+            dependencies: [{ id: 4, type: "FS" as const }],
             deliverables: [
               { id: 8, name: "ISO 27001 Certificate", status: "todo" as const, description: "Official certification document" }
             ]
