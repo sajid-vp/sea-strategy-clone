@@ -678,8 +678,8 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                       d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
                       fill="none"
                       stroke="hsl(var(--primary))"
-                      strokeWidth="1.5"
-                      opacity="0.45"
+                      strokeWidth="2"
+                      opacity="0.75"
                       markerEnd="url(#gantt-arrow-milestone)"
                     />
                   );
