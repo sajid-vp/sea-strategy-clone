@@ -43,6 +43,9 @@ interface Task {
   endDate?: string;
 }
 
+export type DependencyType = "FS" | "SS" | "FF" | "SF";
+export type MilestoneDependency = number | { id: number; type: DependencyType };
+
 interface Milestone {
   id: number;
   name: string;
@@ -50,7 +53,7 @@ interface Milestone {
   progress: number;
   status: string;
   deliverables?: any[];
-  dependencies?: number[];
+  dependencies?: MilestoneDependency[];
 }
 
 interface GanttChartProps {
