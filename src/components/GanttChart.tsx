@@ -170,6 +170,45 @@ const buildFinishToStartPath = (x1: number, y1: number, x2: number, y2: number) 
   return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
 };
 
+/**
+ * Generic dependency path supporting all 4 MS-Project link types.
+ * x1,y1 = anchor on predecessor (start or end based on type)
+ * x2,y2 = anchor on successor (start or end based on type)
+ * enterFromRight = true when arrowhead must enter the successor from the right
+ * (used for FF and SF — anchor is the bar's right edge).
+ */
+const buildDependencyPath = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  enterFromRight: boolean
+) => {
+  const JOG = 0.4;
+  const APPROACH = 0.6;
+
+  if (!enterFromRight) {
+    // Arrowhead points right, entering successor's left edge
+    if (x2 > x1 + JOG + APPROACH) {
+      const elbowX = x2 - APPROACH;
+      return `M ${x1}% ${y1} L ${x1 + JOG}% ${y1} L ${elbowX}% ${y1} L ${elbowX}% ${y2} L ${x2}% ${y2}`;
+    }
+    // Overlap — wrap
+    const overshoot = x1 + JOG;
+    const wrapBack = Math.max(x2 - APPROACH, 0);
+    return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
+  }
+  // Arrowhead points LEFT, entering successor's right edge
+  if (x2 < x1 - JOG - APPROACH) {
+    const elbowX = x2 + APPROACH;
+    return `M ${x1}% ${y1} L ${x1 - JOG}% ${y1} L ${elbowX}% ${y1} L ${elbowX}% ${y2} L ${x2}% ${y2}`;
+  }
+  // Overlap — wrap
+  const overshoot = x1 - JOG;
+  const wrapBack = Math.min(x2 + APPROACH, 100);
+  return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
+};
+
 type RowItem =
   | { type: "milestone"; milestone: Milestone; startDay: number; endDay: number }
   | { type: "task"; task: Task; milestoneId: number; startDay: number; endDay: number; progress: number };
