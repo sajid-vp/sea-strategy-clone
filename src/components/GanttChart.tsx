@@ -699,17 +699,25 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                   const deps = m.dependencies || [];
                   const to = milestoneRowMap.get(m.id);
                   if (!to) return;
-                  deps.forEach((depId) => {
+                  deps.forEach((dep) => {
+                    const depId = typeof dep === "number" ? dep : dep.id;
+                    const depType: DependencyType = typeof dep === "number" ? "FS" : dep.type;
                     const from = milestoneRowMap.get(depId);
                     if (!from) return;
                     const prevY = getRowYCenter(from.rowIdx);
                     const currY = getRowYCenter(to.rowIdx);
-                    const x1 = from.rightPct;
-                    const x2 = to.leftPct;
-                    const d = buildFinishToStartPath(x1, prevY, x2, currY);
+                    // Pick anchor x based on dependency type
+                    // FS: pred end -> succ start
+                    // SS: pred start -> succ start
+                    // FF: pred end -> succ end
+                    // SF: pred start -> succ end
+                    const x1 = depType === "SS" || depType === "SF" ? from.leftPct : from.rightPct;
+                    const x2 = depType === "FF" || depType === "SF" ? to.rightPct : to.leftPct;
+                    const enterFromRight = depType === "FF" || depType === "SF";
+                    const d = buildDependencyPath(x1, prevY, x2, currY, enterFromRight);
                     arrows.push(
                       <path
-                        key={`m-${depId}-${m.id}`}
+                        key={`m-${depId}-${m.id}-${depType}`}
                         d={d}
                         fill="none"
                         stroke="hsl(var(--primary))"
