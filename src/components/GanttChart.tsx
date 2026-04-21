@@ -50,6 +50,7 @@ interface Milestone {
   progress: number;
   status: string;
   deliverables?: any[];
+  dependencies?: number[];
 }
 
 interface GanttChartProps {
