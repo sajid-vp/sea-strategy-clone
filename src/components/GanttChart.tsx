@@ -43,6 +43,9 @@ interface Task {
   endDate?: string;
 }
 
+export type DependencyType = "FS" | "SS" | "FF" | "SF";
+export type MilestoneDependency = number | { id: number; type: DependencyType };
+
 interface Milestone {
   id: number;
   name: string;
@@ -50,7 +53,7 @@ interface Milestone {
   progress: number;
   status: string;
   deliverables?: any[];
-  dependencies?: number[];
+  dependencies?: MilestoneDependency[];
 }
 
 interface GanttChartProps {
@@ -164,6 +167,45 @@ const buildFinishToStartPath = (x1: number, y1: number, x2: number, y2: number) 
   // Overlap / reverse case — wrap around predecessor
   const overshoot = x1 + JOG;
   const wrapBack = Math.max(x2 - APPROACH, 0);
+  return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
+};
+
+/**
+ * Generic dependency path supporting all 4 MS-Project link types.
+ * x1,y1 = anchor on predecessor (start or end based on type)
+ * x2,y2 = anchor on successor (start or end based on type)
+ * enterFromRight = true when arrowhead must enter the successor from the right
+ * (used for FF and SF — anchor is the bar's right edge).
+ */
+const buildDependencyPath = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  enterFromRight: boolean
+) => {
+  const JOG = 0.4;
+  const APPROACH = 0.6;
+
+  if (!enterFromRight) {
+    // Arrowhead points right, entering successor's left edge
+    if (x2 > x1 + JOG + APPROACH) {
+      const elbowX = x2 - APPROACH;
+      return `M ${x1}% ${y1} L ${x1 + JOG}% ${y1} L ${elbowX}% ${y1} L ${elbowX}% ${y2} L ${x2}% ${y2}`;
+    }
+    // Overlap — wrap
+    const overshoot = x1 + JOG;
+    const wrapBack = Math.max(x2 - APPROACH, 0);
+    return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
+  }
+  // Arrowhead points LEFT, entering successor's right edge
+  if (x2 < x1 - JOG - APPROACH) {
+    const elbowX = x2 + APPROACH;
+    return `M ${x1}% ${y1} L ${x1 - JOG}% ${y1} L ${elbowX}% ${y1} L ${elbowX}% ${y2} L ${x2}% ${y2}`;
+  }
+  // Overlap — wrap
+  const overshoot = x1 - JOG;
+  const wrapBack = Math.min(x2 + APPROACH, 100);
   return `M ${x1}% ${y1} L ${overshoot}% ${y1} L ${overshoot}% ${(y1 + y2) / 2} L ${wrapBack}% ${(y1 + y2) / 2} L ${wrapBack}% ${y2} L ${x2}% ${y2}`;
 };
 
@@ -615,6 +657,9 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                 <marker id="gantt-arrow-milestone" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
                   <polygon points="0 0, 7 3, 0 6" fill="hsl(var(--primary))" opacity="0.6" />
                 </marker>
+                <marker id="gantt-arrow-milestone-left" markerWidth="7" markerHeight="6" refX="1" refY="3" orient="auto">
+                  <polygon points="7 0, 0 3, 7 6" fill="hsl(var(--primary))" opacity="0.6" />
+                </marker>
               </defs>
               {(() => {
                 const taskRowMap = new Map<number, { rowIdx: number; leftPct: number; rightPct: number; milestoneId: number }>();
@@ -696,24 +741,32 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                   const deps = m.dependencies || [];
                   const to = milestoneRowMap.get(m.id);
                   if (!to) return;
-                  deps.forEach((depId) => {
+                  deps.forEach((dep) => {
+                    const depId = typeof dep === "number" ? dep : dep.id;
+                    const depType: DependencyType = typeof dep === "number" ? "FS" : dep.type;
                     const from = milestoneRowMap.get(depId);
                     if (!from) return;
                     const prevY = getRowYCenter(from.rowIdx);
                     const currY = getRowYCenter(to.rowIdx);
-                    const x1 = from.rightPct;
-                    const x2 = to.leftPct;
-                    const d = buildFinishToStartPath(x1, prevY, x2, currY);
+                    // Pick anchor x based on dependency type
+                    // FS: pred end -> succ start
+                    // SS: pred start -> succ start
+                    // FF: pred end -> succ end
+                    // SF: pred start -> succ end
+                    const x1 = depType === "SS" || depType === "SF" ? from.leftPct : from.rightPct;
+                    const x2 = depType === "FF" || depType === "SF" ? to.rightPct : to.leftPct;
+                    const enterFromRight = depType === "FF" || depType === "SF";
+                    const d = buildDependencyPath(x1, prevY, x2, currY, enterFromRight);
                     arrows.push(
                       <path
-                        key={`m-${depId}-${m.id}`}
+                        key={`m-${depId}-${m.id}-${depType}`}
                         d={d}
                         fill="none"
                         stroke="hsl(var(--primary))"
                         strokeWidth="1.75"
                         opacity="0.8"
                         strokeLinejoin="miter"
-                        markerEnd="url(#gantt-arrow-milestone)"
+                        markerEnd={enterFromRight ? "url(#gantt-arrow-milestone-left)" : "url(#gantt-arrow-milestone)"}
                       />
                     );
                   });

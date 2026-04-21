@@ -92,7 +92,7 @@ export const initiatives = [
             dueDate: "2025-03-30", 
             progress: 80, 
             status: "in-progress" as const,
-            dependencies: [1],
+            dependencies: [{ id: 1, type: "FS" as const }],
             deliverables: [
               { id: 3, name: "Security Policy Manual", status: "in-progress" as const, description: "Complete security policies documentation" },
               { id: 4, name: "Employee Guidelines", status: "done" as const, description: "Security guidelines for staff", completedDate: "2025-03-15" }
@@ -104,7 +104,7 @@ export const initiatives = [
             dueDate: "2025-05-15", 
             progress: 60, 
             status: "in-progress" as const,
-            dependencies: [2],
+            dependencies: [{ id: 2, type: "FS" as const }],
             deliverables: [
               { id: 5, name: "Access Control System", status: "in-progress" as const, description: "Implement role-based access controls" },
               { id: 6, name: "Encryption Standards", status: "todo" as const, description: "Deploy encryption across systems" }
@@ -116,7 +116,7 @@ export const initiatives = [
             dueDate: "2025-06-15", 
             progress: 0, 
             status: "todo" as const,
-            dependencies: [3],
+            dependencies: [{ id: 3, type: "FS" as const }],
             deliverables: [
               { id: 7, name: "Audit Report", status: "todo" as const, description: "Internal audit findings and recommendations" }
             ]
@@ -127,7 +127,7 @@ export const initiatives = [
             dueDate: "2025-06-30", 
             progress: 0, 
             status: "todo" as const,
-            dependencies: [4],
+            dependencies: [{ id: 4, type: "FS" as const }],
             deliverables: [
               { id: 8, name: "ISO 27001 Certificate", status: "todo" as const, description: "Official certification document" }
             ]
@@ -216,10 +216,10 @@ export const initiatives = [
         dependencies: [],
         milestones: [
           { id: 6, name: "Requirements Analysis", dueDate: "2025-02-28", progress: 100, status: "done" as const, dependencies: [], deliverables: [] },
-          { id: 7, name: "Vendor Selection", dueDate: "2025-03-15", progress: 100, status: "done" as const, dependencies: [6], deliverables: [] },
-          { id: 8, name: "Hardware Installation", dueDate: "2025-06-15", progress: 50, status: "in-progress" as const, dependencies: [7], deliverables: [] },
-          { id: 9, name: "Software Integration", dueDate: "2025-07-31", progress: 30, status: "in-review" as const, dependencies: [8], deliverables: [] },
-          { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "todo" as const, dependencies: [9], deliverables: [] },
+          { id: 7, name: "Vendor Selection", dueDate: "2025-03-15", progress: 100, status: "done" as const, dependencies: [{ id: 6, type: "FS" as const }], deliverables: [] },
+          { id: 8, name: "Hardware Installation", dueDate: "2025-06-15", progress: 50, status: "in-progress" as const, dependencies: [{ id: 7, type: "FS" as const }], deliverables: [] },
+          { id: 9, name: "Software Integration", dueDate: "2025-07-31", progress: 30, status: "in-review" as const, dependencies: [{ id: 8, type: "FS" as const }], deliverables: [] },
+          { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "todo" as const, dependencies: [{ id: 9, type: "FS" as const }], deliverables: [] },
         ],
         tasks: [
           // Requirements Analysis milestone tasks
@@ -291,10 +291,10 @@ export const initiatives = [
         ],
         milestones: [
           { id: 11, name: "UI/UX Design", dueDate: "2025-02-28", progress: 100, status: "done" as const, dependencies: [], deliverables: [] },
-          { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "blocked" as const, dependencies: [11], deliverables: [] },
-          { id: 13, name: "Frontend Development", dueDate: "2025-06-15", progress: 25, status: "in-review" as const, dependencies: [11], deliverables: [] },
-          { id: 14, name: "Integration Testing", dueDate: "2025-07-01", progress: 0, status: "todo" as const, dependencies: [12, 13], deliverables: [] },
-          { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "todo" as const, dependencies: [14], deliverables: [] },
+          { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "blocked" as const, dependencies: [{ id: 11, type: "FS" as const }], deliverables: [] },
+          { id: 13, name: "Frontend Development", dueDate: "2025-06-15", progress: 25, status: "in-review" as const, dependencies: [{ id: 11, type: "FS" as const }], deliverables: [] },
+          { id: 14, name: "Integration Testing", dueDate: "2025-07-01", progress: 0, status: "todo" as const, dependencies: [{ id: 12, type: "FS" as const }, { id: 13, type: "FS" as const }], deliverables: [] },
+          { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "todo" as const, dependencies: [{ id: 14, type: "FS" as const }], deliverables: [] },
         ],
         tasks: [
           // UI/UX Design milestone tasks
@@ -361,9 +361,9 @@ export const initiatives = [
         ],
         milestones: [
           { id: 16, name: "Data Source Integration", dueDate: "2025-04-15", progress: 70, status: "in-progress" as const, dependencies: [], deliverables: [] },
-          { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "in-review" as const, dependencies: [16], deliverables: [] },
-          { id: 18, name: "AI Model Training", dueDate: "2025-08-15", progress: 20, status: "in-review" as const, dependencies: [16], deliverables: [] },
-          { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "todo" as const, dependencies: [17, 18], deliverables: [] },
+          { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "in-review" as const, dependencies: [{ id: 16, type: "FS" as const }], deliverables: [] },
+          { id: 18, name: "AI Model Training", dueDate: "2025-08-15", progress: 20, status: "in-review" as const, dependencies: [{ id: 16, type: "FS" as const }], deliverables: [] },
+          { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "todo" as const, dependencies: [{ id: 17, type: "FS" as const }, { id: 18, type: "FS" as const }], deliverables: [] },
         ],
         tasks: [
           // Data Source Integration milestone tasks
