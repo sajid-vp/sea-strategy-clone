@@ -231,6 +231,17 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
     initialEndDay: number;
   } | null>(null);
   const [dragOffsets, setDragOffsets] = useState<Record<number, { startDelta: number; endDelta: number }>>({});
+  const [timelineWidth, setTimelineWidth] = useState(0);
+
+  useEffect(() => {
+    if (!timelineRef.current) return;
+    const el = timelineRef.current;
+    const update = () => setTimelineWidth(el.getBoundingClientRect().width);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const projStart = parseISO(projectStartDate);
   const projEnd = parseISO(projectEndDate);
