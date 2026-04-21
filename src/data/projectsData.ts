@@ -215,11 +215,11 @@ export const initiatives = [
         documents: [],
         dependencies: [],
         milestones: [
-          { id: 6, name: "Requirements Analysis", dueDate: "2025-02-28", progress: 100, status: "done" as const, deliverables: [] },
-          { id: 7, name: "Vendor Selection", dueDate: "2025-03-15", progress: 100, status: "done" as const, deliverables: [] },
-          { id: 8, name: "Hardware Installation", dueDate: "2025-06-15", progress: 50, status: "in-progress" as const, deliverables: [] },
-          { id: 9, name: "Software Integration", dueDate: "2025-07-31", progress: 30, status: "in-review" as const, deliverables: [] },
-          { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "todo" as const, deliverables: [] },
+          { id: 6, name: "Requirements Analysis", dueDate: "2025-02-28", progress: 100, status: "done" as const, dependencies: [], deliverables: [] },
+          { id: 7, name: "Vendor Selection", dueDate: "2025-03-15", progress: 100, status: "done" as const, dependencies: [6], deliverables: [] },
+          { id: 8, name: "Hardware Installation", dueDate: "2025-06-15", progress: 50, status: "in-progress" as const, dependencies: [7], deliverables: [] },
+          { id: 9, name: "Software Integration", dueDate: "2025-07-31", progress: 30, status: "in-review" as const, dependencies: [8], deliverables: [] },
+          { id: 10, name: "Testing & Deployment", dueDate: "2025-08-31", progress: 0, status: "todo" as const, dependencies: [9], deliverables: [] },
         ],
         tasks: [
           // Requirements Analysis milestone tasks
