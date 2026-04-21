@@ -290,11 +290,11 @@ export const initiatives = [
           "Limited to 2 frontend developers"
         ],
         milestones: [
-          { id: 11, name: "UI/UX Design", dueDate: "2025-02-28", progress: 100, status: "done" as const, deliverables: [] },
-          { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "blocked" as const, deliverables: [] },
-          { id: 13, name: "Frontend Development", dueDate: "2025-06-15", progress: 25, status: "in-review" as const, deliverables: [] },
-          { id: 14, name: "Integration Testing", dueDate: "2025-07-01", progress: 0, status: "todo" as const, deliverables: [] },
-          { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "todo" as const, deliverables: [] },
+          { id: 11, name: "UI/UX Design", dueDate: "2025-02-28", progress: 100, status: "done" as const, dependencies: [], deliverables: [] },
+          { id: 12, name: "Backend API Development", dueDate: "2025-04-30", progress: 40, status: "blocked" as const, dependencies: [11], deliverables: [] },
+          { id: 13, name: "Frontend Development", dueDate: "2025-06-15", progress: 25, status: "in-review" as const, dependencies: [11], deliverables: [] },
+          { id: 14, name: "Integration Testing", dueDate: "2025-07-01", progress: 0, status: "todo" as const, dependencies: [12, 13], deliverables: [] },
+          { id: 15, name: "Beta Testing", dueDate: "2025-07-15", progress: 0, status: "todo" as const, dependencies: [14], deliverables: [] },
         ],
         tasks: [
           // UI/UX Design milestone tasks
