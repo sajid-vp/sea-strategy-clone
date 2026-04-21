@@ -80,6 +80,7 @@ export const initiatives = [
             dueDate: "2025-02-15", 
             progress: 100, 
             status: "done" as const,
+            dependencies: [],
             deliverables: [
               { id: 1, name: "Gap Analysis Report", status: "done" as const, description: "Comprehensive report identifying security gaps", completedDate: "2025-02-10" },
               { id: 2, name: "Risk Assessment Document", status: "done" as const, description: "Initial risk assessment findings", completedDate: "2025-02-14" }
@@ -91,6 +92,7 @@ export const initiatives = [
             dueDate: "2025-03-30", 
             progress: 80, 
             status: "in-progress" as const,
+            dependencies: [1],
             deliverables: [
               { id: 3, name: "Security Policy Manual", status: "in-progress" as const, description: "Complete security policies documentation" },
               { id: 4, name: "Employee Guidelines", status: "done" as const, description: "Security guidelines for staff", completedDate: "2025-03-15" }
@@ -102,6 +104,7 @@ export const initiatives = [
             dueDate: "2025-05-15", 
             progress: 60, 
             status: "in-progress" as const,
+            dependencies: [2],
             deliverables: [
               { id: 5, name: "Access Control System", status: "in-progress" as const, description: "Implement role-based access controls" },
               { id: 6, name: "Encryption Standards", status: "todo" as const, description: "Deploy encryption across systems" }
@@ -113,6 +116,7 @@ export const initiatives = [
             dueDate: "2025-06-15", 
             progress: 0, 
             status: "todo" as const,
+            dependencies: [3],
             deliverables: [
               { id: 7, name: "Audit Report", status: "todo" as const, description: "Internal audit findings and recommendations" }
             ]
@@ -123,6 +127,7 @@ export const initiatives = [
             dueDate: "2025-06-30", 
             progress: 0, 
             status: "todo" as const,
+            dependencies: [4],
             deliverables: [
               { id: 8, name: "ISO 27001 Certificate", status: "todo" as const, description: "Official certification document" }
             ]
