@@ -653,9 +653,9 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                         d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
                         fill="none"
                         stroke={isCriticalArrow ? "hsl(var(--destructive))" : "hsl(var(--muted-foreground))"}
-                        strokeWidth={isCriticalArrow ? "2" : "1"}
+                        strokeWidth={isCriticalArrow ? "2.25" : "1.5"}
                         strokeDasharray={isCriticalArrow ? "none" : "4 3"}
-                        opacity={isCriticalArrow ? "0.7" : "0.25"}
+                        opacity={isCriticalArrow ? "0.85" : "0.7"}
                         markerEnd={isCriticalArrow ? "url(#gantt-arrow-critical)" : "url(#gantt-arrow)"}
                       />
                     );
