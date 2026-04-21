@@ -360,10 +360,10 @@ export const initiatives = [
           "Historical data availability limited to 3 years"
         ],
         milestones: [
-          { id: 16, name: "Data Source Integration", dueDate: "2025-04-15", progress: 70, status: "in-progress" as const, deliverables: [] },
-          { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "in-review" as const, deliverables: [] },
-          { id: 18, name: "AI Model Training", dueDate: "2025-08-15", progress: 20, status: "in-review" as const, deliverables: [] },
-          { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "todo" as const, deliverables: [] },
+          { id: 16, name: "Data Source Integration", dueDate: "2025-04-15", progress: 70, status: "in-progress" as const, dependencies: [], deliverables: [] },
+          { id: 17, name: "Dashboard Development", dueDate: "2025-06-30", progress: 35, status: "in-review" as const, dependencies: [16], deliverables: [] },
+          { id: 18, name: "AI Model Training", dueDate: "2025-08-15", progress: 20, status: "in-review" as const, dependencies: [16], deliverables: [] },
+          { id: 19, name: "User Training", dueDate: "2025-09-30", progress: 0, status: "todo" as const, dependencies: [17, 18], deliverables: [] },
         ],
         tasks: [
           // Data Source Integration milestone tasks
