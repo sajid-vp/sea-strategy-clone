@@ -578,7 +578,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
             <svg className="absolute inset-0 w-full pointer-events-none z-10" style={{ height: totalBodyHeight }}>
               <defs>
                 <marker id="gantt-arrow" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
-                  <polygon points="0 0, 6 2.5, 0 5" fill="hsl(var(--muted-foreground))" opacity="0.4" />
+                  <polygon points="0 0, 6 2.5, 0 5" fill="hsl(var(--muted-foreground))" opacity="0.85" />
                 </marker>
                 <marker id="gantt-arrow-critical" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
                   <polygon points="0 0, 6 2.5, 0 5" fill="hsl(var(--destructive))" opacity="0.8" />
@@ -653,9 +653,9 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                         d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
                         fill="none"
                         stroke={isCriticalArrow ? "hsl(var(--destructive))" : "hsl(var(--muted-foreground))"}
-                        strokeWidth={isCriticalArrow ? "2" : "1"}
+                        strokeWidth={isCriticalArrow ? "2.25" : "1.5"}
                         strokeDasharray={isCriticalArrow ? "none" : "4 3"}
-                        opacity={isCriticalArrow ? "0.7" : "0.25"}
+                        opacity={isCriticalArrow ? "0.85" : "0.7"}
                         markerEnd={isCriticalArrow ? "url(#gantt-arrow-critical)" : "url(#gantt-arrow)"}
                       />
                     );
@@ -678,8 +678,8 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                       d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
                       fill="none"
                       stroke="hsl(var(--primary))"
-                      strokeWidth="1.5"
-                      opacity="0.45"
+                      strokeWidth="2"
+                      opacity="0.75"
                       markerEnd="url(#gantt-arrow-milestone)"
                     />
                   );
