@@ -642,21 +642,21 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
 
                     const prevY = getRowYCenter(dep.rowIdx);
                     const currY = getRowYCenter(curr.rowIdx);
-                    const x1 = dep.rightPct;
-                    const x2 = curr.leftPct;
-                    const midX = (x1 + x2) / 2;
-
+                    const x1 = dep.rightPct; // end of predecessor
+                    const x2 = curr.leftPct;  // start of successor
                     const isCriticalArrow = showCriticalPath && criticalPath.criticalTaskIds.has(depId) && criticalPath.criticalTaskIds.has(row.task.id);
+                    const d = buildFinishToStartPath(x1, prevY, x2, currY);
 
                     arrows.push(
                       <path
                         key={`t-${depId}-${row.task.id}`}
-                        d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
+                        d={d}
                         fill="none"
                         stroke={isCriticalArrow ? "hsl(var(--destructive))" : "hsl(var(--muted-foreground))"}
-                        strokeWidth={isCriticalArrow ? "2.25" : "1.5"}
-                        strokeDasharray={isCriticalArrow ? "none" : "4 3"}
-                        opacity={isCriticalArrow ? "0.85" : "0.7"}
+                        strokeWidth={isCriticalArrow ? "2" : "1.25"}
+                        strokeDasharray={isCriticalArrow ? "none" : "none"}
+                        opacity={isCriticalArrow ? "0.9" : "0.75"}
+                        strokeLinejoin="miter"
                         markerEnd={isCriticalArrow ? "url(#gantt-arrow-critical)" : "url(#gantt-arrow)"}
                       />
                     );
@@ -675,15 +675,16 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
                     const currY = getRowYCenter(to.rowIdx);
                     const x1 = from.rightPct;
                     const x2 = to.leftPct;
-                    const midX = x1 + Math.max((x2 - x1) / 2, 0.5);
+                    const d = buildFinishToStartPath(x1, prevY, x2, currY);
                     arrows.push(
                       <path
                         key={`m-${depId}-${m.id}`}
-                        d={`M ${x1}% ${prevY} L ${midX}% ${prevY} L ${midX}% ${currY} L ${x2}% ${currY}`}
+                        d={d}
                         fill="none"
                         stroke="hsl(var(--primary))"
-                        strokeWidth="2"
-                        opacity="0.75"
+                        strokeWidth="1.75"
+                        opacity="0.8"
+                        strokeLinejoin="miter"
                         markerEnd="url(#gantt-arrow-milestone)"
                       />
                     );
