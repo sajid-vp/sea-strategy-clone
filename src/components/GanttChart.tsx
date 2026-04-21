@@ -578,7 +578,7 @@ export const GanttChart = ({ milestones, projectStartDate, projectEndDate, tasks
             <svg className="absolute inset-0 w-full pointer-events-none z-10" style={{ height: totalBodyHeight }}>
               <defs>
                 <marker id="gantt-arrow" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
-                  <polygon points="0 0, 6 2.5, 0 5" fill="hsl(var(--muted-foreground))" opacity="0.4" />
+                  <polygon points="0 0, 6 2.5, 0 5" fill="hsl(var(--muted-foreground))" opacity="0.85" />
                 </marker>
                 <marker id="gantt-arrow-critical" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
                   <polygon points="0 0, 6 2.5, 0 5" fill="hsl(var(--destructive))" opacity="0.8" />
