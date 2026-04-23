@@ -85,12 +85,16 @@ export const Header = () => {
               >
                 Activities
               </Link>
-              <a
-                href="#"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              <Link
+                to="/scorecards"
+                className={`text-sm font-medium transition-colors ${
+                  currentPath.startsWith("/scorecards")
+                    ? "text-primary border-b-2 border-primary pb-4"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 Scorecard
-              </a>
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">

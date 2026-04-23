@@ -18,6 +18,10 @@ import GoalDetail from "./pages/GoalDetail";
 import Activities from "./pages/Activities";
 import ActivityDetail from "./pages/ActivityDetail";
 import StrategyDashboard from "./pages/StrategyDashboard";
+import ScorecardsIndex from "./pages/scorecards/ScorecardsIndex";
+import InstitutionScorecard from "./pages/scorecards/InstitutionScorecard";
+import DepartmentScorecards from "./pages/scorecards/DepartmentScorecards";
+import IndividualScorecards from "./pages/scorecards/IndividualScorecards";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +48,10 @@ const App = () => (
           <Route path="/activities" element={<Activities />} />
           <Route path="/activities/:id" element={<ActivityDetail />} />
           <Route path="/strategy" element={<StrategyDashboard />} />
+          <Route path="/scorecards" element={<ScorecardsIndex />} />
+          <Route path="/scorecards/institution" element={<InstitutionScorecard />} />
+          <Route path="/scorecards/department" element={<DepartmentScorecards />} />
+          <Route path="/scorecards/individual" element={<IndividualScorecards />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
