@@ -25,9 +25,10 @@ export const ScorecardDetail = ({ entity }: Props) => {
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           title="Health Score"
-          value={<span className={healthColor}>{entity.healthScore}</span> as unknown as string}
+          value={entity.healthScore}
           icon={<Activity className="h-4 w-4" />}
           subtitle={`${entity.onTrackPercentage}% on track`}
+          className={healthColor}
         >
           <Progress value={entity.healthScore} className="h-1.5" />
         </StatCard>
