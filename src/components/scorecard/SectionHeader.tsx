@@ -22,7 +22,7 @@ export const SectionHeader = ({
   actions,
 }: Props) => {
   return (
-    <div className="flex items-start justify-between gap-4 mb-3">
+    <div className="flex items-start justify-between gap-4 mb-2.5">
       <div className="flex items-start gap-3 min-w-0">
         <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0 mt-0.5">
           <Icon className="h-4 w-4" />
