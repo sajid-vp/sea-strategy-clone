@@ -31,7 +31,7 @@ const InstitutionScorecard = () => {
         </div>
 
         <div className="space-y-6">
-          {/* High-level health KPIs and perspectives */}
+          {/* High-level health KPIs */}
           <ScorecardDetail entity={institutionScorecard} />
 
           {/* Strategic layer */}
