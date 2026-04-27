@@ -17,9 +17,16 @@ export const YearProvider = ({ children }: { children: ReactNode }) => {
     }
     return Array.from(ys).sort();
   }, []);
-  const [year, setYear] = useState<number>(
-    availableYears[availableYears.length - 1] ?? new Date().getFullYear(),
-  );
+  // Default to the current calendar year if available, otherwise the most
+  // recent year for which we have data. Prevents the dashboard from opening
+  // on a future plan year (e.g. 2028) when "today" is 2026.
+  const [year, setYear] = useState<number>(() => {
+    const today = new Date().getFullYear();
+    if (availableYears.includes(today)) return today;
+    const past = availableYears.filter((y) => y <= today);
+    if (past.length > 0) return past[past.length - 1];
+    return availableYears[availableYears.length - 1] ?? today;
+  });
   return (
     <Ctx.Provider value={{ year, setYear, availableYears }}>{children}</Ctx.Provider>
   );
