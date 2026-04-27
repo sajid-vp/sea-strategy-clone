@@ -7,8 +7,11 @@ import {
 } from "@/components/ui/carousel";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Rocket } from "lucide-react";
-import { strategicInitiatives } from "@/data/scorecardData";
+import { Rocket, Target } from "lucide-react";
+import {
+  strategicInitiatives,
+  initiativeOkrContribution,
+} from "@/data/scorecardData";
 import { useYear } from "./YearContext";
 import { YoyChip } from "./YoyChip";
 import {
@@ -69,6 +72,10 @@ export const InitiativeCarousel = () => {
             const delta = yoy(actual, prevActual);
             const gap = expected - actual;
             const onPlan = gap <= 0;
+            const okr = initiativeOkrContribution(init.id);
+            const okrPct = okr.contributionPct;
+            const okrTone = tone(okrPct);
+            const okrAccent = accent(okrPct);
 
             return (
               <CarouselItem
@@ -142,10 +149,40 @@ export const InitiativeCarousel = () => {
                     />
                   </div>
 
+                  {/* OKR contribution */}
+                  <div className="rounded-md border bg-muted/30 p-3 mb-3">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <Target className="h-3.5 w-3.5 text-primary" />
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+                          OKR Progress
+                        </span>
+                      </div>
+                      <span className={`text-sm font-bold tabular-nums ${okrTone}`}>
+                        {okrPct}%
+                      </span>
+                    </div>
+                    <div className="relative h-1.5 mb-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className={`absolute inset-y-0 left-0 ${okrAccent}`}
+                        style={{ width: `${okrPct}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                      <span>
+                        {okr.items.length} contributing OKR
+                        {okr.items.length === 1 ? "" : "s"}
+                      </span>
+                      <span className="tabular-nums">
+                        {Math.round(okr.totalDelivered)} / {okr.totalWeight} wt pts
+                      </span>
+                    </div>
+                  </div>
+
                   {/* KPI list */}
                   <div className="space-y-1.5 mt-auto">
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                      KPIs ({year})
+                      KPI Achievements ({year})
                     </div>
                     {init.kpis.map((kpi) => {
                       const point = kpi.trend.find((p) => p.year === year);
