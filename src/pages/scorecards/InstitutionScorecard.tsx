@@ -4,6 +4,7 @@ import { ChevronRight, Building2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { institutionScorecard } from "@/data/scorecardData";
 import { CompactKpiBar } from "@/components/scorecard/CompactKpiBar";
+import { ProgressionRow } from "@/components/scorecard/ProgressionRow";
 import { CompactInitiativeList } from "@/components/scorecard/CompactInitiativeList";
 import { HighlightsRisksCard } from "@/components/scorecard/HighlightsRisksCard";
 import { CompactDepartmentDelivery } from "@/components/scorecard/CompactDepartmentDelivery";
@@ -48,6 +49,11 @@ const InstitutionScorecard = () => {
         {/* KPI strip */}
         <div className="mb-4">
           <CompactKpiBar />
+        </div>
+
+        {/* Progression row */}
+        <div className="mb-4">
+          <ProgressionRow />
         </div>
 
         {/* Cockpit grid */}
