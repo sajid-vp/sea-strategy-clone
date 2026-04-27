@@ -65,13 +65,7 @@ export const InitiativeCarousel = () => {
 
   return (
     <Card className="p-5">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Rocket className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-            Initiatives
-          </h2>
-        </div>
+      <div className="flex items-center justify-end mb-3">
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
           {year}
           {prev !== null ? ` · YoY vs ${prev}` : ""}
