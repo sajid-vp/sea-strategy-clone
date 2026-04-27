@@ -39,7 +39,7 @@ export interface ScorecardEntity {
 
 export const institutionScorecard: ScorecardEntity = {
   id: "inst-1",
-  name: "Acme Corporation",
+  name: "Sharjah Education Academy",
   type: "institution",
   healthScore: 78,
   onTrackPercentage: 72,
