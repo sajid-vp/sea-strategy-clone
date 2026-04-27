@@ -1,12 +1,4 @@
 import { useState } from "react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import {
@@ -63,7 +55,7 @@ export const InitiativeCarousel = () => {
     setExpanded((cur) => (cur === id ? null : id));
 
   return (
-    <Card className="p-5">
+    <div>
       <div className="flex items-center justify-end mb-3">
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
           {year}
@@ -71,9 +63,8 @@ export const InitiativeCarousel = () => {
         </span>
       </div>
 
-      <Carousel opts={{ align: "start", loop: false }} className="w-full">
-        <CarouselContent className="-ml-4">
-          {strategicInitiatives.map((init) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
+        {strategicInitiatives.map((init) => {
         const actual = initiativeActualAtYear(init, year);
         const expected = initiativeExpectedAtYear(init, year);
         const prevActual =
@@ -88,18 +79,15 @@ export const InitiativeCarousel = () => {
         const isOpen = expanded === init.id;
 
         return (
-              <CarouselItem
+              <div
                 key={init.id}
-                className="pl-4 basis-full md:basis-1/2"
+                className={cn(
+                  "rounded-lg border bg-card transition-all flex flex-col",
+                  isOpen
+                    ? "sm:col-span-2 lg:col-span-3 ring-1 ring-primary/30 shadow-md"
+                    : "hover:shadow-md hover:border-primary/30",
+                )}
               >
-                <div
-                  className={cn(
-                    "rounded-lg border bg-card transition-all h-full flex flex-col",
-                    isOpen
-                      ? "ring-1 ring-primary/30 shadow-md"
-                      : "hover:shadow-md hover:border-primary/30",
-                  )}
-                >
             {/* Clickable header / summary */}
             <button
               type="button"
@@ -427,14 +415,10 @@ export const InitiativeCarousel = () => {
                 </div>
               </div>
             )}
-                </div>
-              </CarouselItem>
+              </div>
             );
           })}
-        </CarouselContent>
-        <CarouselPrevious className="hidden md:flex -left-3" />
-        <CarouselNext className="hidden md:flex -right-3" />
-      </Carousel>
-    </Card>
+      </div>
+    </div>
   );
 };
