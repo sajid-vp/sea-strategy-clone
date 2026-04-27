@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -57,9 +57,25 @@ export const InitiativeCarousel = () => {
   const prev = availableYears.includes(year - 1) ? year - 1 : null;
   const [expanded, setExpanded] = useState<string | null>(null);
   const [focusKey, setFocusKey] = useState<string | null>(null);
+  const [api, setApi] = useState<import("embla-carousel-react").EmblaCarouselType | null>(
+    null,
+  );
 
   const toggle = (id: string) =>
     setExpanded((cur) => (cur === id ? null : id));
+
+  // When a card is expanded/collapsed, recompute slide widths and scroll the
+  // expanded card into view so it sits flush against the carousel's left edge
+  // (otherwise Embla keeps the previous scroll offset and the full-width card
+  // appears misaligned).
+  useEffect(() => {
+    if (!api) return;
+    api.reInit();
+    if (expanded) {
+      const idx = strategicInitiatives.findIndex((i) => i.id === expanded);
+      if (idx >= 0) api.scrollTo(idx);
+    }
+  }, [api, expanded]);
 
   return (
     <div>
@@ -70,7 +86,11 @@ export const InitiativeCarousel = () => {
         </span>
       </div>
 
-      <Carousel opts={{ align: "start", loop: false }} className="w-full">
+      <Carousel
+        opts={{ align: "start", loop: false }}
+        setApi={(a) => setApi(a ?? null)}
+        className="w-full"
+      >
         <CarouselContent className="-ml-4">
           {strategicInitiatives.map((init) => {
         const actual = initiativeActualAtYear(init, year);
