@@ -4,6 +4,8 @@ import { departmentScorecards } from "@/data/scorecardData";
 import { useYear } from "./YearContext";
 import { YoyChip } from "./YoyChip";
 import { departmentOkrDeliveryAtYear, yoy } from "./yearMetrics";
+import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 
 /**
  * Tight horizontal department delivery view — every department on one row,
@@ -12,23 +14,70 @@ import { departmentOkrDeliveryAtYear, yoy } from "./yearMetrics";
 export const CompactDepartmentDelivery = () => {
   const { year, availableYears } = useYear();
   const prev = availableYears.includes(year - 1) ? year - 1 : null;
+  const [selected, setSelected] = useState<string[]>(() =>
+    departmentScorecards.map((d) => d.id)
+  );
+
+  const toggle = (id: string) =>
+    setSelected((cur) =>
+      cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]
+    );
+  const allOn = selected.length === departmentScorecards.length;
+
+  const visible = useMemo(
+    () => departmentScorecards.filter((d) => selected.includes(d.id)),
+    [selected]
+  );
 
   return (
     <Card className="p-5">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">
             Annual OKR Delivery by Department
           </h2>
         </div>
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          {year}
-          {prev !== null ? ` · YoY vs ${prev}` : ""}
-        </span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 flex-wrap">
+            <Button
+              size="sm"
+              variant={allOn ? "secondary" : "outline"}
+              className="h-6 px-2 text-[11px]"
+              onClick={() =>
+                setSelected(departmentScorecards.map((d) => d.id))
+              }
+            >
+              All
+            </Button>
+            {departmentScorecards.map((d) => {
+              const on = selected.includes(d.id);
+              return (
+                <Button
+                  key={d.id}
+                  size="sm"
+                  variant={on ? "secondary" : "outline"}
+                  className="h-6 px-2 text-[11px]"
+                  onClick={() => toggle(d.id)}
+                >
+                  {d.name}
+                </Button>
+              );
+            })}
+          </div>
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            {year}
+            {prev !== null ? ` · YoY vs ${prev}` : ""}
+          </span>
+        </div>
       </div>
+      {visible.length === 0 ? (
+        <div className="text-xs text-muted-foreground py-6 text-center">
+          No departments selected.
+        </div>
+      ) : (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {departmentScorecards.map((d) => {
+        {visible.map((d) => {
           const cur = departmentOkrDeliveryAtYear(d.id, year);
           const prv = prev !== null ? departmentOkrDeliveryAtYear(d.id, prev) : null;
           const delta = yoy(cur.pct, prv?.pct ?? null);
@@ -61,6 +110,7 @@ export const CompactDepartmentDelivery = () => {
           );
         })}
       </div>
+      )}
     </Card>
   );
 };
