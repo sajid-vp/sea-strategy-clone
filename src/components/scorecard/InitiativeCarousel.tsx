@@ -57,9 +57,10 @@ export const InitiativeCarousel = () => {
   const prev = availableYears.includes(year - 1) ? year - 1 : null;
   const [expanded, setExpanded] = useState<string | null>(null);
   const [focusKey, setFocusKey] = useState<string | null>(null);
-  const [api, setApi] = useState<import("embla-carousel-react").EmblaCarouselType | null>(
-    null,
-  );
+  type EmblaApi = NonNullable<
+    Parameters<NonNullable<React.ComponentProps<typeof Carousel>["setApi"]>>[0]
+  >;
+  const [api, setApi] = useState<EmblaApi | null>(null);
 
   const toggle = (id: string) =>
     setExpanded((cur) => (cur === id ? null : id));
