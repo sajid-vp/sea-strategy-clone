@@ -4,43 +4,57 @@ interface Props {
   n: number;
   title: string;
   subtitle?: string;
+  eyebrow?: string;
   children: ReactNode;
 }
 
 /**
- * Single-page "slide" frame. Each section on the dashboard is wrapped in this
- * component so the page reads like a deck while still being a normal scrollable
- * page (no next/prev navigation).
- *
- * Visual cues:
- *  - Slide number chip in the top-left
- *  - Generous padding / rounded card
- *  - Soft shadow to lift each slide off the muted page background
- *  - Subtle accent strip on the left edge
+ * Presentation-grade slide frame. Each section is wrapped in this so the page
+ * reads like a polished deck — large numeric chapter mark, bold title, ruled
+ * divider and generous internal padding. Single scrollable page, no nav.
  */
-export const DeckSlide = ({ n, title, subtitle, children }: Props) => {
+export const DeckSlide = ({ n, title, subtitle, eyebrow, children }: Props) => {
   return (
-    <section className="relative rounded-2xl border bg-card shadow-sm overflow-hidden">
-      <div className="absolute inset-y-0 left-0 w-1 bg-primary/60" />
-      <div className="px-8 pt-6 pb-3 flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center justify-center h-5 min-w-[1.25rem] px-1.5 rounded-md bg-primary/10 text-primary text-[10px] font-semibold tabular-nums">
-              {String(n).padStart(2, "0")}
-            </span>
-            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              Slide
-            </span>
-          </div>
-          <h2 className="text-xl font-bold text-foreground leading-tight">
+    <section className="relative rounded-3xl border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
+      {/* Top gradient accent rail */}
+      <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/60 to-transparent" />
+
+      <div className="px-8 md:px-10 pt-7 md:pt-9 pb-4 flex items-start gap-5 md:gap-6">
+        {/* Big slide number */}
+        <div className="hidden sm:flex flex-col items-end shrink-0 pt-1">
+          <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            Slide
+          </span>
+          <span className="text-4xl md:text-5xl font-black leading-none tabular-nums bg-gradient-to-br from-primary to-primary/50 bg-clip-text text-transparent">
+            {String(n).padStart(2, "0")}
+          </span>
+        </div>
+
+        {/* Vertical divider */}
+        <div className="hidden sm:block w-px self-stretch bg-border" />
+
+        {/* Title block */}
+        <div className="min-w-0 flex-1">
+          {eyebrow && (
+            <div className="text-[10px] uppercase tracking-[0.22em] text-primary font-semibold mb-1">
+              {eyebrow}
+            </div>
+          )}
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-tight tracking-tight">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
+            <p className="text-sm md:text-base text-muted-foreground mt-1.5 max-w-3xl">
+              {subtitle}
+            </p>
           )}
         </div>
       </div>
-      <div className="px-8 pb-8 pt-2">{children}</div>
+
+      {/* Body */}
+      <div className="px-8 md:px-10 pb-8 md:pb-10 pt-3">
+        <div className="border-t border-border/60 pt-6">{children}</div>
+      </div>
     </section>
   );
 };
