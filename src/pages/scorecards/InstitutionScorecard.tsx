@@ -6,7 +6,6 @@ import {
   Gauge,
   Rocket,
   Users,
-  LineChart,
   Activity,
   GitBranch,
 } from "lucide-react";
@@ -15,7 +14,6 @@ import { CompactKpiBar } from "@/components/scorecard/CompactKpiBar";
 import { InitiativeCarousel } from "@/components/scorecard/InitiativeCarousel";
 import { ProgressionRow } from "@/components/scorecard/ProgressionRow";
 import { CompactDepartmentDelivery } from "@/components/scorecard/CompactDepartmentDelivery";
-import { InitiativePerformancePanel } from "@/components/scorecard/InitiativePerformancePanel";
 import { AnnualOkrExecutionPanel } from "@/components/scorecard/AnnualOkrExecutionPanel";
 import { InitiativeContributionView } from "@/components/scorecard/InitiativeContributionView";
 import { YearProvider } from "@/components/scorecard/YearContext";
@@ -95,15 +93,6 @@ const InstitutionScorecard = () => {
               subtitle="Annual OKR delivery by department"
             />
             <CompactDepartmentDelivery />
-          </section>
-
-          <section>
-            <SectionHeader
-              icon={LineChart}
-              eyebrow="Detail"
-              title="Initiative Performance"
-            />
-            <InitiativePerformancePanel />
           </section>
 
           <section>
