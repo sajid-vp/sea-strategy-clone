@@ -1,109 +1,85 @@
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { ChevronRight } from "lucide-react";
-import { BoardCover } from "@/components/scorecard/BoardCover";
-import { ExecutiveSummary } from "@/components/scorecard/ExecutiveSummary";
-import { BoardKpiStrip } from "@/components/scorecard/BoardKpiStrip";
-import { InitiativePortfolioMatrix } from "@/components/scorecard/InitiativePortfolioMatrix";
+import { ChevronRight, Building2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { institutionScorecard } from "@/data/scorecardData";
+import { CompactKpiBar } from "@/components/scorecard/CompactKpiBar";
+import { CompactInitiativeList } from "@/components/scorecard/CompactInitiativeList";
+import { HighlightsRisksCard } from "@/components/scorecard/HighlightsRisksCard";
+import { CompactDepartmentDelivery } from "@/components/scorecard/CompactDepartmentDelivery";
 import { InitiativePerformancePanel } from "@/components/scorecard/InitiativePerformancePanel";
 import { AnnualOkrExecutionPanel } from "@/components/scorecard/AnnualOkrExecutionPanel";
 import { InitiativeContributionView } from "@/components/scorecard/InitiativeContributionView";
 import { GapAnalysisPanel } from "@/components/scorecard/GapAnalysisPanel";
-import { BoardAsks } from "@/components/scorecard/BoardAsks";
-
-const SectionDivider = ({
-  index,
-  title,
-  subtitle,
-}: {
-  index: string;
-  title: string;
-  subtitle?: string;
-}) => (
-  <div className="flex items-end gap-4 pt-2">
-    <div className="text-5xl font-bold text-primary/20 leading-none tabular-nums">
-      {index}
-    </div>
-    <div className="pb-1">
-      <h2 className="text-xl font-bold text-foreground">{title}</h2>
-      {subtitle && (
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
-      )}
-    </div>
-    <div className="flex-1 h-px bg-border ml-2" />
-  </div>
-);
 
 const InstitutionScorecard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container mx-auto px-6 py-8 max-w-7xl">
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+      <div className="container mx-auto px-6 py-5 max-w-7xl">
+        <nav className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
           <Link to="/scorecards" className="hover:text-foreground">
             Scorecards
           </Link>
-          <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground">Institution · Board Pack</span>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="text-foreground">Institution</span>
         </nav>
 
-        <div className="space-y-10">
-          {/* Cover */}
-          <BoardCover />
-
-          {/* 01 — Executive summary */}
-          <section className="space-y-5">
-            <SectionDivider
-              index="01"
-              title="Executive Summary"
-              subtitle="The single page the board reads first."
-            />
-            <ExecutiveSummary />
-            <BoardKpiStrip />
-          </section>
-
-          {/* 02 — Strategic portfolio */}
-          <section className="space-y-5">
-            <SectionDivider
-              index="02"
-              title="Strategic Portfolio"
-              subtitle="Are our long-term initiatives progressing as planned?"
-            />
-            <InitiativePortfolioMatrix />
-            <InitiativePerformancePanel />
-          </section>
-
-          {/* 03 — Annual delivery */}
-          <section className="space-y-5">
-            <SectionDivider
-              index="03"
-              title="Annual Delivery"
-              subtitle="Are departments delivering this year's commitments?"
-            />
-            <AnnualOkrExecutionPanel />
-          </section>
-
-          {/* 04 — Strategy ↔ Execution bridge */}
-          <section className="space-y-5">
-            <SectionDivider
-              index="04"
-              title="Strategy ↔ Execution"
-              subtitle="How this year's OKRs ladder up to long-term strategy."
-            />
-            <InitiativeContributionView />
-            <GapAnalysisPanel />
-          </section>
-
-          {/* 05 — Board asks */}
-          <section className="space-y-5">
-            <SectionDivider
-              index="05"
-              title="Asks of the Board"
-              subtitle="Decisions and endorsements requested today."
-            />
-            <BoardAsks />
-          </section>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2.5 rounded-lg bg-primary/10">
+            <Building2 className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground leading-tight">
+              {institutionScorecard.name}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Long-term initiatives and this year's commitments at a glance.
+            </p>
+          </div>
         </div>
+
+        {/* KPI strip */}
+        <div className="mb-4">
+          <CompactKpiBar />
+        </div>
+
+        {/* Cockpit grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+          <div className="lg:col-span-2">
+            <CompactInitiativeList />
+          </div>
+          <div>
+            <HighlightsRisksCard />
+          </div>
+        </div>
+
+        {/* Department delivery */}
+        <div className="mb-4">
+          <CompactDepartmentDelivery />
+        </div>
+
+        {/* Drill-downs in tabs */}
+        <Tabs defaultValue="initiatives" className="w-full">
+          <TabsList>
+            <TabsTrigger value="initiatives">Initiative detail</TabsTrigger>
+            <TabsTrigger value="okrs">OKR execution</TabsTrigger>
+            <TabsTrigger value="bridge">Strategy ↔ OKRs</TabsTrigger>
+            <TabsTrigger value="gap">Gap analysis</TabsTrigger>
+          </TabsList>
+          <TabsContent value="initiatives" className="mt-4">
+            <InitiativePerformancePanel />
+          </TabsContent>
+          <TabsContent value="okrs" className="mt-4">
+            <AnnualOkrExecutionPanel />
+          </TabsContent>
+          <TabsContent value="bridge" className="mt-4">
+            <InitiativeContributionView />
+          </TabsContent>
+          <TabsContent value="gap" className="mt-4">
+            <GapAnalysisPanel />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
