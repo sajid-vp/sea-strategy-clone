@@ -3,9 +3,12 @@ import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { ChevronRight, Users, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { departmentScorecards } from "@/data/scorecardData";
+import { departmentScorecards, objectivesByDepartment } from "@/data/scorecardData";
 import { ScorecardCard } from "@/components/scorecard/ScorecardCard";
 import { ScorecardDetail } from "@/components/scorecard/ScorecardDetail";
+import { OkrBoard } from "@/components/scorecard/OkrBoard";
+import { OkrInitiativeMapping } from "@/components/scorecard/OkrInitiativeMapping";
+import { DepartmentInitiativeContribution } from "@/components/scorecard/DepartmentInitiativeContribution";
 
 const DepartmentScorecards = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -35,7 +38,9 @@ const DepartmentScorecards = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-foreground">Department Scorecards</h1>
-                <p className="text-muted-foreground">Select a department to view its balanced scorecard.</p>
+                <p className="text-muted-foreground">
+                  Are we delivering our committed OKRs, and how do they support strategic initiatives?
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -57,10 +62,15 @@ const DepartmentScorecards = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-foreground">{selected.name}</h1>
-                <p className="text-muted-foreground">Department scorecard</p>
+                <p className="text-muted-foreground">OKR-anchored department scorecard</p>
               </div>
             </div>
-            <ScorecardDetail entity={selected} />
+            <div className="space-y-6">
+              <ScorecardDetail entity={selected} />
+              <OkrBoard objectives={objectivesByDepartment(selected.id)} />
+              <OkrInitiativeMapping objectives={objectivesByDepartment(selected.id)} />
+              <DepartmentInitiativeContribution deptId={selected.id} />
+            </div>
           </>
         )}
       </div>

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { individualScorecards } from "@/data/scorecardData";
 import { ScorecardCard } from "@/components/scorecard/ScorecardCard";
 import { ScorecardDetail } from "@/components/scorecard/ScorecardDetail";
+import { MyOkrContribution } from "@/components/scorecard/MyOkrContribution";
 
 const IndividualScorecards = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -42,7 +43,9 @@ const IndividualScorecards = () => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">Individual Scorecards</h1>
-                  <p className="text-muted-foreground">Personal performance scorecards.</p>
+                  <p className="text-muted-foreground">
+                    What am I delivering this year, and how does it connect to department OKRs?
+                  </p>
                 </div>
               </div>
               <div className="relative w-full sm:w-72">
@@ -84,7 +87,10 @@ const IndividualScorecards = () => {
                 </p>
               </div>
             </div>
+          <div className="space-y-6">
             <ScorecardDetail entity={selected} />
+            <MyOkrContribution individualId={selected.id} />
+          </div>
           </>
         )}
       </div>
