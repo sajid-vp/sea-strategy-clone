@@ -11,9 +11,12 @@ import { InitiativePerformancePanel } from "@/components/scorecard/InitiativePer
 import { AnnualOkrExecutionPanel } from "@/components/scorecard/AnnualOkrExecutionPanel";
 import { InitiativeContributionView } from "@/components/scorecard/InitiativeContributionView";
 import { GapAnalysisPanel } from "@/components/scorecard/GapAnalysisPanel";
+import { YearProvider } from "@/components/scorecard/YearContext";
+import { YearSelector } from "@/components/scorecard/YearSelector";
 
 const InstitutionScorecard = () => {
   return (
+    <YearProvider>
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-6 py-5 max-w-7xl">
@@ -25,18 +28,21 @@ const InstitutionScorecard = () => {
           <span className="text-foreground">Institution</span>
         </nav>
 
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2.5 rounded-lg bg-primary/10">
-            <Building2 className="h-5 w-5 text-primary" />
+        <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-primary/10">
+              <Building2 className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground leading-tight">
+                {institutionScorecard.name}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Long-term initiatives and this year's commitments at a glance.
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground leading-tight">
-              {institutionScorecard.name}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Long-term initiatives and this year's commitments at a glance.
-            </p>
-          </div>
+          <YearSelector />
         </div>
 
         {/* KPI strip */}
@@ -82,6 +88,7 @@ const InstitutionScorecard = () => {
         </Tabs>
       </div>
     </div>
+    </YearProvider>
   );
 };
 
