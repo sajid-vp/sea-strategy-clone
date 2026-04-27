@@ -9,17 +9,14 @@ import {
   LineChart,
   Activity,
   GitBranch,
-  AlertTriangle,
 } from "lucide-react";
 import { institutionScorecard } from "@/data/scorecardData";
 import { CompactKpiBar } from "@/components/scorecard/CompactKpiBar";
 import { InitiativeCarousel } from "@/components/scorecard/InitiativeCarousel";
-import { HighlightsRisksCard } from "@/components/scorecard/HighlightsRisksCard";
 import { CompactDepartmentDelivery } from "@/components/scorecard/CompactDepartmentDelivery";
 import { InitiativePerformancePanel } from "@/components/scorecard/InitiativePerformancePanel";
 import { AnnualOkrExecutionPanel } from "@/components/scorecard/AnnualOkrExecutionPanel";
 import { InitiativeContributionView } from "@/components/scorecard/InitiativeContributionView";
-import { GapAnalysisPanel } from "@/components/scorecard/GapAnalysisPanel";
 import { YearProvider } from "@/components/scorecard/YearContext";
 import { YearSelector } from "@/components/scorecard/YearSelector";
 import { SectionHeader } from "@/components/scorecard/SectionHeader";
@@ -90,17 +87,10 @@ const InstitutionScorecard = () => {
             <SectionHeader
               icon={Users}
               eyebrow="Delivery"
-              title="Department Delivery & Highlights"
-              subtitle="Annual OKR delivery alongside this period's wins and risks"
+              title="Department Delivery"
+              subtitle="Annual OKR delivery by department"
             />
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2">
-                <CompactDepartmentDelivery />
-              </div>
-              <div>
-                <HighlightsRisksCard />
-              </div>
-            </div>
+            <CompactDepartmentDelivery />
           </section>
 
           <section>
@@ -129,15 +119,6 @@ const InstitutionScorecard = () => {
               subtitle="How this year's OKRs contribute to multi-year initiatives"
             />
             <InitiativeContributionView />
-          </section>
-
-          <section>
-            <SectionHeader
-              icon={AlertTriangle}
-              eyebrow="Risk"
-              title="Gap Analysis"
-            />
-            <GapAnalysisPanel />
           </section>
         </div>
       </div>
