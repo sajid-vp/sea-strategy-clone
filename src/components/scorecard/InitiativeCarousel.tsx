@@ -1,7 +1,16 @@
 import { useState } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import {
+  Rocket,
   Target,
   ChevronDown,
   TrendingUp,
@@ -55,8 +64,23 @@ export const InitiativeCarousel = () => {
     setExpanded((cur) => (cur === id ? null : id));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {strategicInitiatives.map((init) => {
+    <Card className="p-5">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Rocket className="h-4 w-4 text-primary" />
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+            Initiatives
+          </h2>
+        </div>
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          {year}
+          {prev !== null ? ` · YoY vs ${prev}` : ""}
+        </span>
+      </div>
+
+      <Carousel opts={{ align: "start", loop: false }} className="w-full">
+        <CarouselContent className="-ml-4">
+          {strategicInitiatives.map((init) => {
         const actual = initiativeActualAtYear(init, year);
         const expected = initiativeExpectedAtYear(init, year);
         const prevActual =
@@ -71,15 +95,18 @@ export const InitiativeCarousel = () => {
         const isOpen = expanded === init.id;
 
         return (
-          <div
-            key={init.id}
-            className={cn(
-              "rounded-lg border bg-card transition-all",
-              isOpen
-                ? "md:col-span-2 ring-1 ring-primary/30 shadow-md"
-                : "hover:shadow-md hover:border-primary/30",
-            )}
-          >
+              <CarouselItem
+                key={init.id}
+                className="pl-4 basis-full md:basis-1/2"
+              >
+                <div
+                  className={cn(
+                    "rounded-lg border bg-card transition-all h-full flex flex-col",
+                    isOpen
+                      ? "ring-1 ring-primary/30 shadow-md"
+                      : "hover:shadow-md hover:border-primary/30",
+                  )}
+                >
             {/* Clickable header / summary */}
             <button
               type="button"
@@ -407,9 +434,14 @@ export const InitiativeCarousel = () => {
                 </div>
               </div>
             )}
-          </div>
-        );
-      })}
-    </div>
+                </div>
+              </CarouselItem>
+            );
+          })}
+        </CarouselContent>
+        <CarouselPrevious className="hidden md:flex -left-3" />
+        <CarouselNext className="hidden md:flex -right-3" />
+      </Carousel>
+    </Card>
   );
 };
