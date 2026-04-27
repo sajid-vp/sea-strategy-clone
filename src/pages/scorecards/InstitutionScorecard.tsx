@@ -57,7 +57,7 @@ const InstitutionScorecard = () => {
               </div>
             </div>
             <div className="shrink-0">
-              <YearSelector />
+              <YearSelector variant="onPrimary" />
             </div>
           </div>
         </section>
