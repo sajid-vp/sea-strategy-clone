@@ -13,6 +13,7 @@ import {
 import { institutionScorecard } from "@/data/scorecardData";
 import { CompactKpiBar } from "@/components/scorecard/CompactKpiBar";
 import { InitiativeCarousel } from "@/components/scorecard/InitiativeCarousel";
+import { ProgressionRow } from "@/components/scorecard/ProgressionRow";
 import { CompactDepartmentDelivery } from "@/components/scorecard/CompactDepartmentDelivery";
 import { InitiativePerformancePanel } from "@/components/scorecard/InitiativePerformancePanel";
 import { AnnualOkrExecutionPanel } from "@/components/scorecard/AnnualOkrExecutionPanel";
@@ -80,6 +81,9 @@ const InstitutionScorecard = () => {
               title="Strategic Initiatives"
               subtitle="Multi-year bets — swipe through year-aware progress and KPIs"
             />
+            <div className="mb-4">
+              <ProgressionRow />
+            </div>
             <InitiativeCarousel />
           </section>
 

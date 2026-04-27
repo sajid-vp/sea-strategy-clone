@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Compass, ListChecks } from "lucide-react";
+import { Compass, CalendarRange } from "lucide-react";
 import { strategicInitiatives } from "@/data/scorecardData";
 import { useYear } from "./YearContext";
 import { YoyChip } from "./YoyChip";
@@ -38,6 +38,22 @@ export const ProgressionRow = () => {
   const overallPct = overallTotal
     ? Math.round((overallOnPlan / overallTotal) * 100)
     : 0;
+  const overallActualAvg = overallTotal
+    ? Math.round(
+        strategicInitiatives.reduce(
+          (s, i) => s + initiativeActualAtYear(i, latestYear),
+          0,
+        ) / overallTotal,
+      )
+    : 0;
+  const overallExpectedAvg = overallTotal
+    ? Math.round(
+        strategicInitiatives.reduce(
+          (s, i) => s + initiativeExpectedAtYear(i, latestYear),
+          0,
+        ) / overallTotal,
+      )
+    : 0;
 
   // ---------- Current year progression ----------
   const cy = initiativesOnPlanAtYear(year);
@@ -46,6 +62,27 @@ export const ProgressionRow = () => {
   const cyPctPrev =
     cyPrev && cyPrev.total
       ? Math.round((cyPrev.onPlan / cyPrev.total) * 100)
+      : null;
+  const cyActualAvg = cy.total
+    ? Math.round(
+        cy.items.reduce((s, i) => s + initiativeActualAtYear(i, year), 0) /
+          cy.total,
+      )
+    : 0;
+  const cyExpectedAvg = cy.total
+    ? Math.round(
+        cy.items.reduce((s, i) => s + initiativeExpectedAtYear(i, year), 0) /
+          cy.total,
+      )
+    : 0;
+  const cyActualPrev =
+    cyPrev && cyPrev.total && prev !== null
+      ? Math.round(
+          cyPrev.items.reduce(
+            (s, i) => s + initiativeActualAtYear(i, prev),
+            0,
+          ) / cyPrev.total,
+        )
       : null;
 
   return (
@@ -60,96 +97,109 @@ export const ProgressionRow = () => {
             </h2>
           </div>
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            Strategy window
+            Strategy window · {Math.min(...allYears)}–{latestYear}
           </span>
         </div>
 
         <div className="flex items-end justify-between gap-4 mb-3">
           <div>
-            <div className={`text-4xl font-bold tabular-nums ${tone(overallPct)}`}>
+            <div
+              className={`text-4xl font-bold tabular-nums ${tone(overallActualAvg)}`}
+            >
+              {overallActualAvg}%
+              <span className="text-base text-muted-foreground font-normal">
+                {" "}/ {overallExpectedAvg}%
+              </span>
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              avg initiative progress (actual vs expected)
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+              On plan
+            </div>
+            <div className={`text-lg font-semibold tabular-nums ${tone(overallPct)}`}>
               {overallOnPlan}
               <span className="text-muted-foreground font-normal">
                 /{overallTotal}
               </span>
             </div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              initiatives on plan ({overallPct}%)
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
-              Current Year ({year})
-            </div>
-            <div className="flex items-center gap-2 justify-end">
-              <span className={`text-lg font-semibold tabular-nums ${tone(cyPct)}`}>
-                {cy.onPlan}/{cy.total}
-              </span>
-              <YoyChip delta={yoy(cyPct, cyPctPrev)} />
-            </div>
             <div className="text-[11px] text-muted-foreground">
-              {cyPct}% on plan
+              {overallPct}% of initiatives
             </div>
           </div>
         </div>
 
         <div className="relative h-2 rounded-full bg-muted overflow-hidden">
           <div
-            className={`absolute inset-y-0 left-0 ${accent(overallPct)}`}
-            style={{ width: `${overallPct}%` }}
+            className={`absolute inset-y-0 left-0 ${accent(overallActualAvg)}`}
+            style={{ width: `${overallActualAvg}%` }}
+          />
+          <div
+            className="absolute top-0 bottom-0 w-px bg-foreground/60"
+            style={{ left: `${overallExpectedAvg}%` }}
           />
         </div>
       </Card>
 
-      {/* Initiative progression */}
+      {/* Current year progression */}
       <Card className="p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <ListChecks className="h-4 w-4 text-primary" />
+            <CalendarRange className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-              Initiative Progression
+              Current Year Progression
             </h2>
           </div>
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            {year} · KPIs on track
+            {year}
+            {prev !== null ? ` · YoY vs ${prev}` : ""}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-          {strategicInitiatives.map((init) => {
-            const total = init.kpis.length;
-            const onTrack = init.kpis.filter((k) => {
-              const point = k.trend.find((p) => p.year === year);
-              if (!point) return false;
-              const span = k.target - k.baseline;
-              if (span === 0) return true;
-              const pct = ((point.value - k.baseline) / span) * 100;
-              const expectedPct =
-                ((year - init.startYear) /
-                  Math.max(1, init.endYear - init.startYear)) *
-                100;
-              return pct >= expectedPct;
-            }).length;
-            const pct = total ? Math.round((onTrack / total) * 100) : 0;
+        <div className="flex items-end justify-between gap-4 mb-3">
+          <div>
+            <div
+              className={`text-4xl font-bold tabular-nums ${tone(cyActualAvg)}`}
+            >
+              {cyActualAvg}%
+              <span className="text-base text-muted-foreground font-normal">
+                {" "}/ {cyExpectedAvg}%
+              </span>
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              avg initiative progress this year
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+              On plan
+            </div>
+            <div className="flex items-center gap-2 justify-end">
+              <span className={`text-lg font-semibold tabular-nums ${tone(cyPct)}`}>
+                {cy.onPlan}
+                <span className="text-muted-foreground font-normal">
+                  /{cy.total}
+                </span>
+              </span>
+              <YoyChip delta={yoy(cyActualAvg, cyActualPrev)} />
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              {cyPct}% of initiatives
+            </div>
+          </div>
+        </div>
 
-            return (
-              <div
-                key={init.id}
-                className="flex items-center justify-between gap-2 py-1"
-              >
-                <div className="text-xs text-foreground truncate flex-1 min-w-0">
-                  {init.name}
-                </div>
-                <div
-                  className={`text-sm font-semibold tabular-nums shrink-0 ${tone(pct)}`}
-                >
-                  {onTrack}
-                  <span className="text-muted-foreground font-normal">
-                    /{total}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+        <div className="relative h-2 rounded-full bg-muted overflow-hidden">
+          <div
+            className={`absolute inset-y-0 left-0 ${accent(cyActualAvg)}`}
+            style={{ width: `${cyActualAvg}%` }}
+          />
+          <div
+            className="absolute top-0 bottom-0 w-px bg-foreground/60"
+            style={{ left: `${cyExpectedAvg}%` }}
+          />
         </div>
       </Card>
     </div>
