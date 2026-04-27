@@ -1,12 +1,9 @@
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { ChevronRight, Building2 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { institutionScorecard } from "@/data/scorecardData";
 import { CompactKpiBar } from "@/components/scorecard/CompactKpiBar";
-import { ProgressionRow } from "@/components/scorecard/ProgressionRow";
 import { InitiativeCarousel } from "@/components/scorecard/InitiativeCarousel";
-import { CompactInitiativeList } from "@/components/scorecard/CompactInitiativeList";
 import { HighlightsRisksCard } from "@/components/scorecard/HighlightsRisksCard";
 import { CompactDepartmentDelivery } from "@/components/scorecard/CompactDepartmentDelivery";
 import { InitiativePerformancePanel } from "@/components/scorecard/InitiativePerformancePanel";
@@ -15,8 +12,60 @@ import { InitiativeContributionView } from "@/components/scorecard/InitiativeCon
 import { GapAnalysisPanel } from "@/components/scorecard/GapAnalysisPanel";
 import { YearProvider } from "@/components/scorecard/YearContext";
 import { YearSelector } from "@/components/scorecard/YearSelector";
+import { DeckShell, type DeckSlide } from "@/components/scorecard/DeckShell";
 
 const InstitutionScorecard = () => {
+  const slides: DeckSlide[] = [
+    {
+      id: "overview",
+      title: "Performance Overview",
+      subtitle: "Health, initiatives on plan, OKR delivery and commitments",
+      content: <CompactKpiBar />,
+    },
+    {
+      id: "initiatives",
+      title: "Strategic Initiatives",
+      subtitle: "Swipe through each multi-year bet, with year-aware progress and KPIs",
+      content: <InitiativeCarousel />,
+    },
+    {
+      id: "departments",
+      title: "Department Delivery & Highlights",
+      subtitle: "Annual OKR delivery alongside this period's wins and risks",
+      content: (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2">
+            <CompactDepartmentDelivery />
+          </div>
+          <div>
+            <HighlightsRisksCard />
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "initiative-detail",
+      title: "Initiative Performance — Detail",
+      content: <InitiativePerformancePanel />,
+    },
+    {
+      id: "okr-execution",
+      title: "Annual OKR Execution",
+      content: <AnnualOkrExecutionPanel />,
+    },
+    {
+      id: "bridge",
+      title: "Strategy ↔ OKRs",
+      subtitle: "How this year's OKRs contribute to multi-year initiatives",
+      content: <InitiativeContributionView />,
+    },
+    {
+      id: "gap",
+      title: "Gap Analysis",
+      content: <GapAnalysisPanel />,
+    },
+  ];
+
   return (
     <YearProvider>
     <div className="min-h-screen bg-background">
@@ -47,57 +96,8 @@ const InstitutionScorecard = () => {
           <YearSelector />
         </div>
 
-        {/* KPI strip */}
-        <div className="mb-4">
-          <CompactKpiBar />
-        </div>
-
-        {/* Progression row */}
-        <div className="mb-4">
-          <ProgressionRow />
-        </div>
-
-        {/* Swipeable initiative carousel */}
-        <div className="mb-4">
-          <InitiativeCarousel />
-        </div>
-
-        {/* Cockpit grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-          <div className="lg:col-span-2">
-            <CompactInitiativeList />
-          </div>
-          <div>
-            <HighlightsRisksCard />
-          </div>
-        </div>
-
-        {/* Department delivery */}
-        <div className="mb-4">
-          <CompactDepartmentDelivery />
-        </div>
-
-        {/* Drill-downs in tabs */}
-        <Tabs defaultValue="initiatives" className="w-full">
-          <TabsList>
-            <TabsTrigger value="initiatives">Initiative detail</TabsTrigger>
-            <TabsTrigger value="okrs">OKR execution</TabsTrigger>
-            <TabsTrigger value="bridge">Strategy ↔ OKRs</TabsTrigger>
-            <TabsTrigger value="gap">Gap analysis</TabsTrigger>
-          </TabsList>
-          <TabsContent value="initiatives" className="mt-4">
-            <InitiativePerformancePanel />
-          </TabsContent>
-          <TabsContent value="okrs" className="mt-4">
-            <AnnualOkrExecutionPanel />
-          </TabsContent>
-          <TabsContent value="bridge" className="mt-4">
-            <InitiativeContributionView />
-          </TabsContent>
-          <TabsContent value="gap" className="mt-4">
-            <GapAnalysisPanel />
-          </TabsContent>
-        </Tabs>
+        {/* Deck */}
+        <DeckShell slides={slides} />
       </div>
     </div>
     </YearProvider>
