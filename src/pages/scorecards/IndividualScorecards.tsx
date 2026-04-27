@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { individualScorecards } from "@/data/scorecardData";
 import { ScorecardCard } from "@/components/scorecard/ScorecardCard";
 import { ScorecardDetail } from "@/components/scorecard/ScorecardDetail";
+import { MyOkrContribution } from "@/components/scorecard/MyOkrContribution";
 
 const IndividualScorecards = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -84,7 +85,10 @@ const IndividualScorecards = () => {
                 </p>
               </div>
             </div>
+          <div className="space-y-6">
             <ScorecardDetail entity={selected} />
+            <MyOkrContribution individualId={selected.id} />
+          </div>
           </>
         )}
       </div>
