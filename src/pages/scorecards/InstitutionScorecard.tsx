@@ -62,8 +62,8 @@ const InstitutionScorecard = () => {
         </section>
 
         {/* Dashboard sections */}
-        <div className="space-y-6">
-          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-5 md:p-6">
+        <div className="space-y-4">
+          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-4 md:p-5">
             <SectionHeader
               icon={Gauge}
               eyebrow="Overview"
@@ -73,11 +73,11 @@ const InstitutionScorecard = () => {
             <CompactKpiBar />
           </section>
 
-          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-5 md:p-6">
+          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-4 md:p-5">
             <ProgressionRow />
           </section>
 
-          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-5 md:p-6">
+          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-4 md:p-5">
             <SectionHeader
               icon={Rocket}
               eyebrow="Strategy"
@@ -87,7 +87,7 @@ const InstitutionScorecard = () => {
             <InitiativeCarousel />
           </section>
 
-          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-5 md:p-6">
+          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-4 md:p-5">
             <SectionHeader
               icon={Users}
               eyebrow="Delivery"
@@ -97,7 +97,7 @@ const InstitutionScorecard = () => {
             <CompactDepartmentDelivery />
           </section>
 
-          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-5 md:p-6">
+          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-4 md:p-5">
             <SectionHeader
               icon={Activity}
               eyebrow="Execution"
@@ -106,7 +106,7 @@ const InstitutionScorecard = () => {
             <AnnualOkrExecutionPanel />
           </section>
 
-          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-5 md:p-6">
+          <section className="rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm p-4 md:p-5">
             <SectionHeader
               icon={GitBranch}
               eyebrow="Linkage"
