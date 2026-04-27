@@ -1,5 +1,3 @@
-import { Card } from "@/components/ui/card";
-import { Activity } from "lucide-react";
 import { departmentScorecards } from "@/data/scorecardData";
 import { useYear } from "./YearContext";
 import { YoyChip } from "./YoyChip";
@@ -30,14 +28,8 @@ export const CompactDepartmentDelivery = () => {
   );
 
   return (
-    <Card className="p-5">
+    <div>
       <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
-        <div className="flex items-center gap-2">
-          <Activity className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-            Annual OKR Delivery by Department
-          </h2>
-        </div>
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1 flex-wrap">
             <Button
@@ -94,7 +86,7 @@ export const CompactDepartmentDelivery = () => {
               ? "bg-warning"
               : "bg-destructive";
           return (
-            <div key={d.id} className="rounded-md border p-3">
+            <div key={d.id} className="rounded-lg border border-border/60 p-3 bg-gradient-to-br from-card to-muted/20 hover:shadow-md hover:border-primary/30 transition-all">
               <div className="text-xs text-muted-foreground truncate">{d.name}</div>
               <div className="flex items-baseline justify-between mt-1 gap-2">
                 <span className={`text-2xl font-bold ${tone}`}>{cur.pct}%</span>
@@ -111,6 +103,6 @@ export const CompactDepartmentDelivery = () => {
         })}
       </div>
       )}
-    </Card>
+    </div>
   );
 };

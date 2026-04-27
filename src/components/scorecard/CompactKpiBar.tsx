@@ -74,12 +74,12 @@ export const CompactKpiBar = () => {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border rounded-lg border bg-card">
+    <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border/60 rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/10 overflow-hidden">
       {items.map((it) => {
         const Icon = it.icon;
         return (
-          <div key={it.label} className="px-4 py-3 flex items-center gap-3">
-            <div className="p-2 rounded-md bg-primary/10 text-primary shrink-0">
+          <div key={it.label} className="px-4 py-4 flex items-center gap-3 hover:bg-muted/30 transition-colors">
+            <div className="p-2.5 rounded-lg bg-primary/10 text-primary shrink-0 ring-1 ring-primary/10">
               <Icon className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1">

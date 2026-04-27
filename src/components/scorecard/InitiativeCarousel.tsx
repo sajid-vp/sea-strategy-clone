@@ -98,10 +98,10 @@ export const InitiativeCarousel = () => {
               >
                 <div
                   className={cn(
-                    "rounded-lg border bg-card transition-all h-full flex flex-col",
+                    "rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/10 transition-all h-full flex flex-col",
                     isOpen
-                      ? "ring-1 ring-primary/30 shadow-md"
-                      : "hover:shadow-md hover:border-primary/30",
+                      ? "ring-1 ring-primary/40 shadow-lg"
+                      : "hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5",
                   )}
                 >
             {/* Clickable header / summary */}
