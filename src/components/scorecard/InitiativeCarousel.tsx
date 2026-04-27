@@ -1,4 +1,11 @@
 import { useState } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import {
@@ -63,8 +70,9 @@ export const InitiativeCarousel = () => {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
-        {strategicInitiatives.map((init) => {
+      <Carousel opts={{ align: "start", loop: false }} className="w-full">
+        <CarouselContent className="-ml-4">
+          {strategicInitiatives.map((init) => {
         const actual = initiativeActualAtYear(init, year);
         const expected = initiativeExpectedAtYear(init, year);
         const prevActual =
@@ -79,15 +87,23 @@ export const InitiativeCarousel = () => {
         const isOpen = expanded === init.id;
 
         return (
-              <div
+              <CarouselItem
                 key={init.id}
                 className={cn(
-                  "rounded-lg border bg-card transition-all flex flex-col",
+                  "pl-4",
                   isOpen
-                    ? "sm:col-span-2 lg:col-span-3 ring-1 ring-primary/30 shadow-md"
-                    : "hover:shadow-md hover:border-primary/30",
+                    ? "basis-full"
+                    : "basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4",
                 )}
               >
+                <div
+                  className={cn(
+                    "rounded-lg border bg-card transition-all h-full flex flex-col",
+                    isOpen
+                      ? "ring-1 ring-primary/30 shadow-md"
+                      : "hover:shadow-md hover:border-primary/30",
+                  )}
+                >
             {/* Clickable header / summary */}
             <button
               type="button"
@@ -415,10 +431,14 @@ export const InitiativeCarousel = () => {
                 </div>
               </div>
             )}
-              </div>
+                </div>
+              </CarouselItem>
             );
           })}
-      </div>
+        </CarouselContent>
+        <CarouselPrevious className="hidden md:flex -left-3" />
+        <CarouselNext className="hidden md:flex -right-3" />
+      </Carousel>
     </div>
   );
 };
