@@ -88,10 +88,12 @@ export const ProgressionRow = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Overall progression */}
-      <Card className="p-5">
+      <Card className="p-5 border-border/60 shadow-none bg-gradient-to-br from-card to-muted/20 hover:shadow-md transition-shadow">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Compass className="h-4 w-4 text-primary" />
+            <div className="p-1.5 rounded-md bg-primary/10 text-primary">
+              <Compass className="h-3.5 w-3.5" />
+            </div>
             <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">
               Overall Progression
             </h2>
@@ -144,10 +146,12 @@ export const ProgressionRow = () => {
       </Card>
 
       {/* Current year progression */}
-      <Card className="p-5">
+      <Card className="p-5 border-border/60 shadow-none bg-gradient-to-br from-card to-muted/20 hover:shadow-md transition-shadow">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <CalendarRange className="h-4 w-4 text-primary" />
+            <div className="p-1.5 rounded-md bg-primary/10 text-primary">
+              <CalendarRange className="h-3.5 w-3.5" />
+            </div>
             <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">
               Current Year Progression
             </h2>
