@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { institutionScorecard } from "@/data/scorecardData";
 import { CompactKpiBar } from "@/components/scorecard/CompactKpiBar";
 import { ProgressionRow } from "@/components/scorecard/ProgressionRow";
+import { InitiativeCarousel } from "@/components/scorecard/InitiativeCarousel";
 import { CompactInitiativeList } from "@/components/scorecard/CompactInitiativeList";
 import { HighlightsRisksCard } from "@/components/scorecard/HighlightsRisksCard";
 import { CompactDepartmentDelivery } from "@/components/scorecard/CompactDepartmentDelivery";
@@ -54,6 +55,11 @@ const InstitutionScorecard = () => {
         {/* Progression row */}
         <div className="mb-4">
           <ProgressionRow />
+        </div>
+
+        {/* Swipeable initiative carousel */}
+        <div className="mb-4">
+          <InitiativeCarousel />
         </div>
 
         {/* Cockpit grid */}
