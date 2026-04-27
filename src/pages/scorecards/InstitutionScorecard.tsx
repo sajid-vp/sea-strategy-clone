@@ -79,7 +79,7 @@ const InstitutionScorecard = () => {
               icon={Rocket}
               eyebrow="Strategy"
               title="Strategic Initiatives"
-              subtitle="Multi-year bets — swipe through year-aware progress and KPIs"
+              subtitle="Multi-year bets — click any card to expand and explore KPIs and contributing OKRs"
             />
             <div className="mb-4">
               <ProgressionRow />
