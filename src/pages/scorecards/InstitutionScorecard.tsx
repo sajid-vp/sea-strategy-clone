@@ -73,15 +73,16 @@ const InstitutionScorecard = () => {
           </section>
 
           <section>
+            <ProgressionRow />
+          </section>
+
+          <section>
             <SectionHeader
               icon={Rocket}
               eyebrow="Strategy"
               title="Strategic Initiatives"
               subtitle="Multi-year bets — click any card to expand and explore KPIs and contributing OKRs"
             />
-            <div className="mb-4">
-              <ProgressionRow />
-            </div>
             <InitiativeCarousel />
           </section>
 
