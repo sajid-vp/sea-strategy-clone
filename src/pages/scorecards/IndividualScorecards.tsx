@@ -43,7 +43,9 @@ const IndividualScorecards = () => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">Individual Scorecards</h1>
-                  <p className="text-muted-foreground">Personal performance scorecards.</p>
+                  <p className="text-muted-foreground">
+                    What am I delivering this year, and how does it connect to department OKRs?
+                  </p>
                 </div>
               </div>
               <div className="relative w-full sm:w-72">
