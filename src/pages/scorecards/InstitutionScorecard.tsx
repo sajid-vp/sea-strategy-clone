@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import {
   ChevronRight,
-  Building2,
+  GraduationCap,
   Gauge,
   Rocket,
   Users,
@@ -42,17 +42,17 @@ const InstitutionScorecard = () => {
           <div className="relative px-6 md:px-8 py-6 md:py-7 flex items-center justify-between gap-6 flex-wrap">
             <div className="flex items-center gap-5 min-w-0">
               <div className="p-3 rounded-xl bg-primary-foreground/15 backdrop-blur-sm shrink-0">
-                <Building2 className="h-6 w-6 text-primary-foreground" />
+                <GraduationCap className="h-6 w-6 text-primary-foreground" />
               </div>
               <div className="min-w-0">
                 <div className="text-[10px] uppercase tracking-[0.24em] text-primary-foreground/70 mb-1">
-                  Institution Scorecard
+                  Academy Strategy Scorecard
                 </div>
                 <h1 className="text-2xl md:text-3xl font-bold leading-tight tracking-tight">
                   {institutionScorecard.name}
                 </h1>
                 <p className="text-sm text-primary-foreground/80 mt-1 max-w-2xl">
-                  Long-term initiatives and this year's commitments at a glance.
+                  Multi-year academic strategy and this year's commitments — at a glance.
                 </p>
               </div>
             </div>
