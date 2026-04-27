@@ -73,6 +73,10 @@ const InstitutionScorecard = () => {
           </section>
 
           <section>
+            <ProgressionRow />
+          </section>
+
+          <section>
             <SectionHeader
               icon={Rocket}
               eyebrow="Strategy"
