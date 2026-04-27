@@ -53,7 +53,6 @@ export const CompactInitiativeList = () => {
 
           return (
             <div key={init.id} className="flex items-center gap-3">
-              <span className={`h-8 w-1 rounded-full ${accent} shrink-0`} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="text-sm font-medium text-foreground truncate">
