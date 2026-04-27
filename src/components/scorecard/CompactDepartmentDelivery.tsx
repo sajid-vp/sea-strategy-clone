@@ -1,5 +1,3 @@
-import { Card } from "@/components/ui/card";
-import { Activity } from "lucide-react";
 import { departmentScorecards } from "@/data/scorecardData";
 import { useYear } from "./YearContext";
 import { YoyChip } from "./YoyChip";
