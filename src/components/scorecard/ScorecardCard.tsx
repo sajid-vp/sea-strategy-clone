@@ -1,18 +1,13 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import type { ScorecardEntity } from "@/data/scorecardData";
 
 interface Props {
   entity: ScorecardEntity;
   to: string;
 }
-
-const trendIcon = (t: "up" | "down" | "flat") =>
-  t === "up" ? <TrendingUp className="h-3 w-3 text-success" /> :
-  t === "down" ? <TrendingDown className="h-3 w-3 text-destructive" /> :
-  <Minus className="h-3 w-3 text-muted-foreground" />;
 
 export const ScorecardCard = ({ entity, to }: Props) => {
   const healthColor =
@@ -38,15 +33,22 @@ export const ScorecardCard = ({ entity, to }: Props) => {
         </div>
         <Progress value={entity.healthScore} className="h-1.5 mb-3" />
         <div className="grid grid-cols-2 gap-2 text-xs">
-          {entity.perspectives.map((p) => (
-            <div key={p.name} className="flex items-center justify-between">
-              <span className="text-muted-foreground">{p.name}</span>
-              <span className="flex items-center gap-1 font-medium text-foreground">
-                {p.score}
-                {trendIcon(p.trend)}
-              </span>
-            </div>
-          ))}
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">On Track</span>
+            <span className="font-medium text-foreground">{entity.totals.onTrack}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">At Risk</span>
+            <span className="font-medium text-foreground">{entity.totals.atRisk}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Blocked</span>
+            <span className="font-medium text-foreground">{entity.totals.blocked}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Done</span>
+            <span className="font-medium text-foreground">{entity.totals.done}</span>
+          </div>
         </div>
       </Card>
     </Link>
