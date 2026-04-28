@@ -321,27 +321,29 @@ const Index = () => {
               
               return (
                 <Link key={goal.id} to={`/goals/${goal.id}`} className="group">
-                  <Card className="p-6 rounded-2xl border border-t-4 border-t-primary bg-card/60 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer relative overflow-hidden">
+                  <Card className="p-6 rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer relative overflow-hidden">
                     <div className="absolute top-4 right-4 flex items-center gap-0.5">
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 group-hover:translate-x-1 opacity-40" />
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 delay-75 group-hover:translate-x-1 opacity-60" />
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 delay-150 group-hover:translate-x-1" />
                     </div>
 
-                    <div className="flex items-start justify-between mb-4 pr-12">
-                      <div>
-                        <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+                    <div className="flex items-start gap-4 mb-3 pr-12">
+                      <div className="p-2.5 rounded-lg bg-primary/10 text-primary shrink-0">
+                        <Target className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold">
+                          Goal · {goal.startYear}–{goal.endYear}
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground leading-tight tracking-tight group-hover:text-primary transition-colors">
                           {goal.title}
                         </h3>
-                        <span className="px-2.5 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
-                          {goal.startYear} - {goal.endYear}
-                        </span>
+                        <p className="text-sm text-muted-foreground mt-1.5">
+                          {goal.description}
+                        </p>
                       </div>
                     </div>
-
-                    <p className="text-sm text-muted-foreground mb-6">
-                      {goal.description}
-                    </p>
 
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2 text-sm">
