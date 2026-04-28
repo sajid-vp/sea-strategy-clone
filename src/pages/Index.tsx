@@ -136,6 +136,19 @@ const Index = () => {
                 </p>
               </div>
             </div>
+            <div className="shrink-0">
+              <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+                <SelectTrigger className="w-56 bg-primary-foreground/15 border-primary-foreground/25 text-primary-foreground hover:bg-primary-foreground/20 focus:ring-primary-foreground/40 backdrop-blur-sm">
+                  <SelectValue placeholder="Filter by period" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All periods</SelectItem>
+                  <SelectItem value="2025-2028">2025-2028</SelectItem>
+                  <SelectItem value="2025-2026">2025-2026</SelectItem>
+                  <SelectItem value="2027-2028">2027-2028</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </section>
 
@@ -260,18 +273,6 @@ const Index = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">Goals</h2>
             <div className="flex items-center gap-3">
-              <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-                <SelectTrigger className="w-64">
-                  <SelectValue placeholder="Filter by period" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All periods</SelectItem>
-                  <SelectItem value="2025-2028">2025-2028</SelectItem>
-                  <SelectItem value="2025-2026">2025-2026</SelectItem>
-                  <SelectItem value="2027-2028">2027-2028</SelectItem>
-                </SelectContent>
-              </Select>
-              
               <Dialog open={isAddGoalOpen} onOpenChange={setIsAddGoalOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2">
