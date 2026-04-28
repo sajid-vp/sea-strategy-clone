@@ -126,7 +126,7 @@ const Index = () => {
               </div>
               <div className="min-w-0">
                 <div className="text-[10px] uppercase tracking-[0.28em] text-primary-foreground/75 mb-1.5 font-medium">
-                  Strategy Home
+                  Sharjah Education Academy
                 </div>
                 <h1 className="text-2xl md:text-[28px] font-bold leading-tight tracking-tight">
                   Vision, Mission & Goals
@@ -146,14 +146,19 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow">
+            <Card className="p-6 rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start gap-4">
-                <div className="rounded-full bg-primary/10 p-3">
-                  <Target className="h-6 w-6 text-primary" />
+                <div className="p-2.5 rounded-lg bg-primary/10 text-primary shrink-0">
+                  <Target className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-foreground">Vision</h3>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold">
+                        Aspiration
+                      </div>
+                      <h3 className="text-lg font-semibold text-foreground leading-tight tracking-tight">Vision</h3>
+                    </div>
                     <Dialog open={isEditingVision} onOpenChange={setIsEditingVision}>
                       <DialogTrigger asChild>
                         <Button 
@@ -189,19 +194,24 @@ const Index = () => {
                       </DialogContent>
                     </Dialog>
                   </div>
-                  <p className="text-muted-foreground">{vision}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{vision}</p>
                 </div>
               </div>
             </Card>
 
-            <Card className="p-6 bg-gradient-to-br from-secondary to-card hover:shadow-lg transition-shadow">
+            <Card className="p-6 rounded-2xl border bg-card/60 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start gap-4">
-                <div className="rounded-full bg-primary/10 p-3">
-                  <Flag className="h-6 w-6 text-primary" />
+                <div className="p-2.5 rounded-lg bg-primary/10 text-primary shrink-0">
+                  <Flag className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-foreground">Mission</h3>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold">
+                        Purpose
+                      </div>
+                      <h3 className="text-lg font-semibold text-foreground leading-tight tracking-tight">Mission</h3>
+                    </div>
                     <Dialog open={isEditingMission} onOpenChange={setIsEditingMission}>
                       <DialogTrigger asChild>
                         <Button 
@@ -237,7 +247,7 @@ const Index = () => {
                       </DialogContent>
                     </Dialog>
                   </div>
-                  <p className="text-muted-foreground">{mission}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{mission}</p>
                 </div>
               </div>
             </Card>
@@ -310,7 +320,7 @@ const Index = () => {
               
               return (
                 <Link key={goal.id} to={`/goals/${goal.id}`} className="group">
-                  <Card className="p-6 border border-t-4 border-t-primary bg-gradient-to-br from-secondary/30 to-transparent hover:shadow-lg transition-all cursor-pointer relative overflow-hidden">
+                  <Card className="p-6 rounded-2xl border border-t-4 border-t-primary bg-card/60 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer relative overflow-hidden">
                     <div className="absolute top-4 right-4 flex items-center gap-0.5">
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 group-hover:translate-x-1 opacity-40" />
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-300 delay-75 group-hover:translate-x-1 opacity-60" />
