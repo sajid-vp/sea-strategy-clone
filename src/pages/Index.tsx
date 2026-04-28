@@ -126,7 +126,7 @@ const Index = () => {
               </div>
               <div className="min-w-0">
                 <div className="text-[10px] uppercase tracking-[0.28em] text-primary-foreground/75 mb-1.5 font-medium">
-                  Strategy Home
+                  Sharjah Education Academy
                 </div>
                 <h1 className="text-2xl md:text-[28px] font-bold leading-tight tracking-tight">
                   Vision, Mission & Goals
